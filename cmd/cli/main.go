@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"atomci/cmd/cli/command"
+	"github.com/go-atomci/atomci/cmd/cli/command"
 )
 
 func main() {
