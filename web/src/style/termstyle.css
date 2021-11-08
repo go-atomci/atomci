@@ -1,0 +1,44 @@
+body {
+    font-family: helvetica, sans-serif, arial;
+    font-size: 1em;
+    color: #111;
+}
+
+h1 {
+    text-align: center;
+}
+.fullScreen .page-header,
+.fullScreen .page-main .main-left,
+.fullScreen .page-footer{
+    display: none
+}
+#serviceTaskTerminal{
+    text-align: center;
+    margin: 0;
+    padding:0;
+}
+.fullScreen #serviceTaskTerminal{
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+#serviceTaskTerminal .el-row{
+    margin-top: 4px;
+}
+#serviceTaskTerminal .el-col-16 .is-plain{
+    vertical-align: -1px;
+}
+#terminal-container {
+    width: 100%;
+    position: fixed;
+    top: 45px;
+    bottom: 0;
+    background-color: #000;
+}
+
+#terminal-container .terminal {
+    background-color: #111;
+    color: #fafafa;
+}

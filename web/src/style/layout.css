@@ -1,0 +1,105 @@
+@import url('//at.alicdn.com/t/font_885293_qeiwichy3zd.css');
+
+/* 统一的布局样式 */
+.portlet-body {
+  background-color: #fff;
+  padding: 10px 16px;
+  /* margin: 16px 0; */
+  overflow: hidden;
+}
+
+/* 增加可点击区域 */
+.portlet-body .el-table__body .el-button.el-button--text.el-button--small,
+.portlet-body .el-table__body i {
+  position: relative;
+}
+
+.portlet-body .el-table__body i:hover {
+  text-shadow: 0 0 0.1em, 0 0 0.3em;
+}
+
+.portlet-body .el-table__body .el-button.el-button--text.el-button--small::before,
+.portlet-body .el-table__body i::after {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  content: '';
+}
+
+.portlet-body .el-table__body .el-button + .el-button {
+  margin-left: 15px;
+}
+
+.table-toolbar {
+  margin-bottom: 5px;
+}
+
+.table-toolbar + .el-table {
+  border-radius: 4px;
+}
+
+.el-table__empty-block {
+  min-height: 200px;
+}
+
+.el-button.el-button--primary.is-plain .icon-plus,
+.el-button.is-plain .icon-refresh {
+  vertical-align: -1px;
+}
+
+.el-table__header-wrapper {
+  border-radius: 4px;
+}
+
+.el-table__header-wrapper .el-table__header th,
+.el-table__header-wrapper .el-table__header th .cell {
+  background-color: #fff;
+}
+
+.el-loading-mask {
+  top: 0 !important;
+  left: 0 !important;
+  width: 88px !important;
+  background-color: transparent !important;
+}
+
+.el-loading-spinner {
+  margin-top: 0 !important;
+  top: calc(50vh - 21px) !important;
+  left: calc(50vw - 21px) !important;
+  width: initial;
+}
+.el-row{
+  text-align: left;
+}
+/* 更加突显的外发光效果 */
+
+/* .el-button--default:focus, .el-button--default:hover,
+.el-button--primary.is-plain:focus,.el-button--primary.is-plain:hover,
+.el-input__inner:focus,
+.el-radio__inner:hover,
+.el-checkbox__inner:hover{
+  box-shadow: 0 0 0.1em #20a0ff, 0 0 0.3em #20a0ff;
+}
+.el-button--success.is-plain:focus,.el-button--success.is-plain:hover{
+  box-shadow: 0 0 0.1em #13ce66, 0 0 0.3em #13ce66;
+}
+.el-dialog__headerbtn .el-dialog__close:hover,
+.el-input-number__decrease:hover i, .el-input-number__increase:hover i{
+  text-shadow: 0 0 0.1em #20a0ff, 0 0 0.2em #20a0ff;
+}
+.el-form-item.is-error .el-input__inner, .el-form-item.is-error .el-textarea__inner{
+  box-shadow: 0 0 0.1em #ff4949, 0 0 0.3em #ff4949;
+} */
+
+body:before {
+  content: '';
+  position: fixed;
+  top: 50px;
+  width: 10px;
+  height: 100%;
+  right: -10px;
+  box-shadow: 0 1px 10px 0 rgba(50, 50, 50, 0.5);
+}

@@ -1,0 +1,8 @@
+{
+  "verbose": true,
+  "delay": "1500",
+  "watch": [
+    "app/"
+  ],
+  "ext": "js"
+}

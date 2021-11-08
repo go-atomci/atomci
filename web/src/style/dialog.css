@@ -1,0 +1,62 @@
+/* 弹出对话框公用样式 */
+
+.el-dialog {
+  border-radius: 4px !important;
+}
+.createDialog .el-dialog__body,
+.commonDialog .el-dialog__body {
+  padding-bottom: 0;
+}
+
+.createDialog .el-dialog__footer,
+.commonDialog .el-dialog__footer {
+  margin-top: 0px;
+}
+
+.createDialog .el-dialog__body .el-form-item {
+  display: flex;
+  padding-right: 40px;
+  position: relative;
+}
+
+.createDialog .dialog-footer {
+  padding-right: 40px;
+}
+
+.createDialog .el-dialog__body .el-form-item .el-form-item__label {
+   flex-basis: 140px
+}
+
+.createDialog .el-dialog__body .el-form-item .el-form-item__content {
+  flex: 1;
+}
+
+.createDialog .el-dialog__body .el-form-item .el-form-item__content .el-input-number {
+  width: 100%;
+}
+
+.createDialog .el-dialog__body .el-form-item__content .el-select,
+.createDialog .el-dialog__body .el-form-item__content .el-cascader {
+  width: 100%;
+}
+
+.createDialog .el-dialog__body .el-form-item__content .el-tag--primary {
+  margin-right: 10px;
+}
+
+/* 增加键值对 */
+
+.createDialog .lbsList .el-form-item__content .el-input {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.createDialog .lbsList ~ .el-col-4 {
+  display: flex;
+  margin-left: -40px;
+}
+
+.createDialog .lbsList ~ .el-col-4 .el-button--default {
+  flex: 1;
+  margin-left: 20px;
+}

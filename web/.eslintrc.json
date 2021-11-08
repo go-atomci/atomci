@@ -1,0 +1,36 @@
+{
+  "root": true,
+  "parserOptions": {
+    "parser": "babel-eslint"
+  },
+  "extends": ["plugin:vue/essential", "za/es"],
+  "rules": {
+    "indent": "off",
+    "no-unused-vars": "off",
+    "valid-v-for": "off",
+    "block-spacing": "off",
+    "no-extra-semi": "off",
+    "no-inner-declarations": "off",
+    "no-irregular-whitespace": "off",
+    "no-multi-spaces": "off",
+    "strict": "off",
+    "max-len": "off",
+    "no-descending-specificity": "off",
+    "no-empty-source": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ForInStatement",
+        "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+      },
+      {
+        "selector": "WithStatement",
+        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+      }
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+.git
+**/node_modules
+**/*.vue
+deploy
+web
+/atomci
+/cli

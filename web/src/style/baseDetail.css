@@ -1,0 +1,59 @@
+/* 详情基本信息头部公用样式 */
+
+.title-content {
+  border-radius: 4px;
+  padding-bottom: 10px;
+}
+
+.title-content .el-icon-arrow-up,
+.title-content .el-icon-arrow-down {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.title-content .el-tag--primary {
+  margin-left: 10px;
+}
+
+.title-content .el-row:nth-child(2) {
+  margin-top: 10px;
+}
+
+.title-content .title-panel {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.title-content .base-title {
+  color: #20a0ff;
+  height: 36px;
+  /* width: 36px; */
+  line-height: 36px;
+  font-size: 16px;
+  font-weight: bolder;
+  padding-right: 10px;
+}
+
+.title-content .el-col-6,
+.title-content .el-col-14 {
+  text-align: right;
+}
+
+.title-content .el-col-8,
+.title-content .el-col-16,
+.title-content .el-col-24 {
+  font-size: 14px;
+  line-height: 25px;
+  color: #666;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.title-content.not-show-detail .el-row:nth-child(1) ~ .el-row {
+  display: none;
+}
+
+.mt10 {
+  margin-top: 10px;
+}

@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+#top ul li {
+  float: left;
+  color: #606266;
+  margin: 20px 0 50px 0;
+  list-style: none;
+  font-size: 13px;
+}
+#top ul li:nth-child(2) {
+  margin-left: 250px;
+}
+#title1 {
+  position: absolute;
+  left: 0;
+  top: 70px;
+  font-size: 13px;
+  color: #606266;
+}
+#title2 {
+  display: block;
+  margin: 30px 0 20px 0;
+  font-size: 13px;
+  color: #606266;
+}

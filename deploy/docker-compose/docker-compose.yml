@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  frontend:
+    image: colynn/atomci-frontend:latest
+    container_name: "frontend"
+    networks:
+        - atomci-network
+    ports:
+      - "8090:8090"
+    volumes:
+      - "./nginx:/etc/nginx/conf.d"
+
+  atomci:
+    image: colynn/atomci:latest
+    container_name: "atomci"
+    depends_on:
+      - mysql
+    networks:
+      - atomci-network
+    ports:
+      - "8080:8080"
+    environment:
+      - ENV=prod
+    volumes:
+      - "./conf/app.conf:/atomci/conf/app.conf"
+      - "./conf/rbac_policy.csv:/atomci/conf/rbac_policy.csv"
+      - "./conf/k8sconfig:/atomci/conf/k8sconfig"
+      - "/etc/localtime:/etc/localtime"
+      - "/usr/share/zoneinfo/Asia/Shanghai:/usr/share/zoneinfo/Asia/Shanghai"
+  
+  mysql:
+    image: mysql:5.7.35
+    container_name: mysql
+    networks:
+      - atomci-network    
+    restart: always
+    volumes:
+        - "./mysql/my.cnf:/etc/mysql/my.cnf"
+        - "./mysql/data:/var/lib/mysql"
+    environment:
+        MYSQL_DATABASE: atomci
+        MYSQL_ROOT_PASSWORD: 123456
+
+networks:
+  atomci-network:
+    driver: bridge

@@ -1,0 +1,87 @@
+/* 卡片布局公用样式 */
+
+.table-content .el-card {
+  box-sizing: border-box;
+  float: left;
+  margin-bottom: 10px;
+  margin-right: 2.3%;
+  width: 31%;
+  border-left: 5px solid #20a0ff;
+}
+
+.table-content .el-card:hover {
+  box-shadow: 3px 3px 10px -1px #20a0ff;
+}
+
+.card-panel {
+  padding: 0 20px;
+}
+
+.card-panel .card-title {
+  display: flex;
+  margin-bottom: 10px;
+  font-size: 16px;
+  border-bottom: 1px solid #eee;
+  height: 40px;
+  line-height: 40px;
+}
+
+.card-panel .card-title .left-title {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.card-panel .card-title .right-operate {
+  width: 175px;
+}
+
+.card-panel .content-panel {
+  display: flex;
+}
+
+.card-panel .content-panel .operate-panel {
+  display: flex;
+  width: 18%;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.card-panel .content-panel .operate-panel .el-button {
+  margin-left: 10px;
+}
+
+.card-panel .content-panel .operate-panel .el-button:hover {
+  text-shadow: 0 0 0.1em, 0 0 0.3em;
+}
+
+.card-panel .card-content {
+  flex: 1;
+  max-width: 82%;
+  list-style: none;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.card-panel .card-content li {
+  display: flex;
+  flex-wrap: nowrap;
+  height: 32px;
+  line-height: 31px;
+}
+
+.card-panel .card-content .title {
+  flex-basis: 85px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.card-panel .card-content .content {
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
