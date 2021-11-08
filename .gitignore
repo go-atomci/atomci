@@ -5,10 +5,10 @@
 .DS_Store
 debug
 # Project binaries.
-atomci
-cli
 *.tgz
 /atomci.exe
+/atomci
+/cli
 conf/app.local.conf
 # conf/*.csv
 
