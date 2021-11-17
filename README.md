@@ -1,6 +1,6 @@
 # atomci
 
-AtomCI 致力于让中小企业快速落地Kubernetes
+AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源
 
 ## 源起
 
