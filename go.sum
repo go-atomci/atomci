@@ -200,6 +200,8 @@ github.com/go-atomci/go-scm v1.13.2-0.20210629010829-147be8a9bdd3 h1:mBv4enC3OLi
 github.com/go-atomci/go-scm v1.13.2-0.20210629010829-147be8a9bdd3/go.mod h1:f6hTOQHcpcnXNU84YiYywndV7gnP9plkgFU2bl1UkdU=
 github.com/go-atomci/workflow v0.0.0-20211028035117-5255a97315b2 h1:z/DDX3yXnMUv+/tWtZDanynRv1m+1V/d4wsCBFdZULs=
 github.com/go-atomci/workflow v0.0.0-20211028035117-5255a97315b2/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
+github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab h1:0NUR9i9gCzvDpDh2J9Ytb5uoPpigs4ZqM6v/VFVhzzo=
+github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
 github.com/go-bindata/go-bindata v3.1.1+incompatible/go.mod h1:xK8Dsgwmeed+BBsSy2XTopBn/8uK2HWuGSnA11C3Joo=
 github.com/go-critic/go-critic v0.3.5-0.20190526074819-1df300866540/go.mod h1:+sE8vrLDS2M0pZkBk0wy6+nLdKexVDrl/jBqQOTDThA=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=

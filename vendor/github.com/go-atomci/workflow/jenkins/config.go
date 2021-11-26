@@ -20,10 +20,7 @@ import "github.com/go-atomci/workflow"
 
 // CommonContext ..
 type CommonContext struct {
-	JenkinsSlaveWorkspace string
-	AccessToken           string
-	RepoCnf               string
-	AtomCIServer          string
+	Namespace string
 }
 
 // CallbackRequest ..
@@ -58,9 +55,6 @@ type ContainerEnv struct {
 // CIContext ..
 type CIContext struct {
 	CommonContext
-	RegistryAddr       string
-	DockerConfig       string
-	DockerAuth         string
 	Stages             string
 	EnvVars            []EnvItem
 	ContainerTemplates []ContainerEnv

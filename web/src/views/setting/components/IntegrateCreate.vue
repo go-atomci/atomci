@@ -40,17 +40,22 @@
           <el-input v-model.trim="form.config.url" auto-complete="off" placeholder="请输入, 如http://jenkins.example.com"></el-input>
         </el-form-item>
 
-        <el-form-item label="Jenkins 用户名" prop="config.user" class="form-item">
+        <el-form-item label="用户名" prop="config.user" class="form-item">
           <el-input v-model.trim="form.config.user" auto-complete="off" maxlength="60" placeholder="请输入Jeknins 用户名"></el-input>
         </el-form-item>
 
-        <el-form-item label="Jenkins 用户Token" prop="config.token" class="form-item">
+        <el-form-item label="用户Token" prop="config.token" class="form-item">
           <el-input v-model.trim="form.config.token" auto-complete="off" maxlength="120" placeholder="请输入Jeknins 用户Token"></el-input>
         </el-form-item>
 
-        <el-form-item label="Jenkins WorkSpace" prop="config.workspace" class="form-item">
-          <el-input v-model.trim="form.config.workspace" auto-complete="off" maxlength="120" placeholder="请输入Jeknins workspace"></el-input>
+        <el-form-item label="工作目录" prop="config.workspace" class="form-item" title="默认是 /home/jenkins/agent">
+          <el-input v-model.trim="form.config.workspace" auto-complete="off" maxlength="120" placeholder="请输入agent的工作目录，默认是 /home/jenkins/agent"></el-input>
         </el-form-item>
+
+        <el-form-item label="agent 命名空间" prop="config.namespace" class="form-item" title="请输入配置的jenkins agent运行的命名空间，参照'jenkins配置'默认是devops">
+          <el-input v-model.trim="form.config.namespace" auto-complete="off" maxlength="120" placeholder="请输入配置的jenkins agent的namespace,默认是devops"></el-input>
+        </el-form-item>
+
       </div >
       <div v-else-if="form.type ==='harbor'">
         <el-form-item label="Harbor URL" prop="config.url" class="form-item">
@@ -206,6 +211,14 @@ export default {
             Message.success(this.$t('bm.add.optionSuc'));
             this.dialogFormVisible = false;
           };
+          if (this.form.type === "jenkins") {
+            if (this.form.config.workspace === undefined || this.form.config.workspace === "") {
+              this.form.config.workspace = "/home/jenkins/agent"
+            }
+            if (this.form.config.namespace === undefined || this.form.config.namespace === "") {
+              this.form.config.namespace = "devops"
+            }
+          }
           const cl = {
             name: this.form.name,
             config: this.form.config,

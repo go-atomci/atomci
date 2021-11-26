@@ -92,6 +92,7 @@ type HarborConfig struct {
 type JenkinsConfig struct {
 	BaseConfig
 	Token     string `json:"token,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
 	WorkSpace string `json:"workspace,omitempty"`
 }
 

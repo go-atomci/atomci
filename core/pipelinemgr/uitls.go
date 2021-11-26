@@ -159,9 +159,9 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		log.Log.Error("getCIConfig occur error: %s", err.Error())
 		return 0, "", err
 	}
-	if len(CIInfo) != 4 {
-		log.Log.Error("get ci config len is not 4, ciinfo: %+v", CIInfo)
-		return 0, "", fmt.Errorf("get ci config len is not 4, ciinfo: %+v", CIInfo)
+	if len(CIInfo) != 5 {
+		log.Log.Error("get ci config len is not 5, ciinfo: %+v", CIInfo)
+		return 0, "", fmt.Errorf("get ci config len is not 5, ciinfo: %+v", CIInfo)
 	}
 	addr, user, token := CIInfo[0], CIInfo[1], CIInfo[2]
 
@@ -390,16 +390,11 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 	// }
 
 	flowProcessor := &jenkins.CIContext{
-		RegistryAddr: deployInfo[1],
-		// TODO: add env vars
-		// TODO: add container templates
 		EnvVars:            envVars,
 		ContainerTemplates: containerTemplates,
 		Stages:             pipelineStagesStr,
 		CommonContext: jenkins.CommonContext{
-			JenkinsSlaveWorkspace: CIInfo[3],
-			AccessToken:           adminToken,
-			AtomCIServer:          atomciServer,
+			Namespace: CIInfo[4],
 		},
 		CallBack: jenkins.CallbackRequest{
 			Token: adminToken,
@@ -431,7 +426,6 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 	// Aggregate the app parms for deploy based on request params
 	appsAllParams, _ := pm.aggregateAppsParamsForDeploy(publishID, stageJSON.StageID, apps, stageJSON)
 
-	// TODO: jenkins
 	CIInfo, err := pm.GetCIConfig(stageJSON.StageID)
 	if err != nil {
 		log.Log.Error("getCIConfig occur error: %s", err.Error())
@@ -546,9 +540,7 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 			Body:  callBackRequestBody,
 		},
 		CommonContext: jenkins.CommonContext{
-			JenkinsSlaveWorkspace: CIInfo[3],
-			AccessToken:           adminToken,
-			AtomCIServer:          atomciServer,
+			Namespace: CIInfo[4],
 		},
 	}
 
@@ -1180,11 +1172,15 @@ func (pm *PipelineManager) GetCIConfig(stageID int64) ([]string, error) {
 	if settingItem.Type != "jenkins" {
 		return []string{}, fmt.Errorf("settings type is: %s, current ci server only support jenkins", settingItem.Type)
 	}
-	var url, user, token, workSpace string
+	var url, user, token, namespace, workSpace string
 	if jenkinsConfig, ok := settingItem.Config.(*settings.JenkinsConfig); ok {
 		url = jenkinsConfig.URL
 		user = jenkinsConfig.User
 		token = jenkinsConfig.Token
+		namespace = jenkinsConfig.Namespace
+		if namespace == "" {
+			namespace = "devops"
+		}
 		workSpace = jenkinsConfig.WorkSpace
 	} else {
 		log.Log.Error("parse jenkins config error")
@@ -1194,7 +1190,7 @@ func (pm *PipelineManager) GetCIConfig(stageID int64) ([]string, error) {
 	if url == "" || user == "" || token == "" || workSpace == "" {
 		return nil, fmt.Errorf("请联系管理员确认 系统管理-服务集成 %v 的配置, 当前配置为: url: %v, user: %v, token: %v, workSpace: %v", settingItem.Name, url, user, token, workSpace)
 	}
-	return []string{url, user, token, workSpace}, nil
+	return []string{url, user, token, workSpace, namespace}, nil
 }
 
 // getDeployInfo cluster,harbor auth info,arrangeEnv
