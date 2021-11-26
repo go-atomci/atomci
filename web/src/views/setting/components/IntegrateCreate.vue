@@ -72,6 +72,9 @@
     <div slot="footer" class="dialog-footer">
       <el-button type="success" @click="doTestConnection" :loading="loading">测试连接</el-button>
       <el-button type="primary" @click="doSubmit" :loading="loading">{{$t('bm.other.confirm')}}</el-button>
+      <el-button v-if="form.type ==='jenkins'">
+        <span><a href="https://go-atomci.github.io/atomci-press/guide/02.jenkins-requirements.html#_1-%E7%A1%AE%E8%AE%A4%E5%AE%89%E8%A3%85%E4%BE%9D%E8%B5%96%E6%8F%92%E4%BB%B6" target="_blank" title="请点击按钮确认jenkins配置">Jenkins 配置</a></span>
+      </el-button>
     </div>
     </div>
   </el-drawer>
