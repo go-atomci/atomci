@@ -20,24 +20,11 @@
           <el-table-column prop="role" :label="$t('bm.add.roleName')" sortable min-width="15%" :show-overflow-tooltip="true" />
           <el-table-column prop="description" :label="$t('bm.serviceM.description')" sortable min-width="15%" :show-overflow-tooltip="true" />
           <el-table-column prop="create_at" :label="$t('bm.serviceM.creationTime')" sortable min-width="15%" :show-overflow-tooltip="true" />
-          <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%" v-if="isUser">
+          <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%">
             <template slot-scope="scope">
               <el-button @click="$refs.commonDelete.doDeleteBody('deleteGroupUserRole', scope.row.role,'system',$route.params.user)" type="text" size="small" :title="$t('bm.depManage.remove')">
                 {{$t('bm.depManage.remove')}}
-              </el-button>
-            </template>
-          </el-table-column>
-          <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%" v-else>
-            <template slot-scope="scope">
-              <el-button @click="goDetail($route.params.dept, scope.row.role)" type="text" size="small" :title="$t('bm.authorManage.manage')">
-                {{$t('bm.authorManage.manage')}}
-              </el-button>
-              <el-button @click="$refs.create.doCreate(true, scope.row)" type="text" size="small" :title="$t('bm.infrast.edit')">
-                {{$t('bm.infrast.edit')}}
-              </el-button>
-              <el-button @click="$refs.commonDelete.doDelete('delGroupRole','system',scope.row.role)" type="text" size="small" :title="$t('bm.other.delete')">
-                {{$t('bm.other.delete')}}
-              </el-button>
+              </el-button>             
             </template>
           </el-table-column>
         </el-table>

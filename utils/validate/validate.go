@@ -72,7 +72,7 @@ func Restricted(s, regdata string) bool {
 // 系统保留的关键字
 func IsReservedBuName(s string) error {
 	stringList := []string{
-		"all", "default", "kube-system", "kube-public", "admin", "超级管理员", "超级管理员组",
+		"all", "default", "kube-system",
 	}
 	for _, str := range stringList {
 		if s == str {
@@ -101,7 +101,7 @@ func ValidateName(s string) error {
 		return fmt.Errorf("the name \"%v\": must be no more than %v characters", s, NameMaxLen)
 	}
 	if !Restricted(s, restrictedNameChars) {
-		return fmt.Errorf("The name \"%v\" is invalid format", s)
+		return fmt.Errorf("the name \"%v\" is invalid format", s)
 	}
 	return nil
 }
@@ -118,7 +118,7 @@ func ValidateDescription(s string) error {
 
 func ValidateEmail(s string) error {
 	if !Restricted(s, restrictedEmailAddr) {
-		return fmt.Errorf("The email \"%v\" is invalid format", s)
+		return fmt.Errorf("the email \"%v\" is invalid format", s)
 	}
 	return nil
 }

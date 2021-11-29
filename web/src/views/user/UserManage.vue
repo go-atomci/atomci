@@ -49,17 +49,22 @@
                              sortable
                              min-width="18%"
                              :show-overflow-tooltip=true />
-            <el-table-column :label="$t('bm.deployCenter.operation')"
-                             min-width="14%">
+            <el-table-column :label="$t('bm.deployCenter.operation')" min-width="14%">
               <template slot-scope="scope"
                         v-if="scope.row.name!=='default'">
                 <el-button type="text"
-                           size="small"
-                           @click="goUserAuthorized(scope.row.user)">{{$t('bm.authorManage.manage')}}
+                        size="small"
+                          @click="goUserAuthorized(scope.row.user)">{{$t('bm.authorManage.manage')}}
+                </el-button>
+                <el-button @click="$refs.create.doCreate(true, scope.row)"
+                        type="text"
+                        size="small"
+                        :title="$t('bm.infrast.edit')">
+                {{$t('bm.infrast.edit')}}
                 </el-button>
                 <el-button @click="$refs.commonDelete.doDelete('delUser',scope.row.user)"
-                           type="text"
-                           size="small">{{$t('bm.other.delete')}}
+                          type="text"
+                          size="small">{{$t('bm.other.delete')}}
                 </el-button>
               </template>
             </el-table-column>

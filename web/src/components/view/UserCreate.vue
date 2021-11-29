@@ -4,19 +4,21 @@
 }
 </style>
 <template>
-  <el-dialog top='25vh' :title="$t('bm.authorManage.createUser')" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog hostCreate" width='50%' :before-close="doCancelCreate">
+  <el-dialog top='25vh' :title="title" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog hostCreate" width='50%' :before-close="doCancelCreate">
+
     <el-form :model="form" :rules="rules" ref="ruleForm">
       <el-form-item :label="$t('bm.operCenter.account')" prop='user'>
         <el-input v-model.trim="form.user" :placeholder="$t('bm.add.inputAcount')" maxlength="64" auto-complete="on" :disabled="isEdit"></el-input>
       </el-form-item>
       <el-form-item :label="$t('bm.authorManage.userName')" prop='name'>
-        <el-input v-model.trim="form.name" :placeholder="$t('bm.add.inputUsername')" maxlength="64" auto-complete="off" :disabled="isEdit"></el-input>
+        <el-input v-model.trim="form.name" :placeholder="$t('bm.add.inputUsername')" maxlength="64" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item :label="$t('bm.infrast.email')" prop='email'>
-        <el-input v-model.trim="form.email" :placeholder="$t('bm.add.inputEmail')" maxlength="64" auto-complete="off" :disabled="isEdit"></el-input>
+        <el-input v-model.trim="form.email" :placeholder="$t('bm.add.inputEmail')" maxlength="64" auto-complete="off"></el-input>
       </el-form-item>
+
       <el-form-item label="密码" prop='password'>
-        <el-input v-model.trim="form.password" :placeholder="$t('bm.add.inputPassword')" maxlength="64" type="password" auto-complete="off" :disabled="isEdit"></el-input>
+        <el-input v-model.trim="form.password" :placeholder="$t('bm.add.inputPassword')" maxlength="64" type="password" auto-complete="off" ></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -28,15 +30,15 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Message } from 'element-ui';
-import backend from '../../api/backend';
-import createTemplate from '../../common/createTemplate';
-import validate from '../../common/validate';
-import keyTxts from '../../common/validateKeyTxt';
+import backend from '@/api/backend';
+import createTemplate from '@/common/createTemplate';
+import validate from '@/common/validate';
 
 const formData = {
   user: '',
   name: '',
   email: '',
+  password: '',
 };
 export default {
   mixins: [createTemplate, validate],
@@ -46,9 +48,17 @@ export default {
       // 是否属于编辑状态
       isEdit: false,
       dialogFormVisible: false,
+      title:  this.$t('bm.authorManage.createUser'),
       form: JSON.parse(JSON.stringify(formData)),
       rolesList: [],
-      rules: {
+    };
+  },
+  computed: {
+    ...mapGetters({
+      loading: 'getPopLoading',
+    }),
+    rules() {
+      return {
         user: [
           { required: true, message: this.$t('bm.add.inputAcount'), trigger: 'blur' },
           { validator: this.validateResourceKeyValue, trigger: 'blur' },
@@ -58,20 +68,16 @@ export default {
           { required: true, message: this.$t('bm.add.inputEmail'), trigger: 'blur' },
           { validator: this.validateEmail, trigger: 'blur' },
         ],
-        password: [{ required: true, message: this.$t('bm.add.inputPassword'), trigger: 'blur' }],
-      },
-    };
-  },
-  computed: {
-    ...mapGetters({
-      loading: 'getPopLoading',
-    }),
+        password: [{ required: !this.isEdit, message: this.$t('bm.add.inputPassword'), trigger: 'blur' }],
+      }
+    }
   },
   methods: {
     doCreate(flag, item) {
       this.dialogFormVisible = true;
       this.isEdit = flag;
       if (flag) {
+        this.title = "编辑用户";
         this.form.user = item.user;
         this.form.name = item.name;
         this.form.email = item.email;
@@ -87,10 +93,24 @@ export default {
             Message.success(this.$t('bm.add.optionSuc'));
             this.dialogFormVisible = false;
           };
-          backend.addUser(JSON.stringify(this.form), () => {
-            successCallBack();
-          });
-          return false;
+          const cl = {
+              user: this.form.user,
+              name: this.form.name,
+              email: this.form.email,
+          };
+
+        if (this.form.password != undefined && this.form.password != '') {
+          cl['password'] = this.form.password
+        }
+          if (this.isEdit) {
+              backend.updateUser(this.form.user, cl, () => {
+                successCallBack();
+              });
+          } else {
+            backend.addUser(JSON.stringify(this.form), () => {
+              successCallBack();
+            });            
+          }
         }
       });
     },

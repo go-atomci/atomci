@@ -68,6 +68,7 @@ func (v *UserReq) Verify() error {
 	v.User = validate.FormatString(v.User)
 	v.Name = validate.FormatString(v.Name)
 	v.Email = validate.FormatString(v.Email)
+
 	if err := validate.ValidateName(v.User); err != nil {
 		return err
 	}
