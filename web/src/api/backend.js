@@ -472,6 +472,11 @@ const backendAPI = {
   delAppPers(app, type, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/applications/${app}/resources/${type}`, cb);
   },
+  // 更新用户
+  updateUser(user, body, cb) {
+    Package.httpMethods('put', `/atomci/api/v1/users/${user}`, cb, body);
+  },
+
   // 删除用户
   delUser(user, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/users/${user}`, cb);
@@ -592,10 +597,7 @@ const backendAPI = {
   addUserToBu(bu, body, cb, errCb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${bu}/users`, cb, body, errCb);
   },
-  // 添加用户到部门当中
-  updateUser(bu, userName, body, cb, errCb) {
-    Package.httpMethods('post', `/atomci/api/v1/groups/${bu}/users/${userName}`, cb, body, errCb);
-  },
+
 
   // pod实例状态列表
   getPodStatusViews(clusterName, namespace, appname, podname, cb) {

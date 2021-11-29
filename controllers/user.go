@@ -68,19 +68,16 @@ func (u *UserController) CreateUser() {
 	}
 
 	// TODO: confirm req.password whether match
-
-	var hash []byte
-	var err error
-	if hash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost); err != nil {
+	passwordHash, err := generatePassword(req.Password)
+	if err != nil {
 		u.HandleBadRequest(err.Error())
 		log.Log.Error("generate password hash error: %s", err.Error())
-		return
 	}
 	user := models.User{
 		User:      req.User,
 		Name:      req.Name,
 		Email:     req.Email,
-		Password:  string(hash),
+		Password:  string(passwordHash),
 		LoginType: models.LocalAuth,
 		Token:     utils.MakeToken(),
 	}
@@ -127,6 +124,15 @@ func (u *UserController) UpdateUser() {
 		log.Log.Error("Update user error: %s", err.Error())
 		return
 	}
+	if len(req.Password) > 0 {
+		passwordHash, err := generatePassword(req.Password)
+		if err != nil {
+			u.HandleBadRequest(err.Error())
+			log.Log.Error("generate password hash error: %s", err.Error())
+		}
+		oldUser.Password = string(passwordHash)
+	}
+
 	oldUser.Name = req.Name
 	oldUser.Email = req.Email
 	if err := dao.UpdateUser(oldUser); err != nil {
@@ -172,4 +178,8 @@ func (u *UserController) GetUserResourceConstraintValues() {
 	}
 	u.Data["json"] = NewResult(true, rsp, "")
 	u.ServeJSON()
+}
+
+func generatePassword(password string) ([]byte, error) {
+	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
