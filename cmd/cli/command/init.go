@@ -114,7 +114,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"auth", "认证"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "认证所有操作"},
 					[]string{"UserLogin", "用户登录"},
 					[]string{"UserLogout", "用户登出"},
 					[]string{"GetCurrentUser", "获取当前用户信息"},
@@ -124,7 +124,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"audit", "操作审计"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "操作审计所有操作"},
 					[]string{"AuditList", "获取操作审计列表"},
 				},
 				ResourceConstraint: [][]string{},
@@ -132,7 +132,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"user", "用户"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "用户所有操作"},
 					[]string{"UserList", "获取用户列表"},
 					[]string{"CreateUser", "创建用户"},
 					[]string{"GetUser", "获取用户详情"},
@@ -149,7 +149,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"pipeline", "流程"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "项目流程所有操作"},
 					[]string{"PipelineList", "获取流程列表"},
 					[]string{"PipelineListByPagination", "获取流程分页列表"},
 					[]string{"PipelineListByPagination", "恢复默认流程"},
@@ -168,7 +168,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"project", "项目"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "项目所有操作"},
 					[]string{"ProjectList", "获取项目列表"},
 					[]string{"CreateProject", "创建项目"},
 					[]string{"UpdateProject", "更新项目信息"},
@@ -195,7 +195,7 @@ func initResource(token string) error {
 			BatchResourceTypeSpec{
 				ResourceType: []string{"publish", "流水线"},
 				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
+					[]string{"*", "流水线所有操作"},
 					[]string{"PublishList", "流水线列表"},
 					[]string{"CreatePublishOrder", "创建流水线"},
 					[]string{"GetPublish", "流水线详情"},
@@ -218,14 +218,6 @@ func initResource(token string) error {
 					[]string{"publishID", "发布单ID"},
 					[]string{"envID", "环境ID"},
 				},
-			},
-			BatchResourceTypeSpec{
-				ResourceType: []string{"system", "系统回调"},
-				ResourceOperation: [][]string{
-					[]string{"*", "所有操作"},
-					[]string{"UpdateJobBuildResult", "更新构建结果"},
-				},
-				ResourceConstraint: [][]string{},
 			},
 		},
 	}
