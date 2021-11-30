@@ -20,7 +20,7 @@
         </el-row>
       </div>
       <template>
-        <el-table stripe :data="dataList">
+        <el-table stripe :data="curList">
           <el-table-column prop="role"
                            :label="$t('bm.add.roleName')"
                            sortable
@@ -166,17 +166,9 @@ export default {
       });
     },
     getList() {
-        backend.getGroupRoleList(this.group, data => {
+        backend.getGroupRoleList((data) => {
           if (data) {
             this.curList = data.map(item => {
-              if (item.policies) {
-                const policies = item.policies.map(subItem => {
-                  return subItem.policy_name;
-                });
-                item.policy = policies.join(' ');
-              } else {
-                item.policy = '';
-              }
               item.create_at = UtilsFn.format(new Date(item.create_at), 'yyyy-MM-dd hh:mm');
               return item;
             });

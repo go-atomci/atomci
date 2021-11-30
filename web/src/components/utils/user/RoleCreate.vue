@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item :label="$t('bm.authorManage.resourceOper')" prop="perPolicy" v-if="!isEdit">
         <el-select v-model="form.perPolicy" :placeholder="$t('bm.add.selectOperation')" multiple filterable>
-          <el-option v-for="(item, index) in policyList" :key="index" :label="item.description" :value="item.resource_operation">
+          <el-option v-for="(item, index) in operationsList" :key="index" :label="item.description" :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -38,9 +38,9 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Message } from 'element-ui';
-import backend from '../../../api/backend';
-import createTemplate from '../../../common/createTemplate';
-import validate from '../../../common/validate';
+import backend from '@/api/backend';
+import createTemplate from '@/common/createTemplate';
+import validate from '@/common/validate';
 
 const formData = {
   role: '',
@@ -56,7 +56,7 @@ export default {
   data() {
     return {
       groupRoleList: [],
-      policyList: [],
+      operationsList: [],
       // 是否属于编辑状态
       isEdit: false,
       dialogFormVisible: false,
@@ -94,7 +94,7 @@ export default {
     } else {
       backend.getResourcesOperation((data) => {
         if (data) {
-          this.policyList = data;
+          this.operationsList = data;
         }
       });
     }
@@ -151,7 +151,7 @@ export default {
             };
             if (this.isEdit) {
               // , JSON.stringify({ "role": this.form.role })
-              backend.updateGroupRole("system", this.form.role, cl, () => {
+              backend.updateGroupRole(this.form.role, cl, () => {
                 successCallBack();
               });
             } else {

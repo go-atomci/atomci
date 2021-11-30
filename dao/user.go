@@ -99,7 +99,7 @@ func GetUserDetail(userName string) (*models.User, error) {
 				user.GroupAdmin = 1
 				break
 			}
-			if role.Role == constant.CompanyAdminRole {
+			if role.Role == constant.DevAdminRole {
 				user.GroupAdmin = 1
 			}
 		}

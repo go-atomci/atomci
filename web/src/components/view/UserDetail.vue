@@ -96,8 +96,7 @@ export default {
           }
         });
       } else {
-        // TODO: group's name use system , tmp
-        backend.getGroupRoleList("system", (data) => {
+        backend.getGroupRoleList((data) => {
           if (data) {
             this.curList = data.map((item) => {
               if (item.policies) {

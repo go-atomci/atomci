@@ -50,6 +50,17 @@ func GetGroupRoleByName(group, role string) (*models.GroupRole, error) {
 	return &groupRole, nil
 }
 
+func GetRoleOperationsByRoleName(role string) ([]*models.GroupRoleOperation, error) {
+	roleOperations := []*models.GroupRoleOperation{}
+	if _, err := GetOrmer().QueryTable("sys_group_role_operation").
+		Filter("group", "system").
+		Filter("role", role).
+		All(&roleOperations); err != nil {
+		return nil, err
+	}
+	return roleOperations, nil
+}
+
 func CreateGroupRole(req *models.GroupRoleReq) (*models.GroupRole, error) {
 	role, _ := GetGroupRoleByName(req.Group, req.Role)
 	if role == nil {
@@ -70,10 +81,21 @@ func CreateGroupRole(req *models.GroupRoleReq) (*models.GroupRole, error) {
 
 	// TODO: generate casbin rules rely on req.Operations
 	log.Log.Debug("req operations length: %v", len(req.Operations))
-	resourceRouterItems, err := GetResourceRouterItems(req.Operations)
+	resOperationItems, err := GetResourceOperationByIDs(req.Operations)
 	if err != nil {
-		log.Log.Error("when create group role, get resource router items error: %s", err.Error())
+		log.Log.Error("when get resource operation by ids occur error: %s", err.Error())
 		return nil, err
+	}
+
+	resTypeOperationsMapping := orderByResourceType(resOperationItems)
+	resourceRouterItems := []models.GatewayRouter{}
+	for key, item := range resTypeOperationsMapping {
+		resRouterItems, err := GetResourceRouterItems(key, item)
+		if err != nil {
+			log.Log.Error("when create group role, get resource router items error: %s", err.Error())
+			continue
+		}
+		resourceRouterItems = append(resourceRouterItems, resRouterItems...)
 	}
 
 	if len(resourceRouterItems) > 0 {
@@ -171,14 +193,14 @@ func GroupRoleUnbundling(req *models.GroupRoleBundlingReq) error {
 func AddRoleOperation(req *models.GroupRolePolicyReq) error {
 	if len(req.Operations) > 0 {
 		values := ""
-		for index, policy := range req.Operations {
+		for index, operationID := range req.Operations {
 			if index == 0 {
-				values = fmt.Sprintf("('%v','%v','%v')", req.Group, req.Role, policy)
+				values = fmt.Sprintf("('%v','%v',%v)", req.Group, req.Role, operationID)
 			} else {
-				values = values + "," + fmt.Sprintf("('%v','%v','%v')", req.Group, req.Role, policy)
+				values = values + "," + fmt.Sprintf("('%v','%v',%v)", req.Group, req.Role, operationID)
 			}
 		}
-		sql := `insert ignore into sys_group_role_operation(` + "`group`" + `,role,policy_name) values` + values
+		sql := `insert ignore into sys_group_role_operation(` + "`group`" + `,role, operation_id) values` + values
 		if _, err := GetOrmer().Raw(sql).Exec(); err != nil {
 			return err
 		}
@@ -196,10 +218,20 @@ func DeleteGroupRolePolicy(req *models.GroupRolePolicyReq) error {
 				values = values + "," + fmt.Sprintf("'%v'", police)
 			}
 		}
-		sql := `delete from sys_group_role_operation where ` + "`group`" + `=? and role=? and policy_name in (` + values + `)`
-		if _, err := GetOrmer().Raw(sql, req.Group, req.Role).Exec(); err != nil {
+		sql := `delete from sys_group_role_operation where ` + `role=? and operation_id in (` + values + `)`
+		if _, err := GetOrmer().Raw(sql, req.Role).Exec(); err != nil {
 			return err
 		}
+
+		// TODO: clean casbin item
 	}
 	return nil
+}
+
+func orderByResourceType(res []*models.ResourceOperation) map[string][]string {
+	resMap := map[string][]string{}
+	for _, item := range res {
+		resMap[item.ResourceType] = append(resMap[item.ResourceType], item.ResourceOperation)
+	}
+	return resMap
 }

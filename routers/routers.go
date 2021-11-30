@@ -73,9 +73,10 @@ func init() {
 
 				beego.NSRouter("/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
 
-				beego.NSRouter("/groups/:group/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
-				beego.NSRouter("/groups/:group/roles/:role", &controllers.RoleController{}, "get:GetRole;put:UpdateRole;delete:DeleteRole"),
-				beego.NSRouter("/groups/:group/roles/:role/policies", &controllers.RoleController{}, "get:RolePolicyList;post:AddRolePolicy;delete:RemoveRolePolicy"),
+				beego.NSRouter("/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
+				beego.NSRouter("/roles/:role", &controllers.RoleController{}, "get:GetRole;put:UpdateRole;delete:DeleteRole"),
+				beego.NSRouter("/roles/:role/operations", &controllers.RoleController{}, "get:RoleOperationList;post:AddRoleOperation"),
+				beego.NSRouter("/roles/:role/operations/:operationID", &controllers.RoleController{}, "delete:RemoveRoleOperation"),
 				beego.NSRouter("/groups/:group/roles/:role/bundling", &controllers.RoleController{}, "get:RoleBundlingList;post:RoleBundling;delete:RoleUnbundling"),
 
 				// PipelineStage

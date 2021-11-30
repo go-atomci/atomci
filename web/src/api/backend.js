@@ -494,10 +494,6 @@ const backendAPI = {
     Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/users/${user}`, cb);
   },
   // 删除用户组权限 - 角色
-  delGroupRole(group, role, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/roles/${role}`, cb);
-  },
-  // 删除用户组权限 - 角色
   delGroupConstraints(group, constraints, cb) {
     Package.httpMethods(
       'delete',
@@ -672,12 +668,17 @@ const backendAPI = {
   },
   
   // 查询角色列表
-  getGroupRoleList(group, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/roles`, cb);
+  getGroupRoleList(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles`, cb);
   },
   // 更新组角色
-  updateGroupRole(group, role, body, cb) {
-    Package.httpMethods('put', `/atomci/api/v1/groups/${group}/roles/${role}`, cb, body);
+  updateGroupRole(role, body, cb) {
+    Package.httpMethods('put', `/atomci/api/v1/roles/${role}`, cb, body);
+  },
+
+  // 删除用户组权限 - 角色
+  delGroupRole(group, role, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/roles/${role}`, cb);
   },
 
   // 资源操作
@@ -723,17 +724,25 @@ const backendAPI = {
     Package.httpMethods('get', `/atomci/api/v1/groups/${group}/users`, cb);
   },
   // 查询角色详情
-  getGroupRoleDetail(group, role, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/roles/${role}`, cb);
+  getGroupRoleDetail(role, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles/${role}`, cb);
   },
+
+  // 查询角色操作
+  getRoleOperations(role, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles/${role}/operations`, cb);
+  },
+
+  // 删除角色操作
+  deleteRoleOperation(role, operationID, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/roles/${role}/operations/${operationID}`, cb);
+  },
+
   // 添加角色权限策略
   addRolePolicies(group, role, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${group}/roles/${role}/policies`, cb, body);
   },
-  // 删除角色权限策略
-  deleteRolePolicies(body, group, role, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/roles/${role}/policies`, cb, body);
-  },
+
   // 添加角色绑定用户
   addRoleBindUser(group, role, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${group}/roles/${role}/bundling`, cb, body);

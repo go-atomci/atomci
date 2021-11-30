@@ -166,7 +166,7 @@ func initOrm() {
 		new(GroupRoleUser),
 		new(GroupUserConstraint),
 		new(GroupRole),
-		new(GroupRolePolicy),
+		new(GroupRoleOperation),
 		new(Audit),
 		new(GatewayRouter),
 

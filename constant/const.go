@@ -20,13 +20,10 @@ package constant
 const (
 	SystemGroup          = "system"
 	SystemAdminRole      = "admin"
+	DevAdminRole         = "devManager"
 	SystemMemberRole     = "developer"
 	SystemAdminUser      = "admin"
 	AdminDefaultPassword = "123456"
-
-	// 	SysDevManager    = "devManager"
-	// TODO: change to sys devmanger
-	CompanyAdminRole = "devManager"
 
 	StepBuild = "build"
 
