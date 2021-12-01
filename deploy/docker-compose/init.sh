@@ -13,6 +13,7 @@ then
     do
         if [ $dockerName == "atomci" ]
         then
+            docker-compose restart mysql
             echo "sleep 10 seconds, wait for mysql init ready"
             sleep 10
         fi
@@ -46,6 +47,6 @@ TOKEN=$(echo $ADMIN_TOKEN | awk '{print $2}')
 
 # atomci init
 docker exec atomci ./cli init --token=${TOKEN}
-
+docker-compose restart atomci
 # init result verify
 [ $? -eq 0 ] && echo -e "AtomCI 初始化成功(:\n\n访问atomci: http://localhost:8090 \n" || echo -e "AtomCI 初始化失败, 请确认atomci 容器日志，\n或是 https://github.com/go-atomci/atomci-press/issues/new 反馈你的问题(:"
