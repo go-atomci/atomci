@@ -182,12 +182,11 @@ func (r *RoleController) RoleOperationList() {
 }
 
 func (r *RoleController) AddRoleOperation() {
-
 	roleName := r.GetStringFromPath(":role")
-	var req models.GroupRolePolicyReq
+	var req models.GroupRoleOperationReq
 	r.DecodeJSONReq(&req)
-	req.Group = "system"
 	req.Role = roleName
+	req.Group = "system"
 
 	if err := dao.AddRoleOperation(&req); err != nil {
 		r.HandleInternalServerError(err.Error())
@@ -202,13 +201,13 @@ func (r *RoleController) AddRoleOperation() {
 func (r *RoleController) RemoveRoleOperation() {
 	roleName := r.GetStringFromPath(":role")
 	operationID, _ := r.GetInt64FromPath(":operationID")
-	req := models.GroupRolePolicyReq{}
+	req := models.GroupRoleOperationReq{}
 	req.Role = roleName
 	req.Operations = []int64{operationID}
 
 	if err := dao.DeleteGroupRolePolicy(&req); err != nil {
 		r.HandleInternalServerError(err.Error())
-		log.Log.Error("Remove role policy error: %s", err.Error())
+		log.Log.Error("Remove role operation error: %s", err.Error())
 		return
 	}
 

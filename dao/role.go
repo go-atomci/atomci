@@ -70,7 +70,7 @@ func CreateGroupRole(req *models.GroupRoleReq) (*models.GroupRole, error) {
 		}
 	}
 
-	if err := AddRoleOperation(&models.GroupRolePolicyReq{
+	if err := AddRoleOperation(&models.GroupRoleOperationReq{
 		Group:      req.Group,
 		Role:       req.Role,
 		Operations: req.Operations,
@@ -79,62 +79,18 @@ func CreateGroupRole(req *models.GroupRoleReq) (*models.GroupRole, error) {
 		return nil, err
 	}
 
-	// TODO: generate casbin rules rely on req.Operations
 	log.Log.Debug("req operations length: %v", len(req.Operations))
-	resOperationItems, err := GetResourceOperationByIDs(req.Operations)
+	err := GenerateCasbinrules(req.Role, req.Operations)
 	if err != nil {
-		log.Log.Error("when get resource operation by ids occur error: %s", err.Error())
-		return nil, err
+		log.Log.Error("generate casbin rules error: %s", err.Error())
 	}
 
-	resTypeOperationsMapping := orderByResourceType(resOperationItems)
-	resourceRouterItems := []models.GatewayRouter{}
-	for key, item := range resTypeOperationsMapping {
-		resRouterItems, err := GetResourceRouterItems(key, item)
-		if err != nil {
-			log.Log.Error("when create group role, get resource router items error: %s", err.Error())
-			continue
-		}
-		resourceRouterItems = append(resourceRouterItems, resRouterItems...)
-	}
-
-	if len(resourceRouterItems) > 0 {
-		casbinRules := generateCasbinRules(resourceRouterItems, req.Role)
-		e, err := mycasbin.NewCasbin()
-		if err != nil {
-			log.Log.Error("new casbin instance error: %s", err.Error())
-			return nil, err
-		}
-		log.Log.Debug("role: %s, casbin rules length: %v", req.Role, len(casbinRules))
-		addFlag, err := e.AddPolicies(casbinRules)
-		if err != nil {
-			log.Log.Error("add policys error: %s", err.Error())
-		}
-		log.Log.Info("add policy to casbin rule, flag: %v", addFlag)
-		if err := e.SavePolicy(); err != nil {
-			log.Log.Error("save casbin policy error: %s", err.Error())
-			return nil, err
-		}
-	}
 	role, err = GetGroupRoleByName(req.Group, req.Role)
 	if err != nil {
 		return nil, err
 	}
 
 	return role, nil
-}
-
-func InsertIgnoreGroupRole(req *models.GroupRoleReq) error {
-	role, _ := GetGroupRoleByName(req.Group, req.Role)
-	if role == nil {
-		sql := `insert ignore into sys_group_role(` + "`group`" + `,role,description) values(?,?,?)`
-		if _, err := GetOrmer().Raw(sql, req.Group, req.Role, req.Description).Exec(); err != nil {
-			return err
-		}
-	}
-
-	// TODO: based on resource operations, init casbin_rules
-	return nil
 }
 
 func UpdateGroupRole(req *models.GroupRoleReq) error {
@@ -190,7 +146,7 @@ func GroupRoleUnbundling(req *models.GroupRoleBundlingReq) error {
 	return nil
 }
 
-func AddRoleOperation(req *models.GroupRolePolicyReq) error {
+func AddRoleOperation(req *models.GroupRoleOperationReq) error {
 	if len(req.Operations) > 0 {
 		values := ""
 		for index, operationID := range req.Operations {
@@ -200,15 +156,20 @@ func AddRoleOperation(req *models.GroupRolePolicyReq) error {
 				values = values + "," + fmt.Sprintf("('%v','%v',%v)", req.Group, req.Role, operationID)
 			}
 		}
+		// TODO: add casbin items;
 		sql := `insert ignore into sys_group_role_operation(` + "`group`" + `,role, operation_id) values` + values
 		if _, err := GetOrmer().Raw(sql).Exec(); err != nil {
+			return err
+		}
+
+		if err := GenerateCasbinrules(req.Role, req.Operations); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func DeleteGroupRolePolicy(req *models.GroupRolePolicyReq) error {
+func DeleteGroupRolePolicy(req *models.GroupRoleOperationReq) error {
 	if len(req.Operations) > 0 {
 		values := ""
 		for index, police := range req.Operations {
@@ -222,12 +183,85 @@ func DeleteGroupRolePolicy(req *models.GroupRolePolicyReq) error {
 		if _, err := GetOrmer().Raw(sql, req.Role).Exec(); err != nil {
 			return err
 		}
-
-		// TODO: clean casbin item
+		if err := DeleteCasbinrules(req.Role, req.Operations); err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
+func DeleteCasbinrules(role string, operations []int64) error {
+	resourceRouterItems, err := getRouterItembyOperationsID(operations)
+	if err != nil {
+		return err
+	}
+	if len(resourceRouterItems) > 0 {
+		casbinRules := generateCasbinRules(resourceRouterItems, role)
+		e, err := mycasbin.NewCasbin()
+		if err != nil {
+			log.Log.Error("new casbin instance error: %s", err.Error())
+			return err
+		}
+		log.Log.Debug("role: %s, casbin rules length: %v", role, len(casbinRules))
+		removeFlag, err := e.RemovePolicies(casbinRules)
+		if err != nil {
+			log.Log.Error("remove policys error: %s", err.Error())
+		}
+		log.Log.Info("remove policy to casbin rule, flag: %v", removeFlag)
+		if err := e.SavePolicy(); err != nil {
+			log.Log.Error("save casbin policy error: %s", err.Error())
+			return err
+		}
+	}
+	return nil
+}
+
+func GenerateCasbinrules(role string, operations []int64) error {
+	resourceRouterItems, err := getRouterItembyOperationsID(operations)
+	if err != nil {
+		return err
+	}
+	if len(resourceRouterItems) > 0 {
+		casbinRules := generateCasbinRules(resourceRouterItems, role)
+		e, err := mycasbin.NewCasbin()
+		if err != nil {
+			log.Log.Error("new casbin instance error: %s", err.Error())
+			return err
+		}
+		log.Log.Debug("role: %s, casbin rules length: %v", role, len(casbinRules))
+		addFlag, err := e.AddPolicies(casbinRules)
+		if err != nil {
+			log.Log.Error("add policys error: %s", err.Error())
+		}
+		log.Log.Info("add policy to casbin rule, flag: %v", addFlag)
+		if err := e.SavePolicy(); err != nil {
+			log.Log.Error("save casbin policy error: %s", err.Error())
+			return err
+		}
+	}
+	return nil
+}
+
+func getRouterItembyOperationsID(operationsID []int64) ([]*models.GatewayRouter, error) {
+	resOperationItems, err := GetResourceOperationByIDs(operationsID)
+	if err != nil {
+		log.Log.Error("when get resource operation by ids occur error: %s", err.Error())
+		return nil, err
+	}
+
+	resTypeOperationsMapping := orderByResourceType(resOperationItems)
+	resourceRouterItems := []*models.GatewayRouter{}
+	for key, item := range resTypeOperationsMapping {
+		resRouterItems, err := GetResourceRouterItems(key, item)
+		if err != nil {
+			log.Log.Error("when create group role, get resource router items error: %s", err.Error())
+			continue
+		}
+		resourceRouterItems = append(resourceRouterItems, resRouterItems...)
+	}
+	return resourceRouterItems, nil
+
+}
 func orderByResourceType(res []*models.ResourceOperation) map[string][]string {
 	resMap := map[string][]string{}
 	for _, item := range res {

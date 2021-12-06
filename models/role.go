@@ -103,8 +103,8 @@ func (t *GroupRoleOperation) TableUnique() [][]string {
 	}
 }
 
-// GroupRolePolicyReq ..
-type GroupRolePolicyReq struct {
+// GroupRoleOperationReq ..
+type GroupRoleOperationReq struct {
 	Group      string  `json:"group"`
 	Role       string  `json:"role"`
 	Operations []int64 `json:"operations"`

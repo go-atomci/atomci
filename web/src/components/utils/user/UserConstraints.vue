@@ -84,7 +84,7 @@ export default {
       isEdit: false,
       dialogFormVisible: false,
       form: formData,
-      title: this.$t('bm.add.addResPolicy'),
+      title: this.$t('bm.add.addResOperation'),
       constraintList: [{
         key: '',
         value: '',

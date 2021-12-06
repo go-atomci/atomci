@@ -2,12 +2,11 @@
   <div class="page-content buManage">
     <div class="portlet-body">
     <div class="table-toolbar">
-      <!-- TODO: 添加资源操作 -->
         <el-row v-show="innerShow">
           <el-col :span="10">
             <refresh v-on:getlist="getList"></refresh>
             <el-button :plain="true" type="primary" @click="$refs.create.doCreate(false)">
-              <i class='icon-plus' /> {{$t('bm.add.addResPolicy')}}</el-button>
+              <i class='icon-plus' /> {{$t('bm.add.addResOperation')}}</el-button>
           </el-col>
           <el-col :span="6">
             &nbsp;
@@ -63,7 +62,7 @@ export default {
       resourceTypeList: [],
       resourceOpList: [],
       resourceConList: [],
-      innerShow: false,
+      innerShow: true,
       group: '',
     };
   },

@@ -56,7 +56,7 @@
                          type="text"
                          size="small"
                          :title="$t('bm.authorManage.manage')">
-                查看资源操作
+                管理
               </el-button>
               <el-button @click="$refs.create.doCreate(true, scope.row)"
                          type="text"

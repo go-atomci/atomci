@@ -33,8 +33,8 @@ func CreateGatewayRoute(router, method, backend, resourceType, resourceOperation
 }
 
 // GetResourceRouterItems ..
-func GetResourceRouterItems(resourceType string, resourceOperations []string) ([]models.GatewayRouter, error) {
-	routerItems := []models.GatewayRouter{}
+func GetResourceRouterItems(resourceType string, resourceOperations []string) ([]*models.GatewayRouter, error) {
+	routerItems := []*models.GatewayRouter{}
 	query := GetOrmer().QueryTable("sys_resource_router")
 	if len(resourceOperations) > 0 {
 		if tools.IsSliceContainsStr(resourceOperations, "*") {
@@ -49,7 +49,7 @@ func GetResourceRouterItems(resourceType string, resourceOperations []string) ([
 	return routerItems, nil
 }
 
-func generateCasbinRules(resourceRouter []models.GatewayRouter, roleName string) [][]string {
+func generateCasbinRules(resourceRouter []*models.GatewayRouter, roleName string) [][]string {
 	res := make([][]string, 0, len(resourceRouter))
 	for _, item := range resourceRouter {
 

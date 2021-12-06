@@ -74,7 +74,7 @@ export default {
           { required: true, message: '描述信息不能为空', trigger: 'blur' },
         ],
         perPolicy: [
-          { required: true, message: '请选择权限策略', trigger: 'blur' },
+          { required: true, message: '请选择资源操作', trigger: 'blur' },
         ],
       },
     };

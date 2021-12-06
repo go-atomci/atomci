@@ -8,9 +8,9 @@
 <template>
   <el-dialog top='25vh' :title="title" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog" width='40%' :before-close="doCancelCreate">
     <el-form :model="form" ref="ruleForm" :rules="rules">
-      <el-form-item :label="$t('bm.add.perPolicy')" prop="polices">
-        <el-select v-model="form.polices" :placeholder="$t('bm.add.selectPolicy')" filterable multiple>
-          <el-option v-for="(item, index) in selOptions" :key="index" :label="item.label" :value="item.value">
+      <el-form-item :label="$t('bm.add.resOperations')" prop="polices">
+        <el-select v-model="form.operations" :placeholder="$t('bm.add.selectOperation')" filterable multiple>
+          <el-option v-for="(item, index) in selOptions" :key="index" :label="item.description" :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -24,11 +24,11 @@
 <script>
 import { mapGetters } from 'vuex';
 import { Message } from 'element-ui';
-import backend from '../../../api/backend';
-import createTemplate from '../../../common/createTemplate';
+import backend from '@/api/backend';
+import createTemplate from '@/common/createTemplate';
 
 const formData = {
-  polices: [],
+  operations: [],
 };
 
 export default {
@@ -36,46 +36,34 @@ export default {
   data() {
     return {
       selOptions: [],
-      groupRoleList: [],
       // 是否属于编辑状态
       isEdit: false,
       dialogFormVisible: false,
       form: JSON.parse(JSON.stringify(formData)),
-      title: this.$t('bm.add.addResPolicy'),
+      title: this.$t('bm.add.addResOperation'),
       rules: {
-        polices: [
-          { required: true, message: '请选择权限策略', trigger: 'blur' },
+        operations: [
+          { required: true, message: '请选择资源操作', trigger: 'blur' },
         ],
       },
-	  group: '',
     };
   },
   created() {
-	if(this.userInfo.groups) {
-	  this.group = this.userInfo.groups[0].group;
-	}
-    const options = [];
-    //站位
-    // backend.getPolicyList(this.group, (data) => {
-    //   for (const i of data) {
-    //     options.push({
-    //       label: i.description,
-    //       value: i.policy_name,
-    //     });
-    //   }
-    //   this.selOptions = options;
-    // });
+    backend.getResourcesOperation((data) => {
+      if (data) {
+        this.selOptions = data;
+      }
+    });
   },
   computed: {
     ...mapGetters({
       loading: 'getPopLoading',
-	  userInfo: 'getUserInfo',
     }),
   },
   methods: {
     doCreate() {
       this.form = {
-        polices: [],
+        operations: [],
       };
       this.dialogFormVisible = true;
     },
@@ -88,10 +76,9 @@ export default {
             this.dialogFormVisible = false;
           };
           const cl = {
-            policies: this.form.polices,
+            operations: this.form.operations,
           };
-          //站位
-          backend.addRolePolicies(this.group, this.$route.params.role, cl, () => {
+          backend.addRolesOperations(this.$route.params.role, cl, () => {
             successCallBack();
           });
         }
