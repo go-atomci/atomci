@@ -975,8 +975,6 @@ export default {
       inputRoleName: '请输入角色名称',
       selectPolicy: '请选择权限策略',
       selectOperation: '请选择资源操作',
-      policyName: '策略名称',
-      inputPolicyName: '请输入策略名称',
       selectResType: '请选择资源类型',
       addResOperation: '添加资源操作',
       createResPolicy: '新建权限策略',

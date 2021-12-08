@@ -54,7 +54,7 @@ export default {
     return {
       curList: [],
       searchList: [
-        { key: 'policy_name', txt: this.$t('bm.add.policyName') },
+        { key: 'resource_operation', txt: this.$t('bm.authorManage.resourceOper') },
         { key: 'description', txt: this.$t('bm.serviceM.description') },
         { key: 'create_at', txt: this.$t('bm.serviceM.creationTime') },
       ],

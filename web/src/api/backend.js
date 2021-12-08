@@ -310,7 +310,7 @@ const backendAPI = {
 
   // 获得集群列表
   getClusterList(cb) {
-    Package.httpMethods('get', '/atomci/api/v1/clusters', cb);
+    Package.httpMethods('get', '/atomci/api/v1/integrate/clusters', cb);
   },
 
   // 查询应用编排资源空间 项目内使用

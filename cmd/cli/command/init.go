@@ -185,6 +185,11 @@ func initResource(token string) error {
 					[]string{"SyncAppBranches", "同步远程分支"},
 					[]string{"SwitchProjectBranch", "切换项目应用的默认分支"},
 					[]string{"DeleteProjectApp", "删除项目应用"},
+					[]string{"GetRepos", "获取代码仓库列表"},
+					[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
+					[]string{"GetProjectEnvs", "项目环境列表"},
+					[]string{"GetProjectPipelinesByPagination", "项目流程分页列表"},
+					[]string{"GetProjectEnvsByPagination", "项目环境分页列表"},
 					[]string{"ProjectPipelineInfo", "获取项目绑定流程信息"},
 					[]string{"ProjectAppServiceStats", "获取项目应用统计"},
 				},
@@ -218,6 +223,16 @@ func initResource(token string) error {
 					[]string{"publishID", "发布单ID"},
 					[]string{"envID", "环境ID"},
 				},
+			},
+			BatchResourceTypeSpec{
+				ResourceType: []string{"system", "系统设置"},
+				ResourceOperation: [][]string{
+					[]string{"*", "系统设置所有操作"},
+					[]string{"GetCompileEnvs", "编译环境列表"},
+					[]string{"GetIntegrateClusters", "获取集成的集群列表"},
+					[]string{"GetIntegrateSettings", "获取集成配置列表"},
+				},
+				ResourceConstraint: [][]string{},
 			},
 		},
 	}
@@ -293,6 +308,7 @@ func initGateWayRoute(token string) error {
 			[]string{"atomci/api/v1/projects/:project_id", "DELETE", "atomci", "project", "DeleteProject"},
 			[]string{"atomci/api/v1/projects/:project_id", "GET", "atomci", "project", "GetProject"},
 			[]string{"atomci/api/v1/projects/:project_id/pipelines", "GET", "atomci", "project", "GetProjectPipelines"},
+			[]string{"atomci/api/v1/projects/:project_id/pipelines", "POST", "atomci", "project", "GetProjectPipelinesByPagination"},
 			[]string{"atomci/api/v1/projects/:project_id/pipelines", "PUT", "atomci", "project", "BindProjectPipeline"},
 			[]string{"atomci/api/v1/projects/:project_id/pipelines/:id", "DELETE", "atomci", "project", "DeleteBindPipeline"},
 			[]string{"atomci/api/v1/projects/:project_id/apps/create", "POST", "atomci", "project", "CreateProjectApp"},
@@ -308,6 +324,8 @@ func initGateWayRoute(token string) error {
 			[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "DELETE", "atomci", "project", "DeleteProjectApp"},
 			[]string{"atomci/api/v1/projects/:project_id/publish/stats", "POST", "atomci", "project", "ProjectPublishStats"},
 			[]string{"atomci/api/v1/projects/:project_id/pipelines/:id", "GET", "atomci", "project", "ProjectPipelineInfo"},
+			[]string{"atomci/api/v1/projects/:project_id/envs", "GET", "atomci", "project", "GetProjectEnvs"},
+			[]string{"atomci/api/v1/projects/:project_id/envs", "POST", "atomci", "project", "GetProjectEnvsByPagination"},
 			// TODO: change to project env
 			// []string{"atomci/api/v1/pipelines/flow/stages", "GET", "atomci", "pipeline", "FlowStageList"},
 			// []string{"atomci/api/v1/pipelines/flow/stages", "POST", "atomci", "pipeline", "FlowStageListByPagination"},
@@ -332,6 +350,11 @@ func initGateWayRoute(token string) error {
 			[]string{"atomci/api/v1/pipelines/:project_id/publishes/:publish_id/stages/:stage_id/steps/:step_name", "GET", "atomci", "publish", "GetStepInfo"},
 			[]string{"atomci/api/v1/pipelines/:project_id/publishes/:publish_id/stages/:stage_id/steps/:step_name", "POST", "atomci", "publish", "RunStep"},
 			[]string{"atomci/api/v1/pipelines/:project_id/publishes/:publish_id/stages/:stage_id/steps/:step_name/callback", "POST", "atomci", "publish", "RunStepCallback"},
+
+			// integrate
+			[]string{"atomci/api/v1/integrate/compile_envs", "GET", "atomci", "system", "GetCompileEnvs"},
+			[]string{"atomci/api/v1/integrate/clusters", "GET", "atomci", "system", "GetIntegrateClusters"},
+			[]string{"atomci/api/v1/integrate/settings", "GET", "atomci", "system", "GetIntegrateSettings"},
 		},
 	}
 

@@ -90,7 +90,7 @@ func init() {
 				beego.NSRouter("/integrate/settings/create", &controllers.IntegrateController{}, "post:CreateIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/:id", &controllers.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &controllers.IntegrateController{}, "post:VerifyIntegrateSetting"),
-				beego.NSRouter("/clusters", &controllers.IntegrateController{}, "get:GetClusterIntegrateSettings"),
+				beego.NSRouter("/integrate/clusters", &controllers.IntegrateController{}, "get:GetClusterIntegrateSettings"),
 				// CompileEnv
 				beego.NSRouter("/integrate/compile_envs", &controllers.IntegrateController{}, "get:GetCompileEnvs;post:GetCompileEnvsByPagination"),
 				beego.NSRouter("/integrate/compile_envs/create", &controllers.IntegrateController{}, "post:CreateCompileEnv"),
