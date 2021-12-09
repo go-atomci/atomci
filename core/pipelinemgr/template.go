@@ -68,6 +68,8 @@ type subTask struct {
 	Params []compileEnv `json:"params,omitempty"`
 }
 
+type SubTask subTask
+
 type compileEnv struct {
 	Name            string `json:"name,omitempty"`
 	Version         string `json:"version,omitempty"`

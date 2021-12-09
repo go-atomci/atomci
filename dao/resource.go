@@ -87,6 +87,7 @@ func GetResourceType(rt string) (*models.ResourceType, error) {
 func BatchCreateResourceType(req models.BatchResourceTypeReq) error {
 	for _, resource := range req.Resources {
 		resourceType := resource.ResourceType.ResourceType
+		// TODO: fix
 		if err := DeleteResourceType(resourceType); err != nil {
 			return err
 		}

@@ -183,7 +183,7 @@ type TaskTmplReq struct {
 	Name        string    `json:"name"`
 	Type        string    `json:"type"`
 	Description string    `json:"description"`
-	SubTask     []subTask `json:"sub_task"`
+	SubTask     []SubTask `json:"sub_task"`
 }
 
 // TaskTmplResp ..

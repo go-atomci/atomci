@@ -41,13 +41,6 @@ func init() {
 
 				beego.NSRouter("/audit", &controllers.AuditController{}, "get:AuditList"),
 
-				beego.NSRouter("/init/users", &controllers.InitController{}, "post:InitUsers"),
-				beego.NSRouter("/init/compileenvs", &controllers.InitController{}, "post:InitCompileEnvs"),
-				beego.NSRouter("/init/tasktmpls", &controllers.InitController{}, "post:InitTaskTemplates"),
-				beego.NSRouter("/init/groups", &controllers.InitController{}, "post:InitGroups"),
-				beego.NSRouter("/init/resource", &controllers.InitController{}, "post:InitResource"),
-				beego.NSRouter("/init/gateway/:backend", &controllers.InitController{}, "post:InitGateway"),
-
 				beego.NSRouter("/resources", &controllers.ResourceController{}, "get:ResourceTypeList;post:CreateResourceType"),
 				beego.NSRouter("/resources-operations", &controllers.ResourceController{}, "get:ResourceOperationsList"),
 				beego.NSRouter("/resources/:resourceType", &controllers.ResourceController{}, "get:GetResourceType;put:UpdateResourceType;delete:DeleteResourceType"),

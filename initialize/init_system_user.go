@@ -128,10 +128,19 @@ func initSystemRole() error {
 		"DeleteProjectApp",
 		"GetProjectEnvs",
 		"GetProjectEnvsByPagination",
+		"CreateProjectEnv",
+		"UpdateProjectEnv",
 		"GetCompileEnvs",
 		"GetIntegrateClusters",
 		"GetProjectPipelinesByPagination",
 
+		"ProjectPipelineInfo",
+		"PipelineCreate",
+		"PipelineUpdate",
+		"PipelineDelete",
+		"FlowStepList",
+
+		"GetProjectPipelines",
 		"PublishList",
 		"CreatePublishOrder",
 		"GetPublish",
@@ -148,6 +157,8 @@ func initSystemRole() error {
 		"GetStepInfo",
 		"RunStep",
 		"RunStepCallback",
+
+		"GetProjectAppServices",
 	})
 	if err != nil {
 		return err
@@ -168,15 +179,13 @@ func initSystemRole() error {
 			Group:       constant.SystemGroup,
 			Role:        constant.SystemMemberRole,
 			Description: "普通成员",
-			// TODO: change to real resouce operation
-			Operations: memberResourceOperationIDs,
+			Operations:  memberResourceOperationIDs,
 		},
 		{
 			Group:       constant.SystemGroup,
 			Role:        constant.DevAdminRole,
 			Description: "项目管理员",
-			// TODO: change to real resouce operation
-			Operations: devAdminResourceOperationIDs,
+			Operations:  devAdminResourceOperationIDs,
 		},
 	}
 	for _, role := range roles {

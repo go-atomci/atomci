@@ -24,6 +24,22 @@ import (
 )
 
 func init() {
+
+	// 注册/更新资源
+	initResource()
+
+	// 初始化/更新路由
+	initRouterItems()
+
+	// 更新所有用户权限策略
+	// TODO: confirm
+	// func initUsers(){
+	// users, _ := dao.UserList()
+	// for _, user := range users {
+	// 	dao.InitSystemMember(user)
+	// }
+	//}()
+
 	// 初始化系统组
 	if err := InitAdminUserAndGroup(); err != nil {
 		if !errors.OrmError1062(err) {
@@ -32,7 +48,18 @@ func init() {
 		}
 	}
 
+	/*
+		TODO: Below resources just run once
+	*/
 	if err := Component(); err != nil {
+		os.Exit(2)
+	}
+
+	// init compile envs
+	initCompileEnvs()
+
+	// init task tmpls
+	if err := initTaskTemplates(); err != nil {
 		os.Exit(2)
 	}
 }
