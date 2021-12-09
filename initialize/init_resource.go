@@ -94,15 +94,16 @@ type RouterReq struct {
 func initRouterItems() error {
 
 	// TODO: fix
-	if err := dao.DeleteGatewayRouteByBackend("atomci"); err != nil {
-		log.Log.Error("Init gateway error: %s", err.Error())
-		return err
-	}
+	// if err := dao.DeleteGatewayRouteByBackend("atomci"); err != nil {
+	// 	log.Log.Error("Init gateway error: %s", err.Error())
+	// 	return err
+	// }
 	for _, route := range gaetwayReq.Routers {
 		if len(route) != 5 {
 			err := fmt.Errorf("invalid router parameter: %v", route)
 			return err
 		}
+		// TODO: add get verify
 		if err := dao.CreateGatewayRoute(route[0], route[1], route[2], route[3], route[4]); err != nil {
 			if !errors.OrmError1062(err) {
 				log.Log.Error("Init gateway error: %s", err.Error())

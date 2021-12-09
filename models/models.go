@@ -85,7 +85,7 @@ func setCreateAt(tables []string) error {
 			}
 			log.Log.Info(sql)
 		} else {
-			log.Log.Info(fmt.Sprintf("table `%v` already alter create_at, skip", table))
+			log.Log.Debug(fmt.Sprintf("table `%v` already alter create_at, skip", table))
 		}
 	}
 	return nil
@@ -107,7 +107,7 @@ func setUpdateAt(tables []string) error {
 			}
 			log.Log.Info(sql)
 		} else {
-			log.Log.Info(fmt.Sprintf("table `%v` already alter update_at, skip", table))
+			log.Log.Debug(fmt.Sprintf("table `%v` already alter update_at, skip", table))
 		}
 	}
 	return nil
@@ -211,11 +211,11 @@ func initOrm() {
 		"sys_resource_router",
 	}
 	if err := setCreateAt(tables); err != nil {
-		beego.Error(err.Error())
+		log.Log.Error(err.Error())
 		os.Exit(2)
 	}
 	if err := setUpdateAt(tables); err != nil {
-		beego.Error(err.Error())
+		log.Log.Error(err.Error())
 		os.Exit(2)
 	}
 }
@@ -223,6 +223,5 @@ func initOrm() {
 // Init ...
 func init() {
 	initOrm()
-	orm.RunSyncdb("default", false, true)
-
+	// orm.RunSyncdb("default", false, true)
 }
