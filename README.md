@@ -2,6 +2,29 @@
 
 AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源
 
+## 架构图
+
+```sh
+┌─────────┐
+│         │
+│  Gitlab ├──────┐      ┌───────────────────────┐    ┌──────────┐   ┌───────────────────────┐
+│         │      │      │ AtomCI                │    │          │   │                       │
+└─────────┘      │      │                       │    │          │   │  ┌────────────────┐   │
+                 │      │      Frontend (Vue)   │    │          │   │  │ jnlp-agent pod1│   │
+                 ├──────►                       ├────►          │   │  └────────────────┘   │
+┌──────────┐     │      │                       │    │          ├───►                       │
+│          │     │      │      Backend (Go)     ◄────┤  Jenkins │   │  ┌────────────────┐   │
+│ Harbor   ├─────┤      │                       │    │          │   │  │ jnlp-agent pod2│   │
+│          │     │      │                       │    │          │   │  └────────────────┘   │
+└──────────┘     │      └──────────┬────────────┘    │          │   │        ....           │
+                 │                 │                 │          │   │  ┌────────────────┐   │
+┌───────────┐    │      ┌──────────┴────────────┐    ├──────────┤   │  │ jnlp-agent podn│   │
+│           │    │      │                       │    │k8s/docker│   │  └────────────────┘   │
+│ Kubernetes│    │      │        MySQL          │    │   or     │   │                       │
+│           ├────┘      │                       │    │ warfile  │   │ agent on kubernetes   │
+└───────────┘           └───────────────────────┘    └──────────┘   └───────────────────────┘
+```
+
 ## 源起
 
 ## 视频演示
@@ -70,13 +93,32 @@ $ yarn run dev
 http://your-ip:8081
 ```
 
+## 如何构建镜像
+
+### 前端
+```sh
+$ cd web
+$ pwd
+# ./atomci/web/
+$ cd web ; docker build . 
+```
+
+### 后端
+```sh
+$ pwd
+# ./atomci
+$ docker build .
+```
+
+> 如果你使用 [`docker-compsoe`](https://go-atomci.github.io/atomci-press/install/02docker-compose.html)方式部署的话，可以通过替换镜像地址的方式，即可使用`master`分支的最新代码．
+
 ## 互动交流
 
 ### AtomCI开发者
 ![Wechat](https://img.shields.io/badge/-colynnliu-%2307C160?style=flat&logo=Wechat&logoColor=white)
 
-<a href="https://github.com/go-atomci/atomci-press/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=go-atomci/atomci-press" />
+<a href="https://github.com/go-atomci/atomci/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=go-atomci/atomci" />
 </a>
 
 ---
