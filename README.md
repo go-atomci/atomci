@@ -83,7 +83,7 @@ http://your-ip:8081
 
 ### 已知问题
 
-__AtomCI__ 仍在不断完善中（[问题列表](https://github.com/go-atomci/atomci-press/issues)）， 如果你发现你想用的一些功能不能正常工作的话，烦请[创建issue](https://github.com/go-atomci/atomci-press/issues/new)，我们会及时标记、修复。 
+__AtomCI__ 仍在不断完善中（[问题列表](https://github.com/go-atomci/atomci/issues)）， 如果你发现你想用的一些功能不能正常工作的话，烦请[创建issue](https://github.com/go-atomci/atomci/issues/new)，我们会及时标记、修复。 
 
 __AtomCI__ 因你而变。
 
