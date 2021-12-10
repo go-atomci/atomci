@@ -100,7 +100,7 @@ func initSystemRole() error {
 	memberResourceOperationIDs := []int64{}
 	devAdminResourceOperationIDs := []int64{}
 
-	devAdminResourceOperations, err := dao.GetResourceOperationByResourceTypes([]string{"pipeline", "project", "publish"})
+	devAdminResourceOperations, err := dao.GetResourceOperationByResourceTypes([]string{"pipeline", "project", "publish", "auth"})
 	if err != nil {
 		return err
 	}
@@ -109,6 +109,8 @@ func initSystemRole() error {
 	}
 
 	sysMemberResourceOperations, err := dao.GetResourceOperationByResourceOperations([]string{
+		"GetCurrentUser",
+
 		"ProjectList",
 		"CreateProject",
 		"UpdateProject",
@@ -127,6 +129,7 @@ func initSystemRole() error {
 		"SwitchProjectBranch",
 		"DeleteProjectApp",
 		"GetProjectEnvs",
+		"GetIntegrateSettings",
 		"GetProjectEnvsByPagination",
 		"CreateProjectEnv",
 		"UpdateProjectEnv",
@@ -144,6 +147,7 @@ func initSystemRole() error {
 		"PublishList",
 		"CreatePublishOrder",
 		"GetPublish",
+		"GetJenkinsConfig",
 		"ClosePublish",
 		"DeletePublish",
 		"GetCanAddedApps",
@@ -159,6 +163,12 @@ func initSystemRole() error {
 		"RunStepCallback",
 
 		"GetProjectAppServices",
+		"GetAppServiceInspect",
+		"GetAppServiceLog",
+		"GetAppServiceEvent",
+		"AppServiceRestart",
+		"AppServiceScale",
+		"AppServiceTerminal",
 	})
 	if err != nil {
 		return err

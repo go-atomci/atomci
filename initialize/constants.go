@@ -70,6 +70,7 @@ var resourceReq = ResourceReq{
 				[]string{"UpdateProject", "更新项目信息"},
 				[]string{"DeleteProject", "删除项目"},
 				[]string{"GetProject", "获取项目信息"},
+
 				[]string{"CreateProjectApp", "项目添加应用"},
 				[]string{"UpdateProjectApp", "更新项目应用"},
 				[]string{"GetProjectApps", "获取项目应用列表"},
@@ -83,11 +84,20 @@ var resourceReq = ResourceReq{
 				[]string{"DeleteProjectApp", "删除项目应用"},
 				[]string{"GetRepos", "获取代码仓库列表"},
 				[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
+				[]string{"ParserAppArrange", "应用编排解析"},
+				[]string{"GetJenkinsConfig", "获取Jenkins配置"},
+
 				[]string{"GetProjectEnvs", "项目环境列表"},
 				[]string{"GetProjectPipelinesByPagination", "项目流程分页列表"},
 
 				// project app service
 				[]string{"GetProjectAppServices", "应用服务列表"},
+				[]string{"GetAppServiceInspect", "应用服务详情"},
+				[]string{"GetAppServiceLog", "应用服务日志"},
+				[]string{"GetAppServiceEvent", "应用服务事件"},
+				[]string{"AppServiceRestart", "重启应用服务"},
+				[]string{"AppServiceScale", "水平扩展应用服务"},
+				[]string{"AppServiceTerminal", "应用服务终端调试"},
 
 				// project pipeline
 				[]string{"PipelineCreate", "创建项目流程"},
@@ -196,12 +206,22 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/projects/:project_id/apps", "POST", "atomci", "project", "GetAppsByPagination"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "GET", "atomci", "project", "GetArrange"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "POST", "atomci", "project", "SetArrange"},
+		[]string{"atomci/api/v1/arrange/yaml/parser", "POST", "atomci", "project", "ParserAppArrange"},
+		[]string{"atomci/api/pipelines/stages/:stage_id/jenkins-config", "GET", "atomci", "project", "GetJenkinsConfig"},
+
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/branches", "POST", "atomci", "project", "GetAppBranches"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/syncBranches", "POST", "atomci", "project", "SyncAppBranches"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "PUT", "atomci", "project", "UpdateProjectApp"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "PATCH", "atomci", "project", "SwitchProjectBranch"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "DELETE", "atomci", "project", "DeleteProjectApp"},
 		[]string{"atomci/api/v1/projects/:project_id/clusters/:cluster/apps", "POST", "atomci", "project", "GetProjectAppServices"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app", "GET", "atomci", "project", "GetAppServiceInspect"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/log", "GET", "atomci", "project", "GetAppServiceLog"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/event", "GET", "atomci", "project", "GetAppServiceEvent"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/restart", "POST", "atomci", "project", "AppServiceRestart"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/scale", "POST", "atomci", "project", "AppServiceScale"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/pods/:podname/containernames/:containername", "GET", "atomci", "project", "AppServiceTerminal"},
+
 		[]string{"atomci/api/v1/projects/:project_id/publish/stats", "POST", "atomci", "project", "ProjectPublishStats"},
 		[]string{"atomci/api/v1/projects/:project_id/envs", "GET", "atomci", "project", "GetProjectEnvs"},
 		[]string{"atomci/api/v1/projects/:project_id/envs", "POST", "atomci", "project", "GetProjectEnvsByPagination"},
