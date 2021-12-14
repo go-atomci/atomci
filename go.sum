@@ -416,6 +416,8 @@ github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NH
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/isbrick/http-client v0.0.0-20210321135403-0a5df00fdb84 h1:f+X6/PyYYWQx2LQEUwCEdZiLxYHrpc4b87KFBHrZBnE=
 github.com/isbrick/http-client v0.0.0-20210321135403-0a5df00fdb84/go.mod h1:ILI7SGUToE8ebBaVw9+tdlWlj2naGFmnMU+FrQj+6ro=
+github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175 h1:HnZgYkC7M0z/0Ll+qXQS2jizZgWjSkC90j6HDmr/SuM=
+github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175/go.mod h1:3jxvSrtFqeDL15wHztv4lLjQqB1YiPU3jAewh3LwUW0=
 github.com/jellevandenhooff/dkim v0.0.0-20150330215556-f50fe3d243e1/go.mod h1:E0B/fFc00Y+Rasa88328GlI/XbtyysCtTHZS8h7IrBU=
 github.com/jimstudt/http-authentication v0.0.0-20140401203705-3eca13d6893a/go.mod h1:wK6yTYYcgjHE1Z1QtXACPDjcFJyBskHEdagmnq3vsP8=
 github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af/go.mod h1:Nht3zPeWKUH0NzdCt2Blrr5ys8VGpn0CEB0cQHVjt7k=

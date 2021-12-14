@@ -87,15 +87,8 @@ func GetResourceType(rt string) (*models.ResourceType, error) {
 func BatchCreateResourceType(req models.BatchResourceTypeReq) error {
 	for _, resource := range req.Resources {
 		resourceType := resource.ResourceType.ResourceType
-		if err := DeleteResourceType(resourceType); err != nil {
-			return err
-		}
 		sql := `insert ignore into sys_resource_type(resource_type,description) values(?,?)`
 		if _, err := GetOrmer().Raw(sql, resourceType, resource.ResourceType.Description).Exec(); err != nil {
-			return err
-		}
-		sql = `insert ignore into sys_resource_operation(resource_type,resource_operation,description) values(?,'*','所有操作')`
-		if _, err := GetOrmer().Raw(sql, resourceType).Exec(); err != nil {
 			return err
 		}
 
@@ -137,9 +130,7 @@ func CreateResourceType(resourceType, description string) (*models.ResourceType,
 	if _, err := GetOrmer().Raw(sql, resourceType, description).Exec(); err != nil {
 		return nil, err
 	}
-	if err := AddResourceOperation(resourceType, "*", "所有操作"); err != nil {
-		return nil, err
-	}
+
 	res, err := GetResourceTypeDetail(resourceType, []string{}, []string{})
 	if err != nil {
 		return nil, err
@@ -192,6 +183,36 @@ func GetResourceOperation(resourceType, resourceOperation string) (*models.Resou
 		return nil, err
 	}
 	return &op, nil
+}
+
+func GetResourceOperationByResourceTypes(resourceTypes []string) ([]*models.ResourceOperation, error) {
+	var resItems []*models.ResourceOperation
+	if _, err := GetOrmer().QueryTable("sys_resource_operation").
+		Filter("resource_type__in", resourceTypes).
+		All(&resItems); err != nil {
+		return nil, err
+	}
+	return resItems, nil
+}
+
+func GetResourceOperationByResourceOperations(resourceOperations []string) ([]*models.ResourceOperation, error) {
+	var resItems []*models.ResourceOperation
+	if _, err := GetOrmer().QueryTable("sys_resource_operation").
+		Filter("resource_operation__in", resourceOperations).
+		All(&resItems); err != nil {
+		return nil, err
+	}
+	return resItems, nil
+}
+
+func GetResourceOperationByIDs(resourceItemIDs []int64) ([]*models.ResourceOperation, error) {
+	var resItems []*models.ResourceOperation
+	if _, err := GetOrmer().QueryTable("sys_resource_operation").
+		Filter("id__in", resourceItemIDs).
+		All(&resItems); err != nil {
+		return nil, err
+	}
+	return resItems, nil
 }
 
 func AddResourceOperation(resourceType, resourceOperation, description string) error {
@@ -266,11 +287,7 @@ func GetUserConstraintByKey(user string, constraintKey []string) (map[string][]s
 	}
 	res := map[string][]string{}
 	for _, con := range constraints {
-		if _, ok := res[con.Constraint]; ok {
-			res[con.Constraint] = append(res[con.Constraint], con.Value)
-		} else {
-			res[con.Constraint] = []string{con.Value}
-		}
+		res[con.Constraint] = append(res[con.Constraint], con.Value)
 	}
 	return res, nil
 }

@@ -35,14 +35,14 @@
   </div>
 </template>
 <script>
-import backend from '../../api/backend';
+import backend from '@/api/backend';
 import PageNav from '../utils/Page';
 import ListSearch from '../utils/ListSearch';
 import RoleCreate from '../utils/user/RoleCreate';
 import CommonDelete from '../utils/Delete';
 import Refresh from '../utils/Refresh';
-import listTemplate from '../../common/listTemplate';
-import UtilsFn from '../../common/utils';
+import listTemplate from '@/common/listTemplate';
+import UtilsFn from '@/common/utils';
 
 export default {
   mixins: [listTemplate],
@@ -53,7 +53,6 @@ export default {
       searchList: [
         { key: 'role', txt: this.$t('bm.add.roleName') },
         { key: 'description', txt: this.$t('bm.serviceM.description') },
-        { key: 'policy', txt: this.$t('bm.add.perPolicy') },
       ],
       filterTxt: '',
     };
@@ -96,8 +95,7 @@ export default {
           }
         });
       } else {
-        // TODO: group's name use system , tmp
-        backend.getGroupRoleList("system", (data) => {
+        backend.getGroupRoleList((data) => {
           if (data) {
             this.curList = data.map((item) => {
               if (item.policies) {

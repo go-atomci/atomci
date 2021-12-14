@@ -41,13 +41,6 @@ func init() {
 
 				beego.NSRouter("/audit", &controllers.AuditController{}, "get:AuditList"),
 
-				beego.NSRouter("/init/users", &controllers.InitController{}, "post:InitUsers"),
-				beego.NSRouter("/init/compileenvs", &controllers.InitController{}, "post:InitCompileEnvs"),
-				beego.NSRouter("/init/tasktmpls", &controllers.InitController{}, "post:InitTaskTemplates"),
-				beego.NSRouter("/init/groups", &controllers.InitController{}, "post:InitGroups"),
-				beego.NSRouter("/init/resource", &controllers.InitController{}, "post:InitResource"),
-				beego.NSRouter("/init/gateway/:backend", &controllers.InitController{}, "post:InitGateway"),
-
 				beego.NSRouter("/resources", &controllers.ResourceController{}, "get:ResourceTypeList;post:CreateResourceType"),
 				beego.NSRouter("/resources-operations", &controllers.ResourceController{}, "get:ResourceOperationsList"),
 				beego.NSRouter("/resources/:resourceType", &controllers.ResourceController{}, "get:GetResourceType;put:UpdateResourceType;delete:DeleteResourceType"),
@@ -73,9 +66,10 @@ func init() {
 
 				beego.NSRouter("/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
 
-				beego.NSRouter("/groups/:group/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
-				beego.NSRouter("/groups/:group/roles/:role", &controllers.RoleController{}, "get:GetRole;put:UpdateRole;delete:DeleteRole"),
-				beego.NSRouter("/groups/:group/roles/:role/policies", &controllers.RoleController{}, "get:RolePolicyList;post:AddRolePolicy;delete:RemoveRolePolicy"),
+				beego.NSRouter("/roles", &controllers.RoleController{}, "get:RoleList;post:CreateRole"),
+				beego.NSRouter("/roles/:role", &controllers.RoleController{}, "get:GetRole;put:UpdateRole;delete:DeleteRole"),
+				beego.NSRouter("/roles/:role/operations", &controllers.RoleController{}, "get:RoleOperationList;post:AddRoleOperation"),
+				beego.NSRouter("/roles/:role/operations/:operationID", &controllers.RoleController{}, "delete:RemoveRoleOperation"),
 				beego.NSRouter("/groups/:group/roles/:role/bundling", &controllers.RoleController{}, "get:RoleBundlingList;post:RoleBundling;delete:RoleUnbundling"),
 
 				// PipelineStage
@@ -89,7 +83,7 @@ func init() {
 				beego.NSRouter("/integrate/settings/create", &controllers.IntegrateController{}, "post:CreateIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/:id", &controllers.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &controllers.IntegrateController{}, "post:VerifyIntegrateSetting"),
-				beego.NSRouter("/clusters", &controllers.IntegrateController{}, "get:GetClusterIntegrateSettings"),
+				beego.NSRouter("/integrate/clusters", &controllers.IntegrateController{}, "get:GetClusterIntegrateSettings"),
 				// CompileEnv
 				beego.NSRouter("/integrate/compile_envs", &controllers.IntegrateController{}, "get:GetCompileEnvs;post:GetCompileEnvsByPagination"),
 				beego.NSRouter("/integrate/compile_envs/create", &controllers.IntegrateController{}, "post:CreateCompileEnv"),

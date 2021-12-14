@@ -310,7 +310,7 @@ const backendAPI = {
 
   // 获得集群列表
   getClusterList(cb) {
-    Package.httpMethods('get', '/atomci/api/v1/clusters', cb);
+    Package.httpMethods('get', '/atomci/api/v1/integrate/clusters', cb);
   },
 
   // 查询应用编排资源空间 项目内使用
@@ -329,25 +329,9 @@ const backendAPI = {
     Package.httpMethods('get', `/atomci/api/v1/clusters/${cluster}/namespaces/${namespace}/apps/${appname}/event`, cb);
   },
 
-  // 获取发布详情
-  getPublishHistoryDetail(projectId, publishJobId, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/publish-jobs/${publishJobId}`, cb);
-  },
-  // 创建项目流水线
-  createProjectSheet(projectId, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${projectId}/publishes/create`, cb, body);
-  },
-  // 获取发布历史记录
-  getPublishHistory(projectId, pubType, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/stages/${pubType}/publish-jobs`, cb);
-  },
   // 获取流水线详情数据
   getListdetail(projectId, publishid, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/publishes/${publishid}`, cb);
-  },
-  // 获取预合并分支
-  getPreMergeBranch(plid, psid, sid, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/pipelines/${plid}/publishes/${psid}/stages/${sid}/steps/publish/`, cb);
   },
   
   // 删除项目
@@ -366,10 +350,6 @@ const backendAPI = {
   getProjectApp(id, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${id}/apps`, cb);
   },
-  // 获取域名地址列表
-  getProjectAddress(id, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/projects/${id}/addressList`, cb);
-  },
   // 获得应用仓库列表
   getWarehouse(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/apps', cb, body);
@@ -381,10 +361,6 @@ const backendAPI = {
   // 获得应用所有分支列表
   getBranches(appID, cb) {
     Package.httpMethods('get', `/atomci/api/v1/apps/${appID}/branches`, cb);
-  },
-  // 获得应用仓库详情
-  getWarehouseDetail(scmAppId, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/apps/${scmAppId}`, cb);
   },
   // 设置应用编排信息
   setArrangement(scmAppId, env, group, body, cb) {
@@ -439,38 +415,13 @@ const backendAPI = {
   getGroupViewList(group, cb) {
     Package.httpMethods('get', `/atomci/api/v1/groups/${group}`, cb);
   },
-  // 获得角色列表数据
-  getRoleViewList(role, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/roles/${role}`, cb);
-  },
-  // 添加角色详情-权限
-  addRolesPermissions(role, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/roles/${role}/permissions`, cb, body);
+  // 添加角色详情-资源操作
+  addRolesOperations(role, body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/roles/${role}/operations`, cb, body);
   },
   // 删除角色详情列表数据
   delRolePers(role, permissions, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/roles/${role}/permissions/${permissions}`, cb);
-  },
-  // 获得应用列表数据
-  getApplicationViewList(app, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/applications/${app}`, cb);
-  },
-
-  // 添加应用详情-权限
-  addApplicationPermissions(app, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/applications/${app}`, cb, body);
-  },
-  // 添加资源详情-创建资源
-  addApplicationResources(app, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/applications/${app}/resources`, cb, body);
-  },
-  // 更新资源详情-更新资源
-  putApplicationResources(app, type, body, cb) {
-    Package.httpMethods('put', `/atomci/api/v1/applications/${app}/resources/${type}`, cb, body);
-  },
-  // 删除应用详情列表数据
-  delAppPers(app, type, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/applications/${app}/resources/${type}`, cb);
   },
   // 更新用户
   updateUser(user, body, cb) {
@@ -494,10 +445,6 @@ const backendAPI = {
     Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/users/${user}`, cb);
   },
   // 删除用户组权限 - 角色
-  delGroupRole(group, role, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/roles/${role}`, cb);
-  },
-  // 删除用户组权限 - 角色
   delGroupConstraints(group, constraints, cb) {
     Package.httpMethods(
       'delete',
@@ -519,12 +466,7 @@ const backendAPI = {
   },
   // 更新用户组详情-约束
   putGroupConstraints(group, constraints, body, cb) {
-    Package.httpMethods(
-      'put',
-      `/atomci/api/v1/groups/${group}/constraints/${constraints}`,
-      cb,
-      body
-    );
+    Package.httpMethods('put', `/atomci/api/v1/groups/${group}/constraints/${constraints}`, cb, body);
   },
   // 操作审计列表
   getAudit(cb) {
@@ -532,14 +474,6 @@ const backendAPI = {
   },
 
     
-  // 获取应用权限列表数据
-  getApplicationList(cb) {
-    Package.httpMethods('get', '/atomci/api/v1/applications', cb);
-  },
-  // 删除应用
-  delApplication(app, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/applications/${app}`, cb);
-  },
   // 获得权限列表数据
   getPermissionList(cb) {
     Package.httpMethods('get', '/atomci/api/v1/permissions', cb);
@@ -585,19 +519,6 @@ const backendAPI = {
   delGroup(group, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/groups/${group}`, cb);
   },
-  // 获得部门成员
-  getBuUser(bu, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${bu}`, cb);
-  },
-  // 把用户从部门中移除
-  removeUserToBu(bu, user, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${bu}/users/${user}`, cb);
-  },
-  // 添加用户到部门当中
-  addUserToBu(bu, body, cb, errCb) {
-    Package.httpMethods('post', `/atomci/api/v1/groups/${bu}/users`, cb, body, errCb);
-  },
-
 
   // pod实例状态列表
   getPodStatusViews(clusterName, namespace, appname, podname, cb) {
@@ -610,11 +531,7 @@ const backendAPI = {
 
   // 移除应用
   removeService(clusterName, namespace, serviceID, cb) {
-    Package.httpMethods(
-      'delete',
-      `/atomci/api/v1/clusters/${clusterName}/namespaces/${namespace}/apps/${serviceID}`,
-      cb
-    );
+    Package.httpMethods('delete', `/atomci/api/v1/clusters/${clusterName}/namespaces/${namespace}/apps/${serviceID}`, cb);
   },
   // 重启应用
   reStart(clusterName, namespace, appname, cb) {
@@ -623,14 +540,6 @@ const backendAPI = {
       `/atomci/api/v1/clusters/${clusterName}/namespaces/${namespace}/apps/${appname}/restart`,
       cb
     );
-  },
-  // 获得人员列表
-  getBizUsers(group, role, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/roles/${role}`, cb);
-  },
-  // 获得产品列表
-  getBizclustersInfo(bu, bizcluster, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${bu}/bizclusters/${bizcluster}`, cb);
   },
   // 获得应用详情
   getServiceInspect(clusterName, namespace, serviceID, cb) {
@@ -672,12 +581,17 @@ const backendAPI = {
   },
   
   // 查询角色列表
-  getGroupRoleList(group, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/roles`, cb);
+  getGroupRoleList(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles`, cb);
   },
   // 更新组角色
-  updateGroupRole(group, role, body, cb) {
-    Package.httpMethods('put', `/atomci/api/v1/groups/${group}/roles/${role}`, cb, body);
+  updateGroupRole(role, body, cb) {
+    Package.httpMethods('put', `/atomci/api/v1/roles/${role}`, cb, body);
+  },
+
+  // 删除用户组权限 - 角色
+  delGroupRole(group, role, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/roles/${role}`, cb);
   },
 
   // 资源操作
@@ -685,21 +599,9 @@ const backendAPI = {
     Package.httpMethods('get', '/atomci/api/v1/resources-operations', cb);
   },
     
-  // 权限策略列表
-  getPolicyList(group, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/policies`, cb);
-  },
   // 创建权限策略
   addPolicies(group, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${group}/policies`, cb, body);
-  },
-  // 更新权限策略
-  updatePolicies(group, policy, body, cb) {
-    Package.httpMethods('put', `/atomci/api/v1/groups/${group}/policies/${policy}`, cb, body);
-  },
-  // 删除权限策略
-  deletePolicies(group, policy, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/policies/${policy}`, cb);
   },
   // 查看权限策略
   getPoliciesDetail(group, policy, cb) {
@@ -723,17 +625,20 @@ const backendAPI = {
     Package.httpMethods('get', `/atomci/api/v1/groups/${group}/users`, cb);
   },
   // 查询角色详情
-  getGroupRoleDetail(group, role, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/groups/${group}/roles/${role}`, cb);
+  getGroupRoleDetail(role, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles/${role}`, cb);
   },
-  // 添加角色权限策略
-  addRolePolicies(group, role, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/groups/${group}/roles/${role}/policies`, cb, body);
+
+  // 查询角色操作
+  getRoleOperations(role, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/roles/${role}/operations`, cb);
   },
-  // 删除角色权限策略
-  deleteRolePolicies(body, group, role, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/groups/${group}/roles/${role}/policies`, cb, body);
+
+  // 删除角色操作
+  deleteRoleOperation(role, operationID, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/roles/${role}/operations/${operationID}`, cb);
   },
+
   // 添加角色绑定用户
   addRoleBindUser(group, role, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${group}/roles/${role}/bundling`, cb, body);
@@ -986,7 +891,7 @@ const backendAPI = {
   createBranch(project_id, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/branches`, cb, body);
   },
-  ansyBranch(project_id, app_id, cb) {
+  asyncBranch(project_id, app_id, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/syncBranches`, cb);
   },
   //新增应用模块

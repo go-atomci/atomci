@@ -28,11 +28,7 @@ type RoleController struct {
 
 // RoleList ..
 func (r *RoleController) RoleList() {
-	groupName := r.GetStringFromPath(":group")
-	if groupName == "" {
-		groupName = "system"
-	}
-	rsp, err := dao.GroupRoleList(groupName)
+	rsp, err := dao.GroupRoleList("system")
 	if err != nil {
 		r.HandleInternalServerError(err.Error())
 		log.Log.Error("Get role list error: %s", err.Error())
@@ -43,10 +39,9 @@ func (r *RoleController) RoleList() {
 }
 
 func (r *RoleController) GetRole() {
-	groupName := r.GetStringFromPath(":group")
 	roleName := r.GetStringFromPath(":role")
 
-	rsp, err := dao.GetGroupRoleByName(groupName, roleName)
+	rsp, err := dao.GetGroupRoleByName("system", roleName)
 	if err != nil {
 		r.HandleInternalServerError(err.Error())
 		log.Log.Error("Get role error: %s", err.Error())
@@ -80,11 +75,10 @@ func (r *RoleController) CreateRole() {
 }
 
 func (r *RoleController) UpdateRole() {
-	groupName := r.GetStringFromPath(":group")
 	roleName := r.GetStringFromPath(":role")
 	var req models.GroupRoleReq
 	r.DecodeJSONReq(&req)
-	req.Group = groupName
+	req.Group = "system"
 	req.Role = roleName
 
 	if err := req.Verify(); err != nil {
@@ -104,10 +98,8 @@ func (r *RoleController) UpdateRole() {
 }
 
 func (r *RoleController) DeleteRole() {
-	groupName := r.GetStringFromPath(":group")
 	roleName := r.GetStringFromPath(":role")
-
-	if err := dao.DeleteGroupRole(groupName, roleName); err != nil {
+	if err := dao.DeleteGroupRole("system", roleName); err != nil {
 		r.HandleInternalServerError(err.Error())
 		log.Log.Error("Delete role error: %s", err.Error())
 		return
@@ -166,26 +158,39 @@ func (r *RoleController) RoleUnbundling() {
 	r.ServeJSON()
 }
 
-func (r *RoleController) RolePolicyList() {
-	// groupName := r.GetStringFromPath(":group")
-	// roleName := r.GetStringFromPath(":role")
-	// TODO: need change role resources list
-	rsp := []string{}
+func (r *RoleController) RoleOperationList() {
+	roleName := r.GetStringFromPath(":role")
+	rolesOperations, err := dao.GetRoleOperationsByRoleName(roleName)
+	if err != nil {
+		r.HandleInternalServerError(err.Error())
+		log.Log.Error("get role operations by role name error: %s", err.Error())
+		return
+	}
+	resIDs := []int64{}
+	for _, item := range rolesOperations {
+		resIDs = append(resIDs, item.OperationID)
+	}
+	rsp, err := dao.GetResourceOperationByIDs(resIDs)
+	if err != nil {
+		r.HandleInternalServerError(err.Error())
+		log.Log.Error("get role operations by ids error: %s", err.Error())
+		return
+	}
+
 	r.Data["json"] = NewResult(true, rsp, "")
 	r.ServeJSON()
 }
 
-func (r *RoleController) AddRolePolicy() {
-	groupName := r.GetStringFromPath(":group")
+func (r *RoleController) AddRoleOperation() {
 	roleName := r.GetStringFromPath(":role")
-	var req models.GroupRolePolicyReq
+	var req models.GroupRoleOperationReq
 	r.DecodeJSONReq(&req)
-	req.Group = groupName
 	req.Role = roleName
+	req.Group = "system"
 
 	if err := dao.AddRoleOperation(&req); err != nil {
 		r.HandleInternalServerError(err.Error())
-		log.Log.Error("Add role policy error: %s", err.Error())
+		log.Log.Error("Add role operation error: %s", err.Error())
 		return
 	}
 
@@ -193,17 +198,16 @@ func (r *RoleController) AddRolePolicy() {
 	r.ServeJSON()
 }
 
-func (r *RoleController) RemoveRolePolicy() {
-	groupName := r.GetStringFromPath(":group")
+func (r *RoleController) RemoveRoleOperation() {
 	roleName := r.GetStringFromPath(":role")
-	var req models.GroupRolePolicyReq
-	r.DecodeJSONReq(&req)
-	req.Group = groupName
+	operationID, _ := r.GetInt64FromPath(":operationID")
+	req := models.GroupRoleOperationReq{}
 	req.Role = roleName
+	req.Operations = []int64{operationID}
 
 	if err := dao.DeleteGroupRolePolicy(&req); err != nil {
 		r.HandleInternalServerError(err.Error())
-		log.Log.Error("Remove role policy error: %s", err.Error())
+		log.Log.Error("Remove role operation error: %s", err.Error())
 		return
 	}
 

@@ -5,7 +5,7 @@ ADD . /go/src/atomci
 
 WORKDIR /go/src/atomci
 
-RUN go build ./cmd/atomci &&  go build ./cmd/cli
+RUN go build ./cmd/atomci
 
 ## run
 FROM alpine:3.9
@@ -19,7 +19,6 @@ RUN mkdir -p /atomci && mkdir -p /atomci/log
 WORKDIR /atomci
 
 COPY --from=build-env /go/src/atomci/atomci /atomci
-COPY --from=build-env /go/src/atomci/cli /atomci
 
 ENV PATH $PATH:/atomci
 

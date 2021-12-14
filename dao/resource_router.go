@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/go-atomci/atomci/models"
+	"github.com/isbrick/tools"
 )
 
 func CreateGatewayRoute(router, method, backend, resourceType, resourceOperation string) error {
@@ -32,11 +33,15 @@ func CreateGatewayRoute(router, method, backend, resourceType, resourceOperation
 }
 
 // GetResourceRouterItems ..
-func GetResourceRouterItems(resourceOperations []string) ([]models.GatewayRouter, error) {
-	routerItems := []models.GatewayRouter{}
+func GetResourceRouterItems(resourceType string, resourceOperations []string) ([]*models.GatewayRouter, error) {
+	routerItems := []*models.GatewayRouter{}
 	query := GetOrmer().QueryTable("sys_resource_router")
 	if len(resourceOperations) > 0 {
-		query = query.Filter("resource_operation__in", resourceOperations)
+		if tools.IsSliceContainsStr(resourceOperations, "*") {
+			query = query.Filter("resource_type", resourceType)
+		} else {
+			query = query.Filter("resource_operation__in", resourceOperations)
+		}
 	}
 	if _, err := query.All(&routerItems); err != nil {
 		return nil, err
@@ -44,7 +49,7 @@ func GetResourceRouterItems(resourceOperations []string) ([]models.GatewayRouter
 	return routerItems, nil
 }
 
-func generateCasbinRules(resourceRouter []models.GatewayRouter, roleName string) [][]string {
+func generateCasbinRules(resourceRouter []*models.GatewayRouter, roleName string) [][]string {
 	res := make([][]string, 0, len(resourceRouter))
 	for _, item := range resourceRouter {
 

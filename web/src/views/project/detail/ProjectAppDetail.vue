@@ -208,7 +208,7 @@ export default {
     synBranch() {
       MessageBox.confirm('确定同步远程分支吗？', this.$t('bm.infrast.tips'), { type: 'warning' })
         .then(() => {
-          backend.ansyBranch(this.$route.params.projectId, this.$route.params.appId, (data) => {
+          backend.asyncBranch(this.$route.params.projectId, this.$route.params.appId, (data) => {
             Message.success(this.$t('bm.add.optionSuc'));
             this.getList();
           });

@@ -30,9 +30,6 @@ run: build
 web:
 	cd web; yarn run dev
 	
-cli:
-## cli: Build cli
-	${GO_BUILD} ./cmd/cli
 
 .PHONY: lint
 lint:

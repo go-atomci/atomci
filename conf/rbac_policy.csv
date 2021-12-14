@@ -13,9 +13,6 @@ p, developer, /atomci/api/v1/projects/:id/apps/:id/syncBranches, POST
 p, developer, /atomci/api/v1/projects/:id/apps/:id, PATCH
 p, developer, /atomci/api/v1/projects/:id/apps/:id, PUT
 p, developer, /atomci/api/v1/pipelines/flow/stages, GET
-p, developer, /passport/api/v1/init/users, POST
-p, developer, /passport/api/v1/init/groups, POST
-p, developer, /passport/api/v1/init/resource, POST
 p, developer, /atomci/api/v1/pipelines/:id/publishes/:pipeline_id/stages/:stage_id/steps/:step, GET
 p, developer, /atomci/api/v1/pipelines/:id/publishes/:pipeline_id/stages/:stage_id/steps/:step, POST
 p, developer, /atomci/api/v1/pipelines/flow/stages, GET
@@ -44,12 +41,15 @@ p, devManager, /atomci/api/v1/projects/:id/apps/:id/syncBranches, POST
 p, devManager, /atomci/api/v1/projects/:id/apps/:id, PATCH
 p, devManager, /atomci/api/v1/projects/:id/apps/:id, PUT
 p, devManager, /atomci/api/v1/pipelines/flow/stages, GET
-p, test001, /atomci/api/v1/init/gateway/:backend, POST
 p, developer, /atomci/api/v1/projects/create, POST
 p, devManager, /atomci/api/v1/projects/create, POST
-p, developer, /publishctl/api/v1/projects/create, POST
-p, devManager, /publishctl/api/v1/projects/create, POST
-g, colynn, groupMember
-g, colynn, admin
-g, colynn, developer
-g, admin, developer
+p, developer, /atomci/api/v1/projects/:project_id/apps, GET
+p, developer, /atomci/api/v1/projects/:project_id/envs, GET
+p, developer, /atomci/api/v1/projects/:project_id/envs, POST
+p, developer, /atomci/api/v1/projects/:project_id/pipelines, POST
+p, developer, /atomci/api/v1/integrate/clusters, GET
+p, developer, /atomci/api/v1/integrate/settings, GET
+p, developer, /atomci/api/v1/repos, GET
+p, developer, /atomci/api/v1/repos/:repo_id/projects, POST
+p, developer, /atomci/api/v1/integrate/compile_envs, GET
+p, developer, /atomci/api/v1/projects/:project_id/apps/create, POST

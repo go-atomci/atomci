@@ -93,26 +93,109 @@ func initAdminUser() (int64, error) {
 
 // 初始化系统角色和管理员用户
 func initSystemRole() error {
+	adminResourceItem, err := dao.GetResourceOperation("*", "*")
+	if err != nil {
+		return err
+	}
+	memberResourceOperationIDs := []int64{}
+	devAdminResourceOperationIDs := []int64{}
+
+	devAdminResourceOperations, err := dao.GetResourceOperationByResourceTypes([]string{"pipeline", "project", "publish", "auth"})
+	if err != nil {
+		return err
+	}
+	for _, item := range devAdminResourceOperations {
+		devAdminResourceOperationIDs = append(devAdminResourceOperationIDs, item.ID)
+	}
+
+	sysMemberResourceOperations, err := dao.GetResourceOperationByResourceOperations([]string{
+		"GetCurrentUser",
+
+		"ProjectList",
+		"CreateProject",
+		"UpdateProject",
+		"GetProject",
+		"CreateProjectApp",
+		"UpdateProjectApp",
+		"GetProjectApps",
+		"GetProjectApp",
+		"GetAppsByPagination",
+		"GetArrange",
+		"SetArrange",
+		"GetAppBranches",
+		"GetRepos",
+		"GetGitProjectsByRepoID",
+		"SyncAppBranches",
+		"SwitchProjectBranch",
+		"DeleteProjectApp",
+		"GetProjectEnvs",
+		"GetIntegrateSettings",
+		"GetProjectEnvsByPagination",
+		"CreateProjectEnv",
+		"UpdateProjectEnv",
+		"GetCompileEnvs",
+		"GetIntegrateClusters",
+		"GetProjectPipelinesByPagination",
+
+		"ProjectPipelineInfo",
+		"PipelineCreate",
+		"PipelineUpdate",
+		"PipelineDelete",
+		"FlowStepList",
+
+		"GetProjectPipelines",
+		"PublishList",
+		"CreatePublishOrder",
+		"GetPublish",
+		"GetJenkinsConfig",
+		"ClosePublish",
+		"DeletePublish",
+		"GetCanAddedApps",
+		"AddPublishApp",
+		"DeletePublishApp",
+		"GetOpertaionLogByPagination",
+		"GetBackTo",
+		"TriggerBackTo",
+		"GetNextStage",
+		"TriggerNextStage",
+		"GetStepInfo",
+		"RunStep",
+		"RunStepCallback",
+
+		"GetProjectAppServices",
+		"GetAppServiceInspect",
+		"GetAppServiceLog",
+		"GetAppServiceEvent",
+		"AppServiceRestart",
+		"AppServiceScale",
+		"AppServiceTerminal",
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, item := range sysMemberResourceOperations {
+		memberResourceOperationIDs = append(memberResourceOperationIDs, item.ID)
+	}
+
 	roles := []models.GroupRoleReq{
 		{
 			Group:       constant.SystemGroup,
 			Role:        constant.SystemAdminRole,
 			Description: "超级管理员",
-			Operations:  []string{"*"},
+			Operations:  []int64{adminResourceItem.ID},
 		},
 		{
 			Group:       constant.SystemGroup,
 			Role:        constant.SystemMemberRole,
 			Description: "普通成员",
-			// TODO: change to real resouce operation
-			Operations: []string{"CreateProject"},
+			Operations:  memberResourceOperationIDs,
 		},
 		{
 			Group:       constant.SystemGroup,
-			Role:        constant.CompanyAdminRole,
+			Role:        constant.DevAdminRole,
 			Description: "项目管理员",
-			// TODO: change to real resouce operation
-			Operations: []string{"CreateProject"},
+			Operations:  devAdminResourceOperationIDs,
 		},
 	}
 	for _, role := range roles {

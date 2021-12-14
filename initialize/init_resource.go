@@ -17,8 +17,17 @@ limitations under the License.
 package initialize
 
 import (
+	"fmt"
+
+	"github.com/go-atomci/atomci/dao"
+	"github.com/go-atomci/atomci/middleware/log"
 	"github.com/go-atomci/atomci/models"
+	"github.com/go-atomci/atomci/utils/errors"
 )
+
+type ResourceReq struct {
+	Resources []BatchResourceTypeSpec `json:"resources"`
+}
 
 type BatchResourceTypeSpec struct {
 	ResourceType       []string   `json:"resource_type"`
@@ -66,4 +75,41 @@ func ToBatchResourceTypeReq(specs []BatchResourceTypeSpec) models.BatchResourceT
 		})
 	}
 	return req
+}
+
+// init resource
+func initResource() error {
+	if err := dao.BatchCreateResourceType(ToBatchResourceTypeReq(resourceReq.Resources)); err != nil {
+		log.Log.Error("Init resource error: %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+type RouterReq struct {
+	Routers [][]string `json:"routers"`
+}
+
+// initRouterItems ..
+func initRouterItems() error {
+
+	// TODO: fix
+	// if err := dao.DeleteGatewayRouteByBackend("atomci"); err != nil {
+	// 	log.Log.Error("Init gateway error: %s", err.Error())
+	// 	return err
+	// }
+	for _, route := range gaetwayReq.Routers {
+		if len(route) != 5 {
+			err := fmt.Errorf("invalid router parameter: %v", route)
+			return err
+		}
+		// TODO: add get verify
+		if err := dao.CreateGatewayRoute(route[0], route[1], route[2], route[3], route[4]); err != nil {
+			if !errors.OrmError1062(err) {
+				log.Log.Error("Init gateway error: %s", err.Error())
+				return err
+			}
+		}
+	}
+	return nil
 }

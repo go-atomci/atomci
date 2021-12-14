@@ -2,12 +2,11 @@
   <div class="page-content buManage">
     <div class="portlet-body">
     <div class="table-toolbar">
-      <!-- TODO: 添加资源操作 -->
         <el-row v-show="innerShow">
           <el-col :span="10">
             <refresh v-on:getlist="getList"></refresh>
             <el-button :plain="true" type="primary" @click="$refs.create.doCreate(false)">
-              <i class='icon-plus' /> {{$t('bm.add.addResPolicy')}}</el-button>
+              <i class='icon-plus' /> {{$t('bm.add.addResOperation')}}</el-button>
           </el-col>
           <el-col :span="6">
             &nbsp;
@@ -19,18 +18,17 @@
       </div>
       <template>
         <el-table border :data="dataList">
-          <el-table-column prop="policy_name" :label="$t('bm.authorManage.resourceOper')" sortable min-width="15%" :show-overflow-tooltip=true />
-          <el-table-column prop="policy_name" :label="$t('bm.authorManage.resourceRouter')" sortable min-width="15%" :show-overflow-tooltip=true />
-          <el-table-column prop="policy_name" :label="$t('bm.authorManage.resourceMethod')" sortable min-width="15%" :show-overflow-tooltip=true />
+          <el-table-column prop="resource_operation" :label="$t('bm.authorManage.resourceOper')" sortable min-width="15%" :show-overflow-tooltip=true />
+          <el-table-column prop="resource_type" :label="$t('bm.authorManage.resourceType')" sortable min-width="15%" :show-overflow-tooltip=true />
           <el-table-column prop="description" :label="$t('bm.serviceM.description')" sortable min-width="15%" :show-overflow-tooltip=true />
           <el-table-column prop="create_at" :label="$t('bm.serviceM.creationTime')" sortable min-width="15%" :show-overflow-tooltip=true />
-          <!-- <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%">
+          <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%">
             <template slot-scope="scope">
-              <el-button @click="$refs.commonDelete.doDeleteBody('deleteRolePolicies', {policies: [scope.row.policy_name]}, $route.params.dept,$route.params.role)" type="text" size="small" :title="$t('bm.depManage.remove')">
+              <el-button @click="$refs.commonDelete.doDeleteBody('deleteRoleOperation', $route.params.role, scope.row.id)" type="text" size="small" :title="$t('bm.depManage.remove')">
                 {{$t('bm.depManage.remove')}}
               </el-button>
             </template>
-          </el-table-column> -->
+          </el-table-column>
         </el-table>
       </template>
       <page-nav ref="page" :list="filteredList"></page-nav>
@@ -56,7 +54,7 @@ export default {
     return {
       curList: [],
       searchList: [
-        { key: 'policy_name', txt: this.$t('bm.add.policyName') },
+        { key: 'resource_operation', txt: this.$t('bm.authorManage.resourceOper') },
         { key: 'description', txt: this.$t('bm.serviceM.description') },
         { key: 'create_at', txt: this.$t('bm.serviceM.creationTime') },
       ],
@@ -64,7 +62,7 @@ export default {
       resourceTypeList: [],
       resourceOpList: [],
       resourceConList: [],
-      innerShow: false,
+      innerShow: true,
       group: '',
     };
   },
@@ -81,15 +79,14 @@ export default {
     }),
   },
   created() {
-    this.group = "system";
     this.getList();
   },
   methods: {
     getList() {
       if(!this.$route.params.role) return;
-      backend.getGroupRoleDetail(this.group, this.$route.params.role, (data) => {
-        if (data && data.policies) {
-          this.curList = data.policies.map((item) => {
+      backend.getRoleOperations(this.$route.params.role, (data) => {
+        if (data) {
+          this.curList = data.map((item) => {
             item.create_at = UtilsFn.format(new Date(item.create_at), 'yyyy-MM-dd hh:mm');
             return item;
           });

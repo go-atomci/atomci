@@ -51,10 +51,10 @@ func (t *GroupRole) TableUnique() [][]string {
 
 // GroupRoleReq ..
 type GroupRoleReq struct {
-	Group       string   `json:"group"`
-	Role        string   `json:"role"`
-	Description string   `json:"description"`
-	Operations  []string `json:"operations"`
+	Group       string  `json:"group"`
+	Role        string  `json:"role"`
+	Description string  `json:"description"`
+	Operations  []int64 `json:"operations"`
 }
 
 // Verify ..
@@ -76,37 +76,38 @@ type RoleRsp struct {
 	Description string `json:"description"`
 }
 
-type GroupRolePolicy struct {
+type GroupRoleOperation struct {
 	Addons
-	Group      string `orm:"column(group)" json:"group"`
-	Role       string `orm:"column(role)" json:"role"`
-	PolicyName string `orm:"column(policy_name)" json:"policy_name"`
+	Group       string `orm:"column(group)" json:"group"`
+	Role        string `orm:"column(role)" json:"role"`
+	PolicyName  string `orm:"column(policy_name)" json:"policy_name"`
+	OperationID int64  `orm:"column(operation_id)" json:"operation_id"`
 }
 
 // TableName ..
-func (t *GroupRolePolicy) TableName() string {
+func (t *GroupRoleOperation) TableName() string {
 	return "sys_group_role_operation"
 }
 
 // TableIndex ..
-func (t *GroupRolePolicy) TableIndex() [][]string {
+func (t *GroupRoleOperation) TableIndex() [][]string {
 	return [][]string{
 		{"Group", "Role"},
 	}
 }
 
 // TableUnique ..
-func (t *GroupRolePolicy) TableUnique() [][]string {
+func (t *GroupRoleOperation) TableUnique() [][]string {
 	return [][]string{
-		{"Group", "Role", "PolicyName"},
+		{"Group", "Role", "OperationID"},
 	}
 }
 
-// GroupRolePolicyReq ..
-type GroupRolePolicyReq struct {
-	Group      string   `json:"group"`
-	Role       string   `json:"role"`
-	Operations []string `json:"operations"`
+// GroupRoleOperationReq ..
+type GroupRoleOperationReq struct {
+	Group      string  `json:"group"`
+	Role       string  `json:"role"`
+	Operations []int64 `json:"operations"`
 }
 
 type GroupRoleBundlingUser struct {
