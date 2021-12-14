@@ -1,6 +1,6 @@
 # atomci
 
-AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源
+AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
 
 * github: https://github.com/go-atomci/atomci
 * gitee: https://gitee.com/goatom/atomci
