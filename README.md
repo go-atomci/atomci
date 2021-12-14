@@ -2,6 +2,8 @@
 
 AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源
 
+* github: https://github.com/go-atomci/atomci
+* gitee: https://gitee.com/goatom/atomci
 ## 架构图
 
 ```sh
