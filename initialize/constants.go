@@ -98,6 +98,7 @@ var resourceReq = ResourceReq{
 				[]string{"AppServiceRestart", "重启应用服务"},
 				[]string{"AppServiceScale", "水平扩展应用服务"},
 				[]string{"AppServiceTerminal", "应用服务终端调试"},
+				[]string{"DeleteAppService", "删除应用服务"},
 
 				// project pipeline
 				[]string{"PipelineCreate", "创建项目流程"},
@@ -216,6 +217,7 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "DELETE", "atomci", "project", "DeleteProjectApp"},
 		[]string{"atomci/api/v1/projects/:project_id/clusters/:cluster/apps", "POST", "atomci", "project", "GetProjectAppServices"},
 		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app", "GET", "atomci", "project", "GetAppServiceInspect"},
+		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app", "DELETE", "atomci", "project", "DeleteAppService"},
 		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/log", "GET", "atomci", "project", "GetAppServiceLog"},
 		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/event", "GET", "atomci", "project", "GetAppServiceEvent"},
 		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app/restart", "POST", "atomci", "project", "AppServiceRestart"},
