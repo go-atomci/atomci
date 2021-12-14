@@ -207,7 +207,7 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "GET", "atomci", "project", "GetArrange"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "POST", "atomci", "project", "SetArrange"},
 		[]string{"atomci/api/v1/arrange/yaml/parser", "POST", "atomci", "project", "ParserAppArrange"},
-		[]string{"atomci/api/pipelines/stages/:stage_id/jenkins-config", "GET", "atomci", "project", "GetJenkinsConfig"},
+		[]string{"atomci/api/v1/pipelines/stages/:stage_id/jenkins-config", "GET", "atomci", "project", "GetJenkinsConfig"},
 
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/branches", "POST", "atomci", "project", "GetAppBranches"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/syncBranches", "POST", "atomci", "project", "SyncAppBranches"},
