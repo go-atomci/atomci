@@ -70,8 +70,8 @@ export default {
    
     backend.getJenkinsServer((data) => {
       let jenkinsURL = data.jenkins
-      if (jenkinsURL.endsWith('/') == true) {
-        jenkinsURL = substring(0,jenkinsURL.length-1)
+      if (jenkinsURL.endsWith('/')) {
+        jenkinsURL = jenkinsURL.slice(0,-1);
       }
       this.curSrc = `${jenkinsURL}/blue/organizations/jenkins/${jobName}/detail/${jobName}/${runId}/pipeline/`;
     },stageId);
