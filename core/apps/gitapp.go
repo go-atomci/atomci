@@ -47,7 +47,8 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 		projectName := strings.Join(projectPathSplit[1:], "/")
 		log.Log.Debug("git projectpathsplit: %s,\tprojectName: %s", projectPathSplit, projectName)
 
-		client, err = gitlab.New("https://" + projectPathSplit[0])
+		schema := strings.Split(vcsPath, "://")[0]
+		client, err = gitlab.New(schema+"://" + projectPathSplit[0])
 		client.Client = &http.Client{
 			Transport: &transport.PrivateToken{
 				Token: token,
@@ -63,7 +64,8 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 		log.Log.Debug("git projectpathsplit: %s,\tprojectName: %s", projectPathSplit, projectName)
 
 		// TODO: github does not work
-		client, err = github.New("https://" + projectPathSplit[0])
+		schema := strings.Split(vcsPath, "://")[0]
+		client, err = github.New(schema+"://" + projectPathSplit[0])
 		client.Client = &http.Client{
 			Transport: &transport.PrivateToken{
 				Token: token,
