@@ -4,6 +4,8 @@ services:
   frontend:
     image: colynn/atomci-frontend:latest
     container_name: "frontend"
+    depends_on:
+      - atomci
     networks:
         - atomci-network
     ports:
