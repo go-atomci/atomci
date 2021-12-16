@@ -28,6 +28,9 @@
       <el-form-item label="构建目录" prop="build_path">
         <el-input v-model="form.build_path" placeholder="请输入构建目录"></el-input>
       </el-form-item>
+      <el-form-item label="Dockerfile" prop="dockerfile">
+        <el-input v-model="form.dockerfile" placeholder="请输入Dockerfile,默认是根目录下的Dockerfile"></el-input>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="doCancelCreate">{{$t('bm.other.cancel')}}</el-button>
@@ -115,6 +118,7 @@ export default {
         compile_env_id: item.compile_env_id || 0,
         branch_name: item.branch_name || '',
         build_path: item.build_path || '/',
+        dockerfile: item.dockerfile || 'Dockerfile',
         branchList: item.branch_history_list || []
       };
       this.rowId = item.id;
@@ -135,7 +139,8 @@ export default {
             language: this.form.language,
             path: this.form.path,
             branch_name: this.form.branch_name,
-            build_path: this.form.build_path
+            build_path: this.form.build_path,
+            dockerfile:  this.form.dockerfile || 'Dockerfile',
           };
           backend.updateAppInfo(this.$route.params.projectId, this.rowId, cl, (data) => {
             successCallBack();

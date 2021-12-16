@@ -32,6 +32,10 @@ func (pm *ProjectManager) CreateProjectApp(projectID int64, item *ProjectAppReq,
 		// reset default value is master
 		item.BranchName = "master"
 	}
+
+	if item.Dockerfile == "" {
+		item.Dockerfile = "Dockerfile"
+	}
 	projectAppModel := models.ProjectApp{
 		Addons:       models.NewAddons(),
 		Creator:      creator,
@@ -44,6 +48,7 @@ func (pm *ProjectManager) CreateProjectApp(projectID int64, item *ProjectAppReq,
 		Path:         item.Path,
 		RepoID:       item.RepoID,
 		BuildPath:    item.BuildPath,
+		Dockerfile:   item.Dockerfile,
 	}
 
 	_, err := pm.model.CreateProjectAppIfNotExist(&projectAppModel)
@@ -127,6 +132,12 @@ func (pm *ProjectManager) UpdateProjectApp(projectID, projectAppID int64, req *P
 		projectApp.BuildPath = "/"
 	} else {
 		projectApp.BuildPath = req.BuildPath
+	}
+
+	if req.Dockerfile == "" {
+		projectApp.Dockerfile = "Dockerfile"
+	} else {
+		projectApp.Dockerfile = req.Dockerfile
 	}
 
 	projectApp.BranchName = req.BranchName

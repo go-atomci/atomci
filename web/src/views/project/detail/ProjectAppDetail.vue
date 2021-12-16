@@ -12,11 +12,11 @@
       </el-row>
       <el-row class="mt-15">
         <el-col class="w-400">开发语言：{{detailInfo.language}}</el-col>
-        <el-col class="w-400">默认分支: {{detailInfo.branch_name}}</el-col>
+        <el-col class="w-400">编译环境: {{detailInfo.compile_env != '' ? detailInfo.compile_env:'未配置'}}</el-col>
       </el-row>
       <el-row class="mt-15">
-        <el-col class="w-400">编译环境: {{detailInfo.compile_env != '' ? detailInfo.compile_env:'未配置'}}</el-col>
         <el-col class="w-400">构建目录: {{detailInfo.build_path}}</el-col>
+        <el-col class="w-400">Dockerfile: {{detailInfo.dockerfile != '' ? detailInfo.dockerfile:'Dockerfile'}}</el-col>
       </el-row>
       <el-row class="mt-15">
         <el-col class="w-400">创建人：{{detailInfo.creator}}</el-col>

@@ -41,6 +41,7 @@ type ProjectAppUpdateReq struct {
 	Path         string `json:"path"`
 	CompileEnvID int64  `json:"compile_env_id"`
 	BuildPath    string `json:"build_path"`
+	Dockerfile   string `json:"dockerfile"`
 }
 
 // ProjectAppBranchUpdateReq ..
@@ -82,6 +83,7 @@ type ProjectAppReq struct {
 	FullName     string `json:"full_name"`
 	BranchName   string `json:"branch_name"`
 	BuildPath    string `json:"build_path"`
+	Dockerfile   string `json:"dockerfile"`
 }
 
 // ProjectAppRsp ..
