@@ -24,6 +24,10 @@
             <el-input v-model="form.build_path" placeholder="请输入构建目录" style="width: 300px"></el-input>
           </el-form-item>
 
+          <el-form-item label="Dockerfile" prop="dockerfile">
+            <el-input v-model="form.dockerfile" placeholder="请输入dockerfile,默认是Dockerfile" style="width: 300px"></el-input>
+          </el-form-item>
+
           <el-form-item label="编译环境" prop="compile_env_id">
             <el-select v-model="form.compile_env_id" placeholder="请选择编译环境" clearable filterable style="width: 300px">
               <el-option v-for="(item, index) in compileEnvs" :key="index" :label="item.name" :value="item.id">
@@ -188,6 +192,7 @@
           type: 'app',
           language: 'Java',
           build_path: '/',
+          dockerfile: 'Dockerfile'
         },
         getRepoLoading: true,
         rules: {
@@ -297,6 +302,7 @@
                 cl.language = this.form.language;
                 cl.type = 'app';
                 cl.build_path = this.form.build_path;
+                cl.dockerfile = this.form.dockerfile || 'Dockerfile';
                 cl.compile_env_id = this.form.compile_env_id || 0;
                 if (this.form.name !== '') {
                   cl.name = this.form.name

@@ -116,6 +116,7 @@ type ProjectApp struct {
 	RepoID            int64    `orm:"column(repo_id)" json:"repo_id"`
 	CompileEnvID      int64    `orm:"column(compile_env_id);size(64)" json:"compile_env_id"`
 	BuildPath         string   `orm:"column(build_path);size(64)" json:"build_path"`
+	Dockerfile        string   `orm:"column(dockerfile);size(256)" json:"dockerfile"`
 	BranchHistoryList []string `orm:"-" json:"branch_history_list"`
 }
 

@@ -1097,7 +1097,11 @@ func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, sta
 		}
 
 		imageURL := newImageAddr
-		Command := fmt.Sprintf("sh \"cd %v; export DOCKER_CONFIG=$DOCKER_CONFIG; /kaniko/executor -f Dockerfile -c ./  -d %v --insecure --skip-tls-verify --insecure-pull \"", appPath, imageURL)
+		dockerfile := app.Dockerfile
+		if dockerfile == "" {
+			dockerfile = "Dockerfile"
+		}
+		Command := fmt.Sprintf("sh \"cd %v; export DOCKER_CONFIG=$DOCKER_CONFIG; /kaniko/executor -f %v -c ./  -d %v --insecure --skip-tls-verify --insecure-pull \"", appPath, dockerfile, imageURL)
 		item.Command = Command
 		appImageItems = append(appImageItems, item)
 	}
