@@ -15,12 +15,13 @@ assignees: ''
 
 
 
+
+
 #
 * 请你通过留下👍 表情为此issue投票，帮助社区和维护者优先考虑这个请求；
-> Please vote on this issue by adding a 👍 reaction to the original issue to help the community and maintainers prioritize this request
-
 * 请不要留下 "+1 "或 "me too"的评论，它们会给问题订阅者带来额外的噪音，并且无助于优先处理请求。
-> Please do not leave "+1" or "me too" comments, they generate extra noise for issue followers and do not help prioritize the request
-
 * 如果你有兴趣在这个问题上工作，或者已经提交了pull request，请留下评论.
-> If you are interested in working on this issue or have submitted a pull request, please leave a comment
+
+* Please vote on this issue by adding a 👍 reaction to the original issue to help the community and maintainers prioritize this request
+* Please do not leave "+1" or "me too" comments, they generate extra noise for issue followers and do not help prioritize the request
+* If you are interested in working on this issue or have submitted a pull request, please leave a comment.
