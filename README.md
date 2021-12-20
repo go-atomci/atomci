@@ -106,6 +106,11 @@ $ docker build .
 
 > 如果你使用 [`docker-compsoe`](https://go-atomci.github.io/atomci-press/install/02docker-compose.html)方式部署的话，可以通过替换镜像地址的方式，即可使用`master`分支的最新代码．
 
+
+## 贡献
+AtomCI 欢迎并鼓励社区贡献．
+请参阅[Contribution Guide](https://github.com/go-atomci/atomci/blob/master/CONTRIBUTING.md) 获取更多的信息．
+
 ## 互动交流
 
 ### AtomCI开发者
