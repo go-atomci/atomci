@@ -53,3 +53,4 @@ p, developer, /atomci/api/v1/repos, GET
 p, developer, /atomci/api/v1/repos/:repo_id/projects, POST
 p, developer, /atomci/api/v1/integrate/compile_envs, GET
 p, developer, /atomci/api/v1/projects/:project_id/apps/create, POST
+g, admin, developer

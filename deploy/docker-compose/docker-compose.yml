@@ -38,11 +38,12 @@ services:
       - atomci-network    
     restart: always
     volumes:
-        - "./mysql/my.cnf:/etc/mysql/my.cnf"
+        - "./mysql/custom.cnf:/etc/mysql/conf.d/custom.cnf"
         - "./mysql/data:/var/lib/mysql"
     environment:
         MYSQL_DATABASE: atomci
         MYSQL_ROOT_PASSWORD: 123456
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
 
 networks:
   atomci-network:
