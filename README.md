@@ -70,14 +70,6 @@ $ make run
 $ go build -o atomci ; ./atomci
 ```
 
-### 后端初始化(仅首次初始化数据库时需要)
-```sh
-$ make cli
-# token-value 可以在 数据库的 sys_user获取，select user,token from sys_user where user='admin';
-$ ./cli init --token=token-value  
-```
-__注意__: 初始化数据后，重新启动一次 `后端服务` , 下一版本会将`cli`整合至运行时，不再需要独立的init
-
 ### 启动前端
 
 ```sh
