@@ -17,7 +17,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="命名空间" prop="namespace">
-        <el-select v-model="form.type" placeholder="请选择命名空间" filterable>
+        <el-select  allow-create filterable default-first-option v-model="form.namespace" placeholder="请选择命名空间">
           <el-option v-for="(item, index) in namespaceList" :key="index" :label="item" :value="item">
           </el-option>
         </el-select>
@@ -68,9 +68,7 @@ export default {
       clusterList: [],
       jenkinsList: [],
       harborList: [],
-      namespaceList: [
-        'default'
-      ],
+      namespaceList: [],
       // 是否属于编辑状态
       isEdit: false,
       dialogFormVisible: false,
@@ -129,6 +127,8 @@ export default {
   methods: {
     doCreate(flag, item) {
       this.isEdit = flag;
+      this.namespaceList = [];
+      this.namespaceList.push('default');
       if (flag) {
         this.title = '编辑';
         this.form = {
@@ -140,6 +140,9 @@ export default {
           description: item.description || '',
           arrange_env: item.arrange_env || '',
         };
+        if(item.namespace != 'default') {
+          this.namespaceList.push(item.namespace);
+        }
         this.rowId = item.id;
       } else {
         this.title = '新增';
