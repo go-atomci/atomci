@@ -173,17 +173,6 @@ func (am *AppModel) SetDeployStatus(cluster, namespace, name, status string) err
 	return err
 }
 
-//return apps which namespace is different with gived namespace
-func (am *AppModel) GetExoticAppListByName(cluster, namespace, name string) ([]models.CaasApplication, error) {
-	var apps []models.CaasApplication
-	_, err := am.tOrmer.QueryTable(am.TableName).
-		Filter("name", name).
-		Filter("cluster", cluster).
-		Filter("deleted", 0).
-		Exclude("namespace", namespace).All(&apps)
-	return apps, err
-}
-
 func (am *AppModel) AppExist(cluster, namespace, name string) bool {
 	return am.tOrmer.QueryTable(am.TableName).
 		Filter("cluster", cluster).Filter("namespace", namespace).
