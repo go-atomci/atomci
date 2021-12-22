@@ -56,8 +56,6 @@ export default {
       return !this.sidebar.opened
     }
   },
-  methods: {
-    xxRouters() {},
-  }
+  methods: {}
 }
 </script>

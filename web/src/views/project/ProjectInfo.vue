@@ -300,8 +300,16 @@ export default {
   computed: {
     ...mapGetters({
       isSysAdmin: 'isAdmin',
-      projectID: 'projectID',
+      projectIDgetter: 'projectID',
     }),
+    projectID() {
+      if (this.projectIDgetter === 0 || this.projectIDgetter === undefined) {
+        this.$store.dispatch('project/setProjectID', this.$route.params.projectID);
+        return this.$route.params.projectID
+      } else {
+        return this.projectIDgetter
+      }
+    },
   },
   created() {
     //角色、成员下拉框初始化

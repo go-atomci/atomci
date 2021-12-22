@@ -115,8 +115,16 @@ export default {
   computed: {
     ...mapGetters({
       loadings: 'getLoading',
-      projectID: 'projectID',
+      projectIDgetter: 'projectID',
     }),
+    projectID() {
+      if (this.projectIDgetter === 0 || this.projectIDgetter === undefined) {
+        this.$store.dispatch('project/setProjectID', this.$route.params.projectID);
+        return this.$route.params.projectID
+      } else {
+        return this.projectIDgetter
+      }
+    },
     dataList() {
       // 强制替换dataList替代listtemplate中的方法
       return this.curList;
