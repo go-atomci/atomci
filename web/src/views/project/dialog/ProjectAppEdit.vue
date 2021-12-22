@@ -142,7 +142,7 @@ export default {
             build_path: this.form.build_path,
             dockerfile:  this.form.dockerfile || 'Dockerfile',
           };
-          backend.updateAppInfo(this.$route.params.projectId, this.rowId, cl, (data) => {
+          backend.updateAppInfo(this.$route.params.projectID, this.rowId, cl, (data) => {
             successCallBack();
           });
 

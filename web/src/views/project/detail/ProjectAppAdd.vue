@@ -231,7 +231,7 @@
     methods: {
       handleClick(index) {},
       getRepos() {
-        backend.getRepos(this.$route.params.projectId, (data) => {
+        backend.getRepos(this.$route.params.projectID, (data) => {
           if(data) {
             data.map((item, index) => {
               if(item.user && item.base_url) {
@@ -258,7 +258,7 @@
               'addr': item.base_url,
               'user': item.user,
             };
-            backend.getReposList(item.repo_id, this.$route.params.projectId, cl, (col) => {
+            backend.getReposList(item.repo_id, this.$route.params.projectID, cl, (col) => {
               this.getTabs[index].proCol = col;
               this.getRepoLoading = false
             });
@@ -276,7 +276,7 @@
               "user": this.getTabs[index].user,
               "token": this.getTabs[index].token
             };
-            backend.getReposList(this.getTabs[index].repo_id, this.$route.params.projectId, cl, (data) => {
+            backend.getReposList(this.getTabs[index].repo_id, this.$route.params.projectID, cl, (data) => {
               if(data) {
                 this.getTabs[index].proCol = data;
                 this.getRepoLoading = false
@@ -307,10 +307,10 @@
                 if (this.form.name !== '') {
                   cl.name = this.form.name
                 }
-                backend.addAppPro(this.$route.params.projectId, cl, (data) => {
+                backend.addAppPro(this.$route.params.projectID, cl, (data) => {
                   Message.success('添加成功！');
                   this.$router.push({
-                    name: 'projectApp', params: {projectID: this.$route.params.projectId}
+                    name: 'projectApp', params: {projectID: this.$route.params.projectID}
                   });
                 });
               }
@@ -325,7 +325,7 @@
         MessageBox.confirm('确定取消添加？', this.$t('bm.infrast.tips'), { type: 'warning' })
         .then(() => {
           this.$router.push({
-            name: 'projectApp', params: {projectID: this.$route.params.projectId}
+            name: 'projectApp', params: {projectID: this.$route.params.projectID}
           });
         })
         .catch(() => {});

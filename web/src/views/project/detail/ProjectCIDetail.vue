@@ -121,7 +121,7 @@
             <page-nav ref="pages" :list="historyData" v-on:getlist="getList"></page-nav>
           </el-tab-pane>
           <el-tab-pane label="应用列表" name="appList">
-            <p style="float: left" v-if="statusCheck"><el-button type="primary" @click="$refs.versionAdd.doShow($route.params.projectId, $route.params.versionId, projectInfo.version_no)">添加应用</el-button></p>
+            <p style="float: left" v-if="statusCheck"><el-button type="primary" @click="$refs.versionAdd.doShow($route.params.projectID, $route.params.versionId, projectInfo.version_no)">添加应用</el-button></p>
             <el-table class="mt10"  :data="projectInfo.apps">
               <el-table-column prop="name" :label="$t('bm.deployCenter.name')" sortable min-width="12%" :show-overflow-tooltip="true" />
               <el-table-column prop="type" :label="$t('bm.deployCenter.type')" sortable min-width="12%" :show-overflow-tooltip="true" />
@@ -318,7 +318,7 @@ export default {
   },
   methods: {
     getVersionInfo() {
-      backend.getListdetail(this.$route.params.projectId, this.$route.params.versionId, (data) => {
+      backend.getListdetail(this.$route.params.projectID, this.$route.params.versionId, (data) => {
         if(data) {
           data.create_at = Utils.format(new Date(data.create_at), 'yyyy-MM-dd hh:mm:ss');
           data.start_at = Utils.format(new Date(data.start_at), 'yyyy-MM-dd hh:mm:ss');
@@ -333,7 +333,7 @@ export default {
       });
     },
     getVersionBaseInfo() {
-      backend.getListdetail(this.$route.params.projectId, this.$route.params.versionId, (data) => {
+      backend.getListdetail(this.$route.params.projectID, this.$route.params.versionId, (data) => {
         if(data) {
          this.projectInfo.name = data.name
          this.projectInfo.version_no = data.version_no
@@ -348,12 +348,12 @@ export default {
         };
         const that = this;
         if(name === 'build') {
-          backend.setBuildMerge(this.$route.params.projectId, id, stargid, params, (data) => {
+          backend.setBuildMerge(this.$route.params.projectID, id, stargid, params, (data) => {
             Message.success(this.$t('bm.add.optionSuc'));
             that.getVersionInfo();
           });
         } else if(name === 'deploy') {
-          backend.setDeploy(this.$route.params.projectId, id, stargid, params, (data)=> {
+          backend.setDeploy(this.$route.params.projectID, id, stargid, params, (data)=> {
             Message.success(this.$t('bm.add.optionSuc'));
             that.getVersionInfo();
           });
@@ -365,7 +365,7 @@ export default {
     gotoclose(id) {
       MessageBox.confirm(this.$t('bm.add.isAgreeAchieved'), this.$t('bm.infrast.tips'), { type: 'warning' }).then(() => {
         const that = this;
-        backend.goclose(this.$route.params.projectId, id, (data) => {
+        backend.goclose(this.$route.params.projectID, id, (data) => {
           Message.success(this.$t('bm.add.optionSuc'));
           that.getVersionInfo();
         });
@@ -376,12 +376,12 @@ export default {
     gotodelete(id) {
       MessageBox.confirm(this.$t('bm.add.isAgreeDelete'), this.$t('bm.infrast.tips'), { type: 'warning' }).then(() => {
         const that = this;
-        backend.getDeletionPublish(this.$route.params.projectId, id, (data) => {
+        backend.getDeletionPublish(this.$route.params.projectID, id, (data) => {
           Message.success(this.$t('bm.add.optionSuc'));
           that.$router.push({
             name: 'projectCI',
             params: {
-              projectID: this.$route.params.projectId
+              projectID: this.$route.params.projectID
             }
           });
         });
@@ -392,7 +392,7 @@ export default {
         page_size: this.$refs.pages.pageSize,
         page_index: this.$refs.pages.currentPage,
       };
-      backend.getOperationLog(this.$route.params.projectId, this.$route.params.versionId, params, (data) => {
+      backend.getOperationLog(this.$route.params.projectID, this.$route.params.versionId, params, (data) => {
         this.historyData = data.item;
         this.historyData.map((i) => {
           if(i.status >= 0) i.status = this.statePublish[i.status];
@@ -407,14 +407,14 @@ export default {
     },
     viewFile(item) {
       window.open(
-        `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectId}/${item.job_name}/${item.run_id}/${item.stage_id}`
+        `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectID}/${item.job_name}/${item.run_id}/${item.stage_id}`
       );
     },
     // 移除应用
     removeApp(id) {
       MessageBox.confirm(this.$t('bm.add.sureDelete'), this.$t('bm.infrast.tips'), { type: 'warning' })
       .then(() => {
-        backend.removeApp(this.$route.params.projectId, this.$route.params.versionId, id, (data) => {
+        backend.removeApp(this.$route.params.projectID, this.$route.params.versionId, id, (data) => {
           Message.success(this.$t('bm.add.optionSuc'));
           this.getVersionInfo();
         });

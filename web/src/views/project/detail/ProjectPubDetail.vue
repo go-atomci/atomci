@@ -63,7 +63,7 @@ export default {
     }, 1000);
   },
   created() {
-    const projectId = this.$route.params.projectId;
+    const projectId = this.$route.params.projectID;
     const jobName = this.$route.params.jobName;
     const runId = this.$route.params.runId;
     const stageId = this.$route.params.stageId;

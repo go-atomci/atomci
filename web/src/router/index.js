@@ -186,6 +186,12 @@ router.beforeEach((to, from, next) => {
             // determine whether the user has obtained his permission roles through getInfo
             const hasRoles = store.getters.roles && store.getters.roles.length > 0
             if (hasRoles) {
+                if (to.path.startsWith('/project/')) {
+                    const projectID = store.getters.projectID
+                    if (projectID === 0 || projectID === undefined) {
+                        store.dispatch('project/setProjectID', to.params.projectID)
+                    }
+                }
                 next()
                 NProgress.done()
             } else {

@@ -133,16 +133,8 @@ const echarts = require('echarts');
     computed: {
       ...mapGetters({
         loading: 'getLoading',
-        projectIDgetter: 'projectID',
+        projectID: 'projectID',
       }),
-      projectID() {
-        if (this.projectIDgetter === 0 || this.projectIDgetter === undefined) {
-          this.$store.dispatch('project/setProjectID', this.$route.params.projectID);
-          return this.$route.params.projectID
-        } else {
-          return this.projectIDgetter
-        }
-      },
     },
     components: {},
     created() {

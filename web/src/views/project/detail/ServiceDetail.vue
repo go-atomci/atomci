@@ -96,7 +96,7 @@
       </div>
     </el-dialog>
     <div class="portlet-body">
-      <common-delete ref="commonDelete" routerName='projectService' :routerParams="{projectID:$route.params.projectId}" isRefresh='true'></common-delete>
+      <common-delete ref="commonDelete" routerName='projectService' :routerParams="{projectID:$route.params.projectID}" isRefresh='true'></common-delete>
       <div class="title-content">
         <el-row>
           <el-col :span="9" class="title-panel">
