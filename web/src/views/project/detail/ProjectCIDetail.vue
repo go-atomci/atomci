@@ -381,7 +381,7 @@ export default {
           that.$router.push({
             name: 'projectCI',
             params: {
-              projectId: this.$route.params.projectId
+              projectID: this.$route.params.projectId
             }
           });
         });

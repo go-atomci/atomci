@@ -310,7 +310,7 @@
                 backend.addAppPro(this.$route.params.projectId, cl, (data) => {
                   Message.success('添加成功！');
                   this.$router.push({
-                    name: 'projectApp', params: {projectId: this.$route.params.projectId}
+                    name: 'projectApp', params: {projectID: this.$route.params.projectId}
                   });
                 });
               }
@@ -325,7 +325,7 @@
         MessageBox.confirm('确定取消添加？', this.$t('bm.infrast.tips'), { type: 'warning' })
         .then(() => {
           this.$router.push({
-            name: 'projectApp', params: {projectId: this.$route.params.projectId}
+            name: 'projectApp', params: {projectID: this.$route.params.projectId}
           });
         })
         .catch(() => {});

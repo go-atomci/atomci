@@ -190,8 +190,16 @@ export default {
   },
   computed: {
     ...mapGetters({
-      projectID: 'projectID',
+      projectIDgetter: 'projectID',
     }),
+    projectID() {
+        if (this.projectIDgetter === 0 || this.projectIDgetter === undefined) {
+          this.$store.dispatch('project/setProjectID', this.$route.params.projectID);
+          return this.$route.params.projectID
+        } else {
+          return this.projectIDgetter
+        }
+    },
   },
   mounted() {},
   created() {},
@@ -279,6 +287,7 @@ export default {
     goback() {
       this.$router.push({
         name: 'projectPipeline',
+        params: {'projectID': this.projectID}
       });
     },
     doSubmit() {
@@ -298,6 +307,7 @@ export default {
             Message.success('配置更新成功');
             this.$router.push({
               name: 'projectPipeline',
+              params: {'projectID': this.projectID}
             });
           });
         })

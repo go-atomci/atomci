@@ -125,7 +125,6 @@
 </style>
 <script>
 import { Message, MessageBox } from 'element-ui';
-import { mapGetters } from 'vuex';
 import backend from '@/api/backend';
 import ListSearch from '@/components/utils/ListSearch';
 import Refresh from '@/components/utils/Refresh';
@@ -154,11 +153,6 @@ export default {
     Refresh,
     CommonDelete,
     ProjectAppEdit,
-  },
-  computed: {
-    ...mapGetters({
-      projectID: 'projectID',
-    })
   },
   created() {
     this.activeName = this.$route.params.tabs != 1 ? 'second' : 'first';
@@ -232,7 +226,7 @@ export default {
     },
     backTo() {
       this.$router.push({
-        name: 'projectApp', params: {projectId: this.$route.params.projectId}
+        name: 'projectApp', params: {projectID: this.$route.params.projectId}
       });
     },
   }
