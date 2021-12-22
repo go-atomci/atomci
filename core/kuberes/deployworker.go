@@ -54,10 +54,6 @@ func NewDeployWorker(name, namespace, kind string, ar *AppRes, eparam *Extension
 
 func (wk *DeployWorker) Start(templateName string, param AppParam) error {
 	log.Log.Info("deploying application: ", wk.Name)
-	err := wk.checkAppRes(param.Name)
-	if err != nil {
-		return err
-	}
 	app, err := wk.arHandle.Appmodel.GetAppByName(wk.arHandle.Cluster, wk.kubeRes.Namespace, param.Name)
 	if err == nil {
 		return wk.updateAppRes(*app)
@@ -67,45 +63,6 @@ func (wk *DeployWorker) Start(templateName string, param AppParam) error {
 	}
 	return wk.createAppRes(templateName, param)
 
-}
-
-//check app res, maybe delete some data
-func (wk *DeployWorker) checkAppRes(appname string) error {
-	// check app name uniqueness in signal cluster
-	exoticapps, err := wk.arHandle.Appmodel.GetExoticAppListByName(wk.arHandle.Cluster, wk.kubeRes.Namespace, appname)
-	if err != nil {
-		return err
-	}
-	if len(exoticapps) != 0 {
-		var exoticns []string
-		if wk.extension.Force {
-			//check right
-			for _, app := range exoticapps {
-				exoticns = append(exoticns, app.Namespace)
-			}
-			if len(exoticns) == 0 {
-				//uninstall
-				for _, app := range exoticapps {
-					log.Log.Warn(fmt.Sprintf("deleting application(%s), cluster(%s), namespace(%s), and you have right to do it...", appname, wk.arHandle.Cluster, app.Namespace))
-					if err = wk.arHandle.DeleteApp(app.Namespace, app.Name); err != nil {
-						return fmt.Errorf("the application(%s) is existed in namespace %v of cluster %v, and delete old application failed: %s",
-							appname, app.Namespace, wk.arHandle.Cluster, err.Error())
-					}
-					log.Log.Warn(fmt.Sprintf("delete application(%s), cluster(%s), namespace(%s) successfully, and you have right to do it...", appname, wk.arHandle.Cluster, app.Namespace))
-				}
-			}
-		} else {
-			//no right
-			for _, app := range exoticapps {
-				exoticns = append(exoticns, app.Namespace)
-			}
-		}
-		if len(exoticns) != 0 {
-			return fmt.Errorf("the application(%s) is existed in namespace %v of cluster %v, and you have no right to cover the old application", appname, exoticns, wk.arHandle.Cluster)
-		}
-	}
-
-	return nil
 }
 
 func (wk *DeployWorker) updateAppRes(app models.CaasApplication) error {
