@@ -1,9 +1,12 @@
-name: Compile
+name: Compile&Publish
 
 on:
   push:
+    branches: 
+      - '**'
+  pull_request:
     branches:
-      - contributing-help
+      - master
 
 jobs:
   build:
@@ -14,14 +17,15 @@ jobs:
         uses: actions/checkout@master
       - name: Buile atomci backend
         run: make build
-#       - name: Build frontend page
-#         uses: actions/setup-node@v2
-#         with:
-#           node-version: '12'
-#       - run: |
-#           cd web
-#           yarn install
-#           yarn run build
+      - name: Build frontend page
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+      - run: |
+          cd web
+          yarn install
+          yarn run build
+        if: github.event_name != 'pull_request'
       
       -
         name: Set up Docker Buildx
@@ -31,12 +35,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-#       - name: Change to atomci frontend dir
-#         run: | 
-#           cd web
-#           pwd
       -
-        name: Build and push
+        name: Build and push atomci frontend
         uses: docker/build-push-action@v2
         with:
           context: ./web
@@ -45,18 +45,22 @@ jobs:
           #build-args: |
           #    arg1=value1
           #    arg2=value2
-          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:debug
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:latest
           cache-to: type=inline
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:debug
+        if: github.event_name == 'pull_request'
       
-      - name: Change to root dir
-        run: | 
-          cd ../
-          pwd
-#       - name: Build atomci backend
-#         uses: docker/build-push-action@v2
-#         with:
-#           context: ./
-#           file: ./Dockerfile
- 
-     
+      -
+        name: Build and push atomci backend 
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          pull: true
+          push: true
+          #build-args: |
+          #    arg1=value1
+          #    arg2=value2
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
+          cache-to: type=inline
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
+        if: github.event_name != 'pull_request'
