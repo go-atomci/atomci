@@ -22,4 +22,13 @@ jobs:
           cd web
           yarn install
           yarn run build
+  
+  push:
+    runs-on: ubuntu-latest
     
+    steps:
+      - name: Check dir
+        run: |
+         pwd
+         ls -dl
+        
