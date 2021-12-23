@@ -40,14 +40,22 @@
         </div>
       </template>
     </div>
-    <div class="portlet-body min-height150" style="float: left">
-      <div class="setTitle" style="float: left">流水线统计</div>
-      <ul class="version-list mt10 clearfix">
-        <li v-for="(item,index) in projectInfo.releases">
-          <span class="span-count">{{item.count}}</span> 个
-          <p>{{item.env}}</p>
-        </li>
-      </ul>
+     <div class="portlet-body min-height150">
+      <el-row>
+        <el-col :span="24">
+          <div class="setTitle" style="float: left">流水线统计</div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="24">
+          <ul class="version-list mt10 clearfix">
+            <li v-for="(item, index) in projectInfo.releases">
+              <span class="span-count">{{ item.count }}</span> 个
+              <p>{{ item.env }}</p>
+            </li>
+          </ul>
+        </el-col>
+      </el-row>
     </div>
     <!-- <div class="portlet-body p-chart min-height150">
       <div class="setTitle pl16">已部署应用</div>
