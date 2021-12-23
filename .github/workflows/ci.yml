@@ -1,12 +1,10 @@
 name: Compile&Publish
 
 on:
-  push:
-    branches: 
-      - '**'
   pull_request:
     branches:
       - master
+    types: [ opened, closed ]
 
 jobs:
   build:
@@ -25,7 +23,6 @@ jobs:
           cd web
           yarn install
           yarn run build
-        if: github.event_name != 'pull_request'
       
       -
         name: Set up Docker Buildx
