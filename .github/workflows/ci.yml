@@ -25,3 +25,4 @@ jobs:
           cd web
           yarn install
           yarn run build
+    
