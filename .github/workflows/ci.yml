@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
-      - name: Buile atomci backend
+      - name: Build atomci backend
         run: make build
       - name: Build frontend page
         uses: actions/setup-node@v2
@@ -35,6 +35,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        if: github.event_name == 'pull_request'
+      
       -
         name: Build and push atomci frontend
         uses: docker/build-push-action@v2
@@ -63,4 +65,4 @@ jobs:
           cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
           cache-to: type=inline
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'pull_request'
