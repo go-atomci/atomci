@@ -28,6 +28,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Change to atomci frontend dir
+        run: | 
+          cd web
+          pwd
       - name: Build atomci frontend
         uses: docker/build-push-action@v2
         with:
