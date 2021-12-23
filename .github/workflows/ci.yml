@@ -22,13 +22,9 @@ jobs:
           cd web
           yarn install
           yarn run build
-  
-  push:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check dir
+      - name: Checkt dir
         run: |
+         cd ../
          pwd
          ls -dl
-        
+     
