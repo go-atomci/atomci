@@ -1,0 +1,27 @@
+name: Compile
+
+on:
+  push:
+    branches:
+      - contributing-help
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
+        with:
+          submodules: true
+      - name: Buile atomci backend
+        run: |
+          make build
+      - name: Build frontend page
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+        run: |
+          cd web
+          yarn install
+          yarn run build
