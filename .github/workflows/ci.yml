@@ -23,6 +23,9 @@ jobs:
 #           yarn install
 #           yarn run build
       
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -32,28 +35,28 @@ jobs:
         run: | 
           cd web
           pwd
-      - name: Build atomci frontend
+      -
+        name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          pull: true
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci:test
-          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:buildcache,mode=max
+          #build-args: |
+          #    arg1=value1
+          #    arg2=value2
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:debug
+          cache-to: type=inline
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:debug
+      
       - name: Change to root dir
         run: | 
           cd ../
           pwd
-      - name: Build atomci backend
-        uses: docker/build-push-action@v2
-        with:
-          context: ./
-          file: ./Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci:test
-          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:buildcache,mode=max
+#       - name: Build atomci backend
+#         uses: docker/build-push-action@v2
+#         with:
+#           context: ./
+#           file: ./Dockerfile
+ 
      
