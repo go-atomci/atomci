@@ -4,18 +4,24 @@
 .idea
 .DS_Store
 debug
-# Project binaries.
 *.tgz
 /atomci.exe
 /atomci
 /cli
 conf/app.local.conf
 # conf/*.csv
-
-web/node_node_modules
-web/dist
-# debug
-/tmp
-__debug_bin
-deploy/binary/atomci*
 conf/k8sconfig
+web/node_node_modules
+
+# debug
+tmp
+__debug_bin
+
+# deploy
+web/dist
+deploy/binary/atomci*
+deploy/*-release.sh
+deploy/wait-for-it.sh
+
+# docs
+docs/outline-design.md
