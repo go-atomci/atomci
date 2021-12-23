@@ -301,7 +301,7 @@ export default {
     ...mapGetters({
       isSysAdmin: 'isAdmin',
       projectID: 'projectID',
-    }),
+    })
   },
   created() {
     //角色、成员下拉框初始化

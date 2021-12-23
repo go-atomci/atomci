@@ -90,8 +90,6 @@ github.com/googleapis/gnostic/extensions
 github.com/gorilla/websocket
 # github.com/imdario/mergo v0.3.5
 github.com/imdario/mergo
-# github.com/inconshreveable/mousetrap v1.0.0
-github.com/inconshreveable/mousetrap
 # github.com/isbrick/http-client v0.0.0-20210321135403-0a5df00fdb84
 github.com/isbrick/http-client
 # github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175
@@ -121,7 +119,6 @@ github.com/pmezard/go-difflib/difflib
 github.com/shiena/ansicolor
 # github.com/spf13/cobra v1.0.0
 ## explicit
-github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
 # github.com/stretchr/testify v1.7.0

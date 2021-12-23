@@ -147,9 +147,7 @@ export default {
   name: 'home',
   data() {
     return {
-      defaultActiveIndex: '/project',
       loading: false,
-      //nickname: '',
       // 支持的语言种类
       languageList: [
         {
@@ -173,7 +171,6 @@ export default {
     if (isAdmin == 1) {
       this.menuTrue = true;
     }
-    //this.nickname = window.sessionStorage.getItem('username');
     
     // this.fetchNavData();
     // 设置默认语言
@@ -187,6 +184,12 @@ export default {
     }),
     nickname() {
       return this.$store.state.user.name
+    },
+    defaultActiveIndex() {
+      if (this.$route.path.startsWith('/project')){
+        return '/project'  
+      }
+      return '/settings'
     },
   },
   methods: {

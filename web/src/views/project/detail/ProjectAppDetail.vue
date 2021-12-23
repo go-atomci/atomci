@@ -5,7 +5,7 @@
         <el-col :span="24" class="app-title clearfix">
           <div class="f-r">
             <el-button type="primary" @click="appDetail(true)">编辑</el-button>
-            <el-button type="danger" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectId,$route.params.appId)">删除</el-button>
+            <el-button type="danger" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectID,$route.params.appId)">删除</el-button>
           </div>
           {{detailInfo.name}}
         </el-col>
@@ -125,7 +125,6 @@
 </style>
 <script>
 import { Message, MessageBox } from 'element-ui';
-import { mapGetters } from 'vuex';
 import backend from '@/api/backend';
 import ListSearch from '@/components/utils/ListSearch';
 import Refresh from '@/components/utils/Refresh';
@@ -155,11 +154,6 @@ export default {
     CommonDelete,
     ProjectAppEdit,
   },
-  computed: {
-    ...mapGetters({
-      projectID: 'projectID',
-    })
-  },
   created() {
     this.activeName = this.$route.params.tabs != 1 ? 'second' : 'first';
     this.appDetail();
@@ -175,7 +169,7 @@ export default {
         page_size: this.$refs.pages.pageSize,
         page_index: this.$refs.pages.currentPage,
       };
-      backend.getProjectBranch(this.$route.params.projectId, this.$route.params.appId, params, (data) => {
+      backend.getProjectBranch(this.$route.params.projectID, this.$route.params.appId, params, (data) => {
         this.listCol = data.item;
         this.$refs.pages.total = data.total;
       });
@@ -194,7 +188,7 @@ export default {
             branch_name: item.branch_name
           };
           backend.changeBranch(
-            this.$route.params.projectId,
+            this.$route.params.projectID,
             this.$route.params.appId,
             params,
             () => {
@@ -208,7 +202,7 @@ export default {
     synBranch() {
       MessageBox.confirm('确定同步远程分支吗？', this.$t('bm.infrast.tips'), { type: 'warning' })
         .then(() => {
-          backend.asyncBranch(this.$route.params.projectId, this.$route.params.appId, (data) => {
+          backend.asyncBranch(this.$route.params.projectID, this.$route.params.appId, (data) => {
             Message.success(this.$t('bm.add.optionSuc'));
             this.getList();
           });
@@ -216,7 +210,7 @@ export default {
         .catch(() => {});
     },
     appDetail(flag) {
-      backend.getAppDetail(this.$route.params.projectId, this.$route.params.appId, (data) => {
+      backend.getAppDetail(this.$route.params.projectID, this.$route.params.appId, (data) => {
         if(flag) {
           let history = [];
           this.listCol.map((i) => {
@@ -232,7 +226,7 @@ export default {
     },
     backTo() {
       this.$router.push({
-        name: 'projectApp', params: {projectId: this.$route.params.projectId}
+        name: 'projectApp', params: {projectID: this.$route.params.projectID}
       });
     },
   }

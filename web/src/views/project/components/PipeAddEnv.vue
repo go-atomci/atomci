@@ -22,7 +22,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex';
-import backend from '@/api/backend';
 import createTemplate from '@/common/createTemplate';
 import validate from '@/common/validate';
 
@@ -54,7 +53,6 @@ export default {
   computed: {
     ...mapGetters({
       loading: 'getPopLoading',
-      projectID: 'projectID',
     }),
   },
   methods: {

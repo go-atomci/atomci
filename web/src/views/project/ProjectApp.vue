@@ -207,26 +207,16 @@ export default {
       this.$router.push({
         name: 'addApp',
         params: {
-          projectId: this.projectID
+          projectID: this.projectID
         }
       });
     },
-    // // 分支管理
-    // branchManage(scmAppId) {
-    //   this.$router.push({
-    //     path: `/project/projectBranch/${projectId}/${scmAppId}`,
-    //     params: {
-    //       projectId: this.projectID,
-    //       appId: scmAppId
-    //     },
-    //   });
-    // },
     // 代码仓库详情
     appDetail(scmAppId, tabs) {
       this.$router.push({
         name: 'projectAppDetail',
         params: {
-          projectId: this.projectID,
+          projectID: this.projectID,
           appId: scmAppId,
           tabs: tabs
         },

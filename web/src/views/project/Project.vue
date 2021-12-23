@@ -268,7 +268,7 @@ export default {
       this.$store.dispatch('project/setProjectID', projectID);
       this.$router.push({
         name: 'projectSummary',
-        query: { id: projectID }
+        params: { projectID: projectID }
       })
     },
     changeFilterTxt(val, type) {

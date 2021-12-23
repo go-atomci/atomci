@@ -6,6 +6,7 @@
 
 <script>
 import { isExternal } from '@/utils/validate'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -23,6 +24,16 @@ export default {
         return 'a'
       }
       return 'router-link'
+    },
+    ...mapGetters({
+      projectIDgetter: 'projectID',
+    }),
+    projectID() {
+      let projectID = this.projectIDgetter
+      if ( projectID === undefined ) {
+        projectID =  this.$route.params.projectID
+      }
+      return projectID
     }
   },
   methods: {
@@ -33,6 +44,9 @@ export default {
           target: '_blank',
           rel: 'noopener'
         }
+      }
+      if (to.startsWith('/project/')) {
+        to = to.replace(':projectID', this.projectID)
       }
       return {
         to: to

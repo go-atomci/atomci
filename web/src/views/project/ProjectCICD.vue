@@ -303,7 +303,7 @@
       // 终止发布
       stopPub() {
         MessageBox.confirm(this.$t('bm.add.sureStopCodeModule'), this.$t('bm.infrast.tips'), { type: 'warning' }).then(() => {
-          backend.execStopPub(this.curPubRow.id, this.$route.params.projectId, (data) => {
+          backend.execStopPub(this.curPubRow.id, this.$route.params.projectID, (data) => {
             this.hasStop = true;
             this.hasError = true;
             this.getList(true);
@@ -312,7 +312,7 @@
       },
       goPubDetail(type, id) {
         window.open(
-          `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectId}/${
+          `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectID}/${
           this.$props.pubItem.id
           }/${id}/${type}`
         );
@@ -376,7 +376,7 @@
         this.$router.push({
           name: 'projectCIDetail',
           params: {
-            projectId: this.projectID,
+            projectID: this.projectID,
             versionId: id
           }
         });

@@ -279,6 +279,7 @@ export default {
     goback() {
       this.$router.push({
         name: 'projectPipeline',
+        params: {'projectID': this.projectID}
       });
     },
     doSubmit() {
@@ -298,6 +299,7 @@ export default {
             Message.success('配置更新成功');
             this.$router.push({
               name: 'projectPipeline',
+              params: {'projectID': this.projectID}
             });
           });
         })

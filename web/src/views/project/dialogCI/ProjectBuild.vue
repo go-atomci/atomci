@@ -147,8 +147,8 @@
     },
     computed: {
       ...mapGetters({
-        projectID: 'projectID',
-      })
+      projectID: 'projectID',
+    })
     },
     methods: {
       golist(rows) {

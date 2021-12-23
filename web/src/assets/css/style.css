@@ -216,6 +216,10 @@ aside .el-menu-item.is-active, aside .el-menu-item.is-active:hover, aside .el-me
   color: #409EFF;
 }
 
+.router-link-exact-active > li {
+  color: #409EFF !important;
+}
+
 aside .el-menu-item:hover i {
   color: #409EFF;
 }

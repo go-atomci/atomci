@@ -169,8 +169,16 @@ export default {
   components: {},
   computed: {
     ...mapGetters({
-      projectID: 'projectID',
+      projectIDgetter: 'projectID',
     }),
+    projectID() {
+        if (this.projectIDgetter === 0 || this.projectIDgetter === undefined) {
+          this.$store.dispatch('project/setProjectID', this.$route.params.projectID);
+          return this.$route.params.projectID
+        } else {
+          return this.projectIDgetter
+        }
+    },
   },
   // watch: {
   //   $route(to, from) {

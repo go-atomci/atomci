@@ -98,7 +98,7 @@ export default {
     ...mapGetters({
       loading: 'getLoading',
       projectID: 'projectID',
-    }),
+    })
   },
   methods: {
     goEdit(id) {
