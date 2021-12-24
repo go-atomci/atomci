@@ -18,7 +18,7 @@ jobs:
         dst_token: ${{ secrets.GITEE_TOKEN }}
         static_list: "atomci"
         debug: true
-        force_update: true
+        # force_update: true
         account_type: org
         # src_account_type: org
         # dst_account_type: org
