@@ -1,0 +1,24 @@
+name: SyncToGitee
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Mirror the Github organization repos to Gitee.
+      uses: Yikun/hub-mirror-action@v1.1
+      with:
+        src: github/go-atomci
+        dst: gitee/goatom
+        dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+        dst_token: ${{ secrets.GITEE_TOKEN }}
+        static_list: "atomci"
+        debug: true
+        force_update: true
+        account_type: org
+        # src_account_type: org
+        # dst_account_type: org

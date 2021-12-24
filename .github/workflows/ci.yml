@@ -1,27 +1,68 @@
-name: Compile
+name: Compile&Publish
 
 on:
+  pull_request:
+    branches:
+      - master
   push:
     branches:
-      - contributing-help
-
+      - master
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repo
         uses: actions/checkout@master
-        with:
-          submodules: true
-      - name: Buile atomci backend
-        run: |
-          make build
+      - name: Build atomci backend
+        run: make build
       - name: Build frontend page
         uses: actions/setup-node@v2
         with:
           node-version: '12'
-        run: |
+      - run: |
           cd web
           yarn install
           yarn run build
+      
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        if: github.event_name != 'pull_request'
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        if: github.event_name != 'pull_request'
+      
+      -
+        name: Build and push atomci frontend
+        uses: docker/build-push-action@v2
+        with:
+          context: ./web
+          pull: true
+          push: true
+          #build-args: |
+          #    arg1=value1
+          #    arg2=value2
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:latest
+          cache-to: type=inline
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci-frontend:latest
+        if: github.event_name != 'pull_request'
+      
+      -
+        name: Build and push atomci backend 
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          pull: true
+          push: true
+          #build-args: |
+          #    arg1=value1
+          #    arg2=value2
+          cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
+          cache-to: type=inline
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/atomci:latest
+        if: github.event_name != 'pull_request'
