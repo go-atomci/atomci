@@ -271,20 +271,44 @@
       secondStep(index) {
         this.$refs['listRef' + index][0].validate((valid) => {
           if (valid) {
-            const cl = {
-              "base_url": this.getTabs[index].base_url,
-              "user": this.getTabs[index].user,
-              "token": this.getTabs[index].token
-            };
-            backend.getReposList(this.getTabs[index].repo_id, this.$route.params.projectID, cl, (data) => {
-              if(data) {
-                this.getTabs[index].proCol = data;
-                this.getRepoLoading = false
-                this.getTabs[index].stepsNum = 3;
-              }
-            });
+            let url = new URL(this.getTabs[index].base_url);
+            if(url.pathname !=="/"){     
+              let new_base_url = url.origin;       
+              MessageBox.confirm('看起来您的地址不是仓库的主地址，需要主动为您修改为['+new_base_url+']吗？',
+                this.$t('bm.infrast.tips'), 
+                { 
+                  confirmButtonText: '确定修改',
+                  cancelButtonText: '保持原状',
+                  type: 'warning'
+                 }
+                )
+              .then(() => {
+                this.getTabs[index].base_url=new_base_url;
+                this.getReposList(index);
+              })
+              .catch(() => {
+                this.getReposList(index);
+              });
+            }else{
+              this.getReposList(index);
+            }
           }
         });
+      },
+      getReposList(index){
+        const cl = {
+            "base_url": this.getTabs[index].base_url,
+            "user": this.getTabs[index].user,
+            "token": this.getTabs[index].token
+          };
+        backend.getReposList(this.getTabs[index].repo_id, this.$route.params.projectID, cl, (data) => {
+          if(data) {
+            this.getTabs[index].proCol = data;
+            this.getRepoLoading = false
+            this.getTabs[index].stepsNum = 3;
+          }
+        });
+
       },
       addApp() {
         const nums = parseInt(this.activeName);
