@@ -65,8 +65,8 @@ export function projectDetailRouter() {
         },
         {
           path: '/project/projectPubDetail/:projectID/:jobName/:runId/:stageId',
-          rename: '发布详情',
           name: 'projectPubDetail',
+          meta: { title: '日志详情', noCache: true },
           component: () => import('@/views/project/detail/ProjectPubDetail.vue'),
           hidden: true
         },
