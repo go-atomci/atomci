@@ -98,21 +98,24 @@ func (manager *AppManager) SetArrange(
 				return err
 			}
 			log.Log.Debug("update app arrnage item id: %v", id)
-			for _, imageMappingitem := range request.ImageMapings {
-				if imageMappingitem.ProjectAppID == 0 {
-					log.Log.Debug("item: %v did not join with project app: 0, skip", imageMappingitem.Name)
-					if err := manager.deleteAppImageMapping(imageMappingitem.ArrangeID, imageMappingitem.Image); err != nil {
-						log.Log.Error("delete origin app image mapping error: %s", err.Error())
+			if len(request.ImageMapings) == 0 {
+				return manager.deleteAppImageMappingByIDs(id, request.ProjectAppID)
+			} else {
+				for _, imageMappingitem := range request.ImageMapings {
+					if imageMappingitem.ProjectAppID == 0 {
+						log.Log.Debug("item: %v did not join with project app: 0, skip", imageMappingitem.Name)
+						if err := manager.deleteAppImageMapping(imageMappingitem.ArrangeID, imageMappingitem.Image); err != nil {
+							log.Log.Error("delete origin app image mapping error: %s", err.Error())
+						}
+						continue
 					}
-					continue
-				}
-				appImageMappingModel := generateAppMappingModel(id, imageMappingitem)
-				if err := manager.createOrUpdateAppMapping(appImageMappingModel); err != nil {
-					log.Log.Error("create/update app mapping occur error: %v", id)
-					return err
+					appImageMappingModel := generateAppMappingModel(id, imageMappingitem)
+					if err := manager.createOrUpdateAppMapping(appImageMappingModel); err != nil {
+						log.Log.Error("create/update app mapping occur error: %v", id)
+						return err
+					}
 				}
 			}
-
 		}
 	}
 	return nil
@@ -152,6 +155,10 @@ func (manager *AppManager) createOrUpdateAppMapping(imageMappingItem models.AppI
 		log.Log.Error("get app arrange error: %s", err.Error())
 	}
 	return err
+}
+
+func (manager *AppManager) deleteAppImageMappingByIDs(arrangeID, projectAppID int64) error {
+	return manager.model.DeleteMulAppImageMappings(arrangeID, projectAppID)
 }
 
 func (manager *AppManager) deleteAppImageMapping(arrangeID int64, image string) error {

@@ -91,6 +91,12 @@
                           </el-select>
                         </template>
                       </el-table-column>
+                      <el-table-column :label="$t('bm.deployCenter.operation')">
+                        <template slot-scope="scope">
+                          <el-button @click="deleteRow(scope.$index, form.image_mapings)" type="text" size="small">{{$t('bm.other.delete')}}
+                          </el-button>
+                        </template>
+                      </el-table-column>
                     </el-table>
                   </el-row>
                   <el-row class="arrange-row">
@@ -234,8 +240,6 @@ export default {
           item.project_app_id = row.project_app_id;
         }
       });
-      console.log('change form image_mapping..');
-      console.log(this.form.image_mapings);
     },
     linkAppImageTagType(row) {
       this.form.image_mapings.forEach((item) => {
@@ -243,8 +247,9 @@ export default {
           item.image_tag_type = row.image_tag_type;
         }
       });
-      console.log('change form image_mapping..');
-      console.log(this.form.image_mapings);
+    },
+    deleteRow(index, rows) {
+      rows.splice(index, 1)
     },
     doSetup(row) {
       this.appID = row.id;
@@ -265,7 +270,7 @@ export default {
             this.currentImageMappings = data.image_mapings;
           }
         } else {
-          resetForm()
+          this.resetForm()
         }
       });
     },
@@ -282,7 +287,7 @@ export default {
             this.currentImageMappings = data.image_mapings;
           }
         } else {
-          resetForm()
+          this.resetForm()
         }
       });
     },

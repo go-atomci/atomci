@@ -86,10 +86,19 @@ func (model *AppArrangeModel) UpdateAppImageMapping(appImageMappingItem *models.
 	return err
 }
 
-// UpdateAppImageMapping ...
+// DeleteAppImageMapping ...
 func (model *AppArrangeModel) DeleteAppImageMapping(appImageMappingItem *models.AppImageMapping) error {
 	_, err := model.ormer.Delete(appImageMappingItem)
 	return err
+}
+
+// DeleteMulAppImageMappings ...
+func (model *AppArrangeModel) DeleteMulAppImageMappings(arrangeID, projectAppID int64) error {
+	sql := `update app_image_mapping set deleted=true where arrange_id=? and project_app_id=?`
+	if _, err := GetOrmer().Raw(sql, arrangeID, projectAppID).Exec(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetAppArrange ...
