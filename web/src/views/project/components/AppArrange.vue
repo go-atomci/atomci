@@ -232,6 +232,8 @@ export default {
                 data[index].image_tag_type = currentItem.image_tag_type
                 data[index].project_app_id = currentItem.project_app_id
                 data[index].id = currentItem.id
+              } else {
+                data.unshift(currentItem)
               }
             });
           });
