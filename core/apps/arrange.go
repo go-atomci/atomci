@@ -44,6 +44,7 @@ func (manager *AppManager) GetArrange(ProjectAppID, envID int64) (*AppArrangeRes
 	}
 	for _, item := range appImageMappings {
 		item := ImageMaping{
+			ID:           item.ID,
 			Name:         item.Name,
 			Image:        item.Image,
 			ProjectAppID: item.ProjectAppID,
@@ -98,15 +99,8 @@ func (manager *AppManager) SetArrange(
 				return err
 			}
 			log.Log.Debug("update app arrnage item id: %v", id)
-			items, err := manager.model.GetAppImageMappingByIDs(id, request.ProjectAppID)
-			if err != nil {
-				return err
-			}
-			if len(items) > 0 {
-				if err := manager.deleteAppImageMappingByIDs(id, request.ProjectAppID); err != nil {
-					return err
-				}
-			}
+			//
+			validItemIDs := []int64{}
 			for _, imageMappingitem := range request.ImageMapings {
 				if imageMappingitem.ProjectAppID == 0 {
 					log.Log.Debug("item: %v did not join with project app: 0, skip", imageMappingitem.Name)
@@ -116,12 +110,38 @@ func (manager *AppManager) SetArrange(
 					continue
 				}
 				appImageMappingModel := generateAppMappingModel(id, imageMappingitem)
-				if err := manager.createOrUpdateAppMapping(appImageMappingModel); err != nil {
-					log.Log.Error("create/update app mapping occur error: %v", id)
-					return err
+				if imageMappingitem.ID == 0 {
+					mappingID, err := manager.createAppMapping(appImageMappingModel)
+					if err != nil {
+						log.Log.Error("create app mapping occur error: %v", err.Error())
+						return err
+					}
+					validItemIDs = append(validItemIDs, mappingID)
+				} else {
+					validItemIDs = append(validItemIDs, imageMappingitem.ID)
+					item, err := manager.model.GetAppImageMappingItemByID(imageMappingitem.ID)
+					if err != nil {
+						log.Log.Error("get app mapping by %v occur error: %v", id, err.Error())
+						return err
+					}
+					appImageMappingModel.Addons = item.Addons
+					err = manager.model.UpdateAppImageMapping(&appImageMappingModel)
+					if err != nil {
+						log.Log.Error("update app mapping by %v occur error: %v", id, err.Error())
+						return err
+					}
 				}
 			}
 
+			invalidItems, err := manager.model.GetInvalidAppImageMappingItems(id, projectAppID, validItemIDs)
+			if err != nil {
+				return err
+			}
+			for _, invalidItem := range invalidItems {
+				if err := manager.model.DeleteAppImageMapping(invalidItem); err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
@@ -145,30 +165,19 @@ func (manager *AppManager) createOrUpdateAppConfig(newArrange models.AppArrange)
 	return newArrange.ID, err
 }
 
-func (manager *AppManager) createOrUpdateAppMapping(imageMappingItem models.AppImageMapping) error {
+func (manager *AppManager) createAppMapping(imageMappingItem models.AppImageMapping) (int64, error) {
 	// create or update arrange with the config
-	currentImageMappingItem, err := manager.model.GetAppImageMappingItem(imageMappingItem.ArrangeID, imageMappingItem.Image)
-	if err == nil {
-		imageMappingItem.Addons = currentImageMappingItem.Addons
-		err = manager.model.UpdateAppImageMapping(&imageMappingItem)
-	} else if err == orm.ErrNoRows {
-		imageMappingItem.Addons = models.NewAddons()
-		err = manager.model.InsertAppImageMapping(&imageMappingItem)
-		if err != nil {
-			log.Log.Error("when insert occur error: %s", err.Error())
-		}
-	} else {
-		log.Log.Error("get app arrange error: %s", err.Error())
+	imageMappingItem.Addons = models.NewAddons()
+	id, err := manager.model.InsertAppImageMapping(&imageMappingItem)
+	if err != nil {
+		log.Log.Error("when insert occur error: %s", err.Error())
 	}
-	return err
-}
 
-func (manager *AppManager) deleteAppImageMappingByIDs(arrangeID, projectAppID int64) error {
-	return manager.model.DeleteMulAppImageMappings(arrangeID, projectAppID)
+	return id, err
 }
 
 func (manager *AppManager) deleteAppImageMapping(arrangeID int64, image string) error {
-	imageMapping, err := manager.model.GetAppImageMappingItem(arrangeID, image)
+	imageMapping, err := manager.model.GetAppImageMappingItemByImage(arrangeID, image)
 	if err != nil {
 		return err
 	}
