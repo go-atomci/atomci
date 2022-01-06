@@ -219,18 +219,23 @@ export default {
     parseYamlImages() {
       backend.parseYamlImages(this.form, (data) => {
         this.form.image_mapings = this.currentImageMappings;
-        this.form.image_mapings.forEach((currentItem) => {
-          data.forEach((parseItem, index) => {
-            if (
-              currentItem != undefined &&
-              currentItem.name == parseItem.name &&
-              currentItem.image == parseItem.image
-            ) {
-              data.splice(index, 1);
-            }
+        if (this.form.image_mapings == undefined || this.form.image_mapings.length == 0) {
+          this.form.image_mapings = data
+        } else {
+          this.form.image_mapings.forEach((currentItem) => {
+              data.forEach((parseItem, index) => {
+              if (
+                currentItem != undefined && 
+                parseItem.name == currentItem.name || parseItem.image == currentItem.image
+              ) {
+                // data.splice(index, 1);
+                data[index].image_tag_type = currentItem.image_tag_type
+                data[index].project_app_id = currentItem.project_app_id
+              }
+            });
           });
-        });
-        this.form.image_mapings = this.form.image_mapings.concat(data);
+          this.form.image_mapings = data
+        }
         this.$forceUpdate();
       });
     },
@@ -260,6 +265,9 @@ export default {
         Message.error('请先通过"项目设置"--"项目环境" 新增自定义的环境信息，然后再配置 应用编排');
         return;
       }
+      this.getProjectArrnageInfo()
+    },
+    getProjectArrnageInfo() {
       backend.getProjectArrange(this.projectID, this.appID, this.editableTabsValue, (data) => {
         if (data !== null) {
           this.form = data;
@@ -321,6 +329,7 @@ export default {
         JSON.stringify(submitData),
         () => {
           Message.success(this.$t('bm.add.setSuc'));
+          this.getProjectArrnageInfo()
         }
       );
     },

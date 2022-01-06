@@ -63,7 +63,7 @@ func (model *AppArrangeModel) GetAppImageMappingByArrangeID(arrangeID int64) ([]
 	return imageMappings, err
 }
 
-// GetAppImageMappingByArrangeID ...
+// GetAppImageMappingByArrangeIDAndProjectAppID ...
 func (model *AppArrangeModel) GetAppImageMappingByArrangeIDAndProjectAppID(arrangeID, projectAppID int64) (*models.AppImageMapping, error) {
 	imageMapping := models.AppImageMapping{}
 	qs := model.ormer.QueryTable(model.AppImageMappingTableName).Filter("deleted", false)
@@ -72,6 +72,17 @@ func (model *AppArrangeModel) GetAppImageMappingByArrangeIDAndProjectAppID(arran
 	}
 	err := qs.Filter("arrange_id", arrangeID).Filter("project_app_id", projectAppID).One(&imageMapping)
 	return &imageMapping, err
+}
+
+// GetAppImageMappingByIDs ...
+func (model *AppArrangeModel) GetAppImageMappingByIDs(arrangeID, projectAppID int64) ([]*models.AppImageMapping, error) {
+	imageMapping := []*models.AppImageMapping{}
+	qs := model.ormer.QueryTable(model.AppImageMappingTableName).Filter("deleted", false)
+	if arrangeID == 0 || projectAppID == 0 {
+		return nil, fmt.Errorf("args invalidate arrange id: %v, projectAppID: %v", arrangeID, projectAppID)
+	}
+	_, err := qs.Filter("arrange_id", arrangeID).Filter("project_app_id", projectAppID).All(&imageMapping)
+	return imageMapping, err
 }
 
 // InsertAppImageMapping ...
@@ -94,7 +105,7 @@ func (model *AppArrangeModel) DeleteAppImageMapping(appImageMappingItem *models.
 
 // DeleteMulAppImageMappings ...
 func (model *AppArrangeModel) DeleteMulAppImageMappings(arrangeID, projectAppID int64) error {
-	sql := `update app_image_mapping set deleted=true where arrange_id=? and project_app_id=?`
+	sql := `delete from app_image_mapping where arrange_id=? and project_app_id=?`
 	if _, err := GetOrmer().Raw(sql, arrangeID, projectAppID).Exec(); err != nil {
 		return err
 	}
