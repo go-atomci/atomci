@@ -52,7 +52,7 @@ type ProjectEnvReq struct {
 	Namespace   string `json:"namespace"`
 	ArrangeEnv  string `json:"arrange_env"`
 	CIServer    int64  `json:"ci_server"`
-	Harbor      int64  `json:"harbor"`
+	Registry    int64  `json:"registry"`
 }
 
 func (s *PipelineReq) String() (string, error) {
@@ -231,8 +231,8 @@ func (pm *ProjectManager) UpdateProjectEnv(request *ProjectEnvReq, stepID int64)
 	if request.CIServer != 0 {
 		stageModel.CIServer = request.CIServer
 	}
-	if request.Harbor != 0 {
-		stageModel.Harbor = request.Harbor
+	if request.Registry != 0 {
+		stageModel.Registry = request.Registry
 	}
 
 	return pm.model.UpdateProjectEnv(stageModel)
@@ -266,7 +266,7 @@ func (pm *ProjectManager) CreateProjectEnv(request *ProjectEnvReq, creator strin
 		Cluster:     request.Cluster,
 		Namespace:   request.Namespace,
 		CIServer:    request.CIServer,
-		Harbor:      request.Harbor,
+		Registry:    request.Registry,
 		ArrangeEnv:  request.ArrangeEnv,
 		Creator:     creator,
 	}

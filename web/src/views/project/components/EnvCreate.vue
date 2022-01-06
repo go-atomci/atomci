@@ -25,9 +25,9 @@
       <el-form-item label="ENV标识" prop="arrange_env">
         <el-input v-model.trim="form.arrange_env" auto-complete="off" maxlength="10" placeholder="请输入ENV标识"></el-input>
       </el-form-item>
-      <el-form-item label="镜像仓库" prop="harbor">
-        <el-select v-model="form.harbor" placeholder="请选择镜像仓库" filterable>
-          <el-option v-for="(item, index) in harborList" :key="index" :label="item.name" :value="item.id">
+      <el-form-item label="镜像仓库" prop="registry">
+        <el-select v-model="form.registry" placeholder="请选择镜像仓库" filterable>
+          <el-option v-for="(item, index) in registryList" :key="index" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -67,7 +67,7 @@ export default {
       name: '', 
       clusterList: [],
       jenkinsList: [],
-      harborList: [],
+      registryList: [],
       namespaceList: [],
       // 是否属于编辑状态
       isEdit: false,
@@ -87,7 +87,7 @@ export default {
         arrange_env: [
           { required: true, message: '请输入ENV标识', trigger: 'blur' },
         ],
-        harbor: [
+        registry: [
           { required: true, message: '请输入镜像仓库', trigger: 'blur' },
         ],
         ci_server: [
@@ -122,8 +122,8 @@ export default {
           case 'jenkins':
             this.jenkinsList.push(element)
             break;
-          case 'harbor':
-            this.harborList.push(element)
+          case 'registry':
+            this.registryList.push(element)
             break;
           default:
             console.log("this type not support", element.type)
@@ -144,7 +144,7 @@ export default {
           cluster: item.cluster || undefined,
           ci_server: item.ci_server || undefined,
           namespace: item.namespace || 'default',
-          harbor: item.harbor || undefined,
+          registry: item.registry || undefined,
           description: item.description || '',
           arrange_env: item.arrange_env || '',
         };
@@ -154,18 +154,18 @@ export default {
         this.rowId = item.id;
       } else {
         this.title = '新增';
-        let defaultJenkins, defaultHarbor
+        let defaultJenkins, defaultRegistry
         if (this.jenkinsList.length > 0){
           defaultJenkins = this.jenkinsList[0].id
         }
-        if (this.harborList.length > 0){
-          defaultHarbor = this.harborList[0].id
+        if (this.registryList.length > 0){
+          defaultRegistry = this.registryList[0].id
         }
         this.form = {
           name: '',
           cluster: undefined,
           ci_server: defaultJenkins,
-          harbor: defaultHarbor,
+          registry: defaultRegistry,
           namespace: 'default',
           description: '',
           arrange_env: '',
@@ -188,7 +188,7 @@ export default {
             cluster: this.form.cluster,
             namespace: this.form.namespace || 'default',
             ci_server: this.form.ci_server,
-            harbor: this.form.harbor,
+            registry: this.form.registry,
             description: this.form.description,
             arrange_env: this.form.arrange_env
           };

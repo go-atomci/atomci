@@ -27,7 +27,6 @@ import (
 	"github.com/go-atomci/atomci/dao"
 	"github.com/go-atomci/atomci/middleware/log"
 	"github.com/go-atomci/atomci/models"
-	"github.com/go-atomci/atomci/pkg/harbor"
 	"github.com/go-atomci/atomci/utils/query"
 	"github.com/go-atomci/atomci/utils/validate"
 
@@ -68,7 +67,7 @@ type IntegrateSettingReq struct {
 // const variables
 const (
 	KubernetesType = "kubernetes"
-	HarborType     = "harbor"
+	RegistryType   = "registry"
 	JenkinsType    = "jenkins"
 )
 
@@ -83,10 +82,11 @@ type KubeConfig struct {
 	URL  string `json:"url,omitempty"`
 	Conf string `json:"conf,omitempty"`
 }
-type HarborConfig struct {
+type RegistryConfig struct {
 	BaseConfig
 	Name     string `json:"name,omitempty"`
 	Password string `json:"password,omitempty"`
+	IsHttps  bool   `json:"isHttps,omitempty"`
 }
 
 type JenkinsConfig struct {
@@ -112,10 +112,10 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		jenkins := &JenkinsConfig{}
 		err := json.Unmarshal([]byte(sc), jenkins)
 		return jenkins, err
-	case "harbor":
-		harbor := &HarborConfig{}
-		err := json.Unmarshal([]byte(sc), harbor)
-		return harbor, err
+	case "registry":
+		registry := &RegistryConfig{}
+		err := json.Unmarshal([]byte(sc), registry)
+		return registry, err
 	default:
 		log.Log.Warn("this settings type %s is not support, return origin string", settingType)
 		return sc, nil
@@ -262,18 +262,19 @@ func (pm *SettingManager) VerifyIntegrateSetting(request *IntegrateSettingReq) V
 		}
 		msg := fmt.Sprintf("Connected to Kubernetes %s", k8sVersion.GitVersion)
 		resp.Msg = msg
-	case HarborType:
-		harborConf := &HarborConfig{}
-		err := json.Unmarshal([]byte(config), harborConf)
+	case RegistryType:
+		registryConf := &RegistryConfig{}
+		err := json.Unmarshal([]byte(config), registryConf)
 		if err != nil {
-			log.Log.Error("harborConf conf format error:  %v", err.Error())
+			log.Log.Error("registryConf conf format error:  %v", err.Error())
 			resp.Error = err
 		} else {
-			log.Log.Debug("verify harbor conf: %v", harborConf)
-			if err := harbor.PingHarbor(harborConf.URL, harborConf.User, harborConf.Password, false); err != nil {
+			log.Log.Debug("verify registry conf: %v", registryConf)
+
+			if err := TryLoginRegistry(registryConf.URL, registryConf.User, registryConf.Password, !registryConf.IsHttps); err != nil {
 				resp.Error = err
 			} else {
-				resp.Msg = "Connected to Harbor"
+				resp.Msg = "Connected to Registry"
 			}
 		}
 	case JenkinsType:

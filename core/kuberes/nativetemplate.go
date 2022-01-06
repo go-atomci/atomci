@@ -72,7 +72,7 @@ type DeployConfig struct {
 	DefaultPort     int32  `json:"default_port"` //默认服务端口
 	DeployStrategy  string `json:"deploy_strategy"`
 	ImagePullSecret string `json:"image_pull_secret"`
-	HarborAddr      string `json:"harbor_addr"`
+	RegistryAddr    string `json:"registry_addr"`
 	Description     string `json:"description"`
 }
 
@@ -89,12 +89,12 @@ func NewNativeTemplate() *NativeTemplate {
 // set default value for template config
 func (t *NativeTemplate) Default(envID int64) Template {
 	if t.Config.ImagePullSecret == "" && envID != 0 {
-		defSecret, harborURL, err := getDefaultPullSecretAndHarborAddr(envID)
+		defSecret, registryURL, err := getDefaultPullSecretAndRegistryAddr(envID)
 		if err != nil {
 			log.Log.Error("get default pull secret failed:", err)
 		}
 		t.Config.ImagePullSecret = defSecret
-		t.Config.HarborAddr = harborURL
+		t.Config.RegistryAddr = registryURL
 	}
 	return t
 }
