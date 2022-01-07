@@ -288,7 +288,7 @@ func (ar *AppRes) InstallApp(
 	template Template,
 	eparam *ExtensionParam) error {
 	CreateK8sNamespace(ar.Cluster, namespace)
-	CreateHarborSecret(ar.Cluster, namespace, ar.EnvID)
+	CreateRegistrySecret(ar.Cluster, namespace, ar.EnvID)
 	if err := template.Validate(); err != nil {
 		return errors.NewBadRequest().SetCause(err)
 	}
@@ -504,45 +504,45 @@ func CreateK8sNamespace(cluster, namespace string) error {
 	return nil
 }
 
-func CreateHarborSecret(cluster, namespace string, envID int64) error {
+func CreateRegistrySecret(cluster, namespace string, envID int64) error {
 	client, err := kube.GetClientset(cluster)
 	if err != nil {
-		log.Log.Warning(fmt.Sprintf("create harbor secret failed: %v", err.Error()))
+		log.Log.Warning(fmt.Sprintf("create registry secret failed: %v", err.Error()))
 		return err
 	}
 	// TODO: refactor code combine
 	projectEnv, err := dao.NewProjectModel().GetProjectEnvByID(envID)
 	if err != nil {
-		log.Log.Error("when create harbor secret get project env by id: %v, error: %s", envID, err.Error())
+		log.Log.Error("when create registry secret get project env by id: %v, error: %s", envID, err.Error())
 		return err
 	}
-	integrateSettingHarbor, err := settings.NewSettingManager().GetIntegrateSettingByID(projectEnv.Harbor)
+	integrateSettingRegistry, err := settings.NewSettingManager().GetIntegrateSettingByID(projectEnv.Registry)
 	if err != nil {
-		log.Log.Error("when create harbor secret get integrate setting by id: %v, error: %s", projectEnv.Harbor, err.Error())
+		log.Log.Error("when create registry secret get integrate setting by id: %v, error: %s", projectEnv.Registry, err.Error())
 		return err
 	}
 
-	var harborAddr, harborUser, harborPassword, harborAuth string
-	harborName := integrateSettingHarbor.Name
-	if harborConf, ok := integrateSettingHarbor.Config.(*settings.HarborConfig); ok {
-		harborAddr = harborConf.URL
-		harborPassword = harborConf.Password
-		harborUser = harborConf.User
-		harborAuth = base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", harborConf.User, harborConf.Password)))
+	var registryAddr, registryUser, registryPassword, registryAuth string
+	registryName := strings.ToLower(integrateSettingRegistry.Name)
+	if registryConf, ok := integrateSettingRegistry.Config.(*settings.RegistryConfig); ok {
+		registryAddr = registryConf.URL
+		registryPassword = registryConf.Password
+		registryUser = registryConf.User
+		registryAuth = base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", registryConf.User, registryConf.Password)))
 	} else {
-		log.Log.Error("parse integrate setting harbor config error")
-		return fmt.Errorf("parse integrate setting harbor config error")
+		log.Log.Error("parse integrate setting registry config error")
+		return fmt.Errorf("parse integrate setting registry config error")
 	}
 
-	harborSecretName := fmt.Sprintf("harbor-%v", harborName)
-	harborInfo := make(map[string]interface{})
-	harborInfo[harborAddr] = map[string]string{
-		"username": harborUser,
-		"password": harborPassword,
-		"auth":     harborAuth,
+	registrySecretName := fmt.Sprintf("registry-%v", registryName)
+	registryInfo := make(map[string]interface{})
+	registryInfo[registryAddr] = map[string]string{
+		"username": registryUser,
+		"password": registryPassword,
+		"auth":     registryAuth,
 	}
-	auth, _ := json.Marshal(harborInfo)
-	harborSec, err := client.CoreV1().Secrets(namespace).Get(harborSecretName, metav1.GetOptions{})
+	auth, _ := json.Marshal(registryInfo)
+	registrySec, err := client.CoreV1().Secrets(namespace).Get(registrySecretName, metav1.GetOptions{})
 	if err != nil {
 		if !k8serrors.IsNotFound(err) {
 			return err
@@ -550,7 +550,7 @@ func CreateHarborSecret(cluster, namespace string, envID int64) error {
 		_, err = client.CoreV1().Secrets(namespace).Create(&apiv1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: namespace,
-				Name:      harborSecretName,
+				Name:      registrySecretName,
 			},
 			Type: apiv1.SecretTypeDockercfg,
 			Data: map[string][]byte{
@@ -558,14 +558,14 @@ func CreateHarborSecret(cluster, namespace string, envID int64) error {
 			},
 		})
 	} else {
-		if string(harborSec.Data[".dockercfg"]) == string(auth) {
+		if string(registrySec.Data[".dockercfg"]) == string(auth) {
 			return nil
 		}
-		harborSec.Data = map[string][]byte{".dockercfg": auth}
-		_, err = client.CoreV1().Secrets(namespace).Update(harborSec)
+		registrySec.Data = map[string][]byte{".dockercfg": auth}
+		_, err = client.CoreV1().Secrets(namespace).Update(registrySec)
 	}
 	if err != nil {
-		log.Log.Warning(fmt.Sprintf("set harbor secret failed: %v", err.Error()))
+		log.Log.Warning(fmt.Sprintf("set registry secret failed: %v", err.Error()))
 	}
 	return err
 }

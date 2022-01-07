@@ -27,7 +27,7 @@
                 <div v-if="scope.row.type === 'jenkins'">
                   <el-tag type="danger">{{scope.row.type}}</el-tag>
                 </div>
-                <div v-else-if="scope.row.type === 'harbor'">
+                <div v-else-if="scope.row.type === 'registry'">
                   <el-tag type="success">{{scope.row.type}}</el-tag>
                 </div>
                 <div v-else>

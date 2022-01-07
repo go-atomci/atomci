@@ -5,7 +5,7 @@ const initializeState = {
   isNeedLoading: true,
   userInfo: {},
   clusterList: [],
-  harborList: [],
+  registryList: [],
 };
 const getters = {
   getLoading(state) {
@@ -23,8 +23,8 @@ const getters = {
   getClusterList(state) {
     return state.clusterList;
   },
-  getHarborList(state) {
-    return state.harborList;
+  getRegistryList(state) {
+    return state.registryList;
   },
 };
 // actions
@@ -44,8 +44,8 @@ const actions = {
   setClusterList({ commit }, obj) {
     commit('CHANGE_CLUSTER_LIST', { obj });
   },
-  setHarborList({ commit }, obj) {
-    commit('CHANGE_HARBOR_LIST', { obj });
+  setRegistryList({ commit }, obj) {
+    commit('CHANGE_REGISTRY_LIST', { obj });
   },
 };
 // mutations
@@ -68,8 +68,8 @@ const mutations = {
       state.curCluster = state.clusterList[0].name;
     }
   },
-  CHANGE_HARBOR_LIST(state, { obj }) {
-    state.harborList = obj;
+  CHANGE_REGISTRY_LIST(state, { obj }) {
+    state.registryList = obj;
   },
 };
 export default {

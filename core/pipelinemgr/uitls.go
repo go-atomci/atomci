@@ -235,7 +235,7 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		log.Log.Error("getDeployInfo occur error: %s", err.Error())
 		return 0, "", err
 	}
-	if len(deployInfo) != 3 {
+	if len(deployInfo) != 4 {
 		log.Log.Error("deploy info is validate, len: %v", len(deployInfo))
 	}
 	// Create publishJob publishJobApps
@@ -1039,7 +1039,7 @@ func (pm *PipelineManager) renderAppBuildItemsForBuild(projectID, stageID, publi
 func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, stageID, publishJobID int64, allParms []*RunBuildAllParms, ciConfig []string, deployInfo []string) ([]*jenkins.StepItem, error) {
 	appImageItems := []*jenkins.StepItem{}
 
-	if len(ciConfig) != 4 {
+	if len(ciConfig) != 5 {
 		log.Log.Error("ciConfig is invalide, real len: %v", len(ciConfig))
 	}
 
@@ -1101,7 +1101,11 @@ func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, sta
 		if dockerfile == "" {
 			dockerfile = "Dockerfile"
 		}
-		Command := fmt.Sprintf("sh \"cd %v; export DOCKER_CONFIG=$DOCKER_CONFIG; /kaniko/executor -f %v -c ./  -d %v --insecure --skip-tls-verify --insecure-pull \"", appPath, dockerfile, imageURL)
+		var insecure = ""
+		if isHttps, _ := strconv.ParseBool(deployInfo[3]); !isHttps {
+			insecure = "--insecure --skip-tls-verify --insecure-pull"
+		}
+		Command := fmt.Sprintf("sh \"cd %v; export DOCKER_CONFIG=$DOCKER_CONFIG; /kaniko/executor -f %v -c ./  -d %v %s \"", appPath, dockerfile, imageURL, insecure)
 		item.Command = Command
 		appImageItems = append(appImageItems, item)
 	}
@@ -1197,7 +1201,7 @@ func (pm *PipelineManager) GetCIConfig(stageID int64) ([]string, error) {
 	return []string{url, user, token, workSpace, namespace}, nil
 }
 
-// getDeployInfo cluster,harbor auth info,arrangeEnv
+// getDeployInfo cluster,registry auth info,arrangeEnv
 func (pm *PipelineManager) getDeployInfo(stageID int64) ([]string, int64, error) {
 	envStage, err := pm.modelProject.GetProjectEnvByID(stageID)
 	if err != nil {
@@ -1214,24 +1218,26 @@ func (pm *PipelineManager) getDeployInfo(stageID int64) ([]string, int64, error)
 		return []string{}, 0, fmt.Errorf("settings type is: %s, current deploy server only support kubernetes", settingKubernetesItem.Type)
 	}
 
-	settingHarborItem, err := pm.settingsHandler.GetIntegrateSettingByID(envStage.Harbor)
+	settingRegistryItem, err := pm.settingsHandler.GetIntegrateSettingByID(envStage.Registry)
 	if err != nil {
-		log.Log.Error("integrate setting harbor by id: %v error: %s", envStage.Harbor, err.Error())
-		return []string{}, 0, fmt.Errorf("integrate setting harbor by id: %v error: %s", envStage.Harbor, err.Error())
+		log.Log.Error("integrate setting registry by id: %v error: %s", envStage.Registry, err.Error())
+		return []string{}, 0, fmt.Errorf("integrate setting registry by id: %v error: %s", envStage.Registry, err.Error())
 	}
-	if settingHarborItem.Type != "harbor" {
-		return []string{}, 0, fmt.Errorf("settings type is: %s, current deploy server only support kubernetes", settingHarborItem.Type)
+	if settingRegistryItem.Type != "registry" {
+		return []string{}, 0, fmt.Errorf("settings type is: %s, current deploy server only support kubernetes", settingRegistryItem.Type)
 	}
 
-	var harborAddr, harborAuth string
-	if harborConf, ok := settingHarborItem.Config.(*settings.HarborConfig); ok {
-		harborAddr = harborConf.URL
-		harborAuth = base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", harborConf.User, harborConf.Password)))
+	var registryAddr, registryAuth string
+	var isHttps bool
+	if registryConf, ok := settingRegistryItem.Config.(*settings.RegistryConfig); ok {
+		registryAddr = registryConf.URL
+		registryAuth = base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", registryConf.User, registryConf.Password)))
+		isHttps = registryConf.IsHttps
 	} else {
 		log.Log.Error("parse kubernetes config error")
 		return []string{}, 0, fmt.Errorf("parse jenkins config error")
 	}
-	return []string{settingKubernetesItem.Name, harborAddr, harborAuth}, envStage.ID, nil
+	return []string{settingKubernetesItem.Name, registryAddr, registryAuth, strconv.FormatBool(isHttps)}, envStage.ID, nil
 }
 
 func (pm *PipelineManager) publishStepVerify(publishID int64, step string) (bool, error) {

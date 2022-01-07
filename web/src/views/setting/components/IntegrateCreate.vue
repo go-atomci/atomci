@@ -57,17 +57,20 @@
         </el-form-item>
 
       </div >
-      <div v-else-if="form.type ==='harbor'">
-        <el-form-item label="Harbor URL" prop="config.url" class="form-item">
-          <el-input v-model.trim="form.config.url" auto-complete="off" placeholder="请输入 Harbor 地址"></el-input>
+      <div v-else-if="form.type ==='registry'">
+        <el-form-item label="Registry URL" prop="config.url" class="form-item">
+          <el-input v-model.trim="form.config.url" auto-complete="off" placeholder="请输入 Registry 地址"></el-input>
         </el-form-item>
 
         <el-form-item label="用户名" prop="config.user" class="form-item">
-          <el-input v-model.trim="form.config.user" auto-complete="off" maxlength="60" placeholder="请输入 Harbor 用户名"></el-input>
+          <el-input v-model.trim="form.config.user" auto-complete="off" maxlength="60" placeholder="请输入 Registry 用户名"></el-input>
         </el-form-item>
 
         <el-form-item label="用户密码" prop="config.password" class="form-item">
-          <el-input v-model.trim="form.config.password" auto-complete="off" maxlength="120" placeholder="请输入 Harbor 密码"></el-input>
+          <el-input v-model.trim="form.config.password" auto-complete="off" maxlength="120" placeholder="请输入 Registry 密码"></el-input>
+        </el-form-item>
+        <el-form-item label="是否HTTPS" prop="config.isHttps" class="form-item">
+           <el-switch v-model="form.config.isHttps"></el-switch>
         </el-form-item>
       </div>
       <el-form-item label="描述" prop="description" class="form-item">
@@ -107,7 +110,7 @@ export default {
       settingTypeList: [
         {"name": "kubernetes"},
         {"name": "jenkins"},
-        {"name": "harbor"}
+        {"name": "registry"}
       ],
       direction: 'rtl',
       // 是否属于编辑状态
@@ -161,6 +164,7 @@ export default {
         .catch(_ => {});
     },
     doCreate(flag, item) {
+      console.log("test",item)
       this.isEdit = flag;
       this.isKubernetes = false
       if (flag) {

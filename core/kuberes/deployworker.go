@@ -18,6 +18,7 @@ package kuberes
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-atomci/atomci/core/settings"
 	"github.com/go-atomci/atomci/dao"
@@ -136,26 +137,27 @@ func (wk *DeployWorker) deleteApplication(appname string) {
 	}
 }
 
-func getDefaultPullSecretAndHarborAddr(envID int64) (string, string, error) {
+func getDefaultPullSecretAndRegistryAddr(envID int64) (string, string, error) {
 	projectEnv, err := dao.NewProjectModel().GetProjectEnvByID(envID)
 	if err != nil {
-		log.Log.Error("when create harbor secret get project env by id: %v, error: %s", envID, err.Error())
+		log.Log.Error("when create registry secret get project env by id: %v, error: %s", envID, err.Error())
 		return "", "", err
 	}
-	integrateSettingHarbor, err := dao.NewSysSettingModel().GetIntegrateSettingByID(projectEnv.Harbor)
+	integrateSettingRegistry, err := dao.NewSysSettingModel().GetIntegrateSettingByID(projectEnv.Registry)
 	if err != nil {
-		log.Log.Error("when create harbor secret get integrate setting by id: %v, error: %s", projectEnv.Harbor, err.Error())
+		log.Log.Error("when create registry secret get integrate setting by id: %v, error: %s", projectEnv.Registry, err.Error())
 		return "", "", err
 	}
 	config := settings.Config{}
-	configJSON, err := config.Struct(integrateSettingHarbor.Config, integrateSettingHarbor.Type)
+	configJSON, err := config.Struct(integrateSettingRegistry.Config, integrateSettingRegistry.Type)
 	if err != nil {
-		log.Log.Error("when parse harbor config error: %s", err.Error())
+		log.Log.Error("when parse registry config error: %s", err.Error())
 		return "", "", err
 	}
 	var url string
-	if harborConf, ok := configJSON.(*settings.HarborConfig); ok {
-		url = harborConf.URL
+	if registryConf, ok := configJSON.(*settings.RegistryConfig); ok {
+		url = registryConf.URL
 	}
-	return "harbor-" + integrateSettingHarbor.Name, url, nil
+
+	return "registry-" + strings.ToLower(integrateSettingRegistry.Name), url, nil
 }

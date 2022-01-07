@@ -135,7 +135,7 @@ type ProjectEnv struct {
 	Namespace   string `orm:"column(namespace);size(256)" json:"namespace"`
 	ArrangeEnv  string `orm:"column(arrange_env);size(64)" json:"arrange_env"`
 	CIServer    int64  `orm:"column(ci_server);" json:"ci_server"`
-	Harbor      int64  `orm:"column(harbor);" json:"harbor"`
+	Registry    int64  `orm:"column(registry);" json:"registry"`
 	Creator     string `orm:"column(creator);size(64)" json:"creator"`
 }
 

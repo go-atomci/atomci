@@ -233,7 +233,7 @@ func (tp *NativeAppTemplate) newPodTemplateSpec(spec apiv1.PodTemplateSpec, podV
 		}
 		IncludeEnvImage := false
 		for _, item := range podContainers {
-			if strings.Contains(item.Image, tp.Config.HarborAddr) {
+			if strings.Contains(item.Image, tp.Config.RegistryAddr) {
 				IncludeEnvImage = true
 				break
 			}
