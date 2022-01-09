@@ -523,7 +523,6 @@ func CreateRegistrySecret(cluster, namespace string, envID int64) error {
 	}
 
 	var registryAddr, registryUser, registryPassword, registryAuth string
-	registryName := strings.ToLower(integrateSettingRegistry.Name)
 	if registryConf, ok := integrateSettingRegistry.Config.(*settings.RegistryConfig); ok {
 		registryAddr = registryConf.URL
 		registryPassword = registryConf.Password
@@ -534,7 +533,7 @@ func CreateRegistrySecret(cluster, namespace string, envID int64) error {
 		return fmt.Errorf("parse integrate setting registry config error")
 	}
 
-	registrySecretName := fmt.Sprintf("registry-%v", registryName)
+	registrySecretName := fmt.Sprintf("registry-%x", integrateSettingRegistry.ID)
 	registryInfo := make(map[string]interface{})
 	registryInfo[registryAddr] = map[string]string{
 		"username": registryUser,

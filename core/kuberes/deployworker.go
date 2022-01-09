@@ -18,8 +18,6 @@ package kuberes
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/go-atomci/atomci/core/settings"
 	"github.com/go-atomci/atomci/dao"
 	"github.com/go-atomci/atomci/middleware/log"
@@ -159,5 +157,5 @@ func getDefaultPullSecretAndRegistryAddr(envID int64) (string, string, error) {
 		url = registryConf.URL
 	}
 
-	return "registry-" + strings.ToLower(integrateSettingRegistry.Name), url, nil
+	return fmt.Sprintf("registry-%x", integrateSettingRegistry.ID), url, nil
 }
