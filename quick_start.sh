@@ -20,7 +20,7 @@ do
 			break
 		else
 			echo "ok"
-            sleep 1s
+			sleep 1s
 		fi
 	done
 	if [ ${success} == "true" ];then
@@ -45,10 +45,10 @@ else
 fi
 
 echo '当前最新版本为：${ATOMCIVERSION} 开始下载...'
-
 wget --no-check-certificate https://${server_url}/go-atomci/atomci/releases/download/v${ATOMCIVERSION}/atomci-${ATOMCIVERSION}-docker-compose.tgz
-
 tar zxf atomci-${ATOMCIVERSION}-docker-compose.tgz
 cd atomci-${ATOMCIVERSION}
+
+echo '开始部署'
 docker-compose down && docker-compose up -d
 /bin/bash init.sh
