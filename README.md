@@ -91,7 +91,7 @@ http://your-ip:8081
 1. 准备一台可以正常运行的linux服务器（支持MacOS）
 2. 安装Docker 和 Docker Compose
 ```sh
-curl -sSL https://raw.githubusercontent.com/go-atomci/atomci/master/quick_start.sh | bash
+curl -sSL https://raw.githubusercontent.com/go-atomci/atomci/master/deploy/docker-compose/quick_start.sh | bash
 ```
 
 ## 如何构建镜像
