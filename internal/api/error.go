@@ -14,30 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package api
 
 import (
-	"runtime"
-
-	"github.com/astaxie/beego"
-	_ "github.com/go-sql-driver/mysql" // import your used driver
-
-	_ "github.com/go-atomci/atomci/internal/initialize"
-	_ "github.com/go-atomci/atomci/internal/models"
-	"github.com/go-atomci/atomci/pkg/kube"
-	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/internal/cronjob"
+	"github.com/go-atomci/atomci/utils/errors"
 )
 
-func init() {
-	kube.Init()
+type ErrorController struct {
+	BaseController
 }
 
-func main() {
-	cronjob.RunPublishJobServer()
-	beego.Info("Beego version:", beego.VERSION)
+func (this *ErrorController) Error404() {
+	err := errors.NewNotFound()
+	this.ServeError(err)
+}
 
-	routers.RegisterRoutes()
-	beego.Info("Golang version:", runtime.Version())
-	beego.Run()
+func (this *ErrorController) Error405() {
+	err := errors.NewMethodNotAllowed()
+	this.ServeError(err)
 }

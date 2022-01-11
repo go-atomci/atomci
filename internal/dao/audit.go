@@ -14,30 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package dao
 
 import (
-	"runtime"
-
-	"github.com/astaxie/beego"
-	_ "github.com/go-sql-driver/mysql" // import your used driver
-
-	_ "github.com/go-atomci/atomci/internal/initialize"
-	_ "github.com/go-atomci/atomci/internal/models"
-	"github.com/go-atomci/atomci/pkg/kube"
-	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/internal/cronjob"
+	"github.com/go-atomci/atomci/internal/models"
 )
 
-func init() {
-	kube.Init()
+func AuditInsert(audit *models.Audit) error {
+	_, err := GetOrmer().Insert(audit)
+	return err
 }
 
-func main() {
-	cronjob.RunPublishJobServer()
-	beego.Info("Beego version:", beego.VERSION)
-
-	routers.RegisterRoutes()
-	beego.Info("Golang version:", runtime.Version())
-	beego.Run()
+func AuditList() ([]*models.Audit, error) {
+	auditList := []*models.Audit{}
+	if _, err := GetOrmer().QueryTable("sys_audit").OrderBy("-create_at").All(&auditList); err != nil {
+		return nil, err
+	}
+	return auditList, nil
 }

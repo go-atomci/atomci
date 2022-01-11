@@ -10,16 +10,16 @@ export PROJECT_ROOT := $(CURDIR)
 
 ## linux-amd64: Compile linux-amd64 package
 linux-amd64:
-	@env GOOS=linux GOARCH=amd64 go build -o deploy/binary/$(NAME)-linux-amd64
+	@env GOOS=linux GOARCH=amd64 go build -o deploy/binary/$(NAME)-linux-amd64 cmd/atomci/main.go
 
 ## linux-arm64: Compile linux-amd64 package
 linux-arm64:
-	@env GOOS=linux GOARCH=arm64 go build -o deploy/binary/$(NAME)-linux-arm64
+	@env GOOS=linux GOARCH=arm64 go build -o deploy/binary/$(NAME)-linux-arm64 cmd/atomci/main.go
 
 .PHONY: build
 ## build: Compile the packages.
 build:
-	@go build -o $(NAME)
+	@go build -o $(NAME) cmd/atomci/main.go
 
 .PHONY: run
 ## run: Build and Run in local mode.
