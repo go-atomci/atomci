@@ -67,7 +67,7 @@ url = root:root@tcp(127.0.0.1:3306)/atomci?charset=utf8mb4
 $ make run  
 
 # windowns环境，或是没有make命令
-$ go build -o atomci ; ./atomci
+$ go build -o atomci  cmd/atomci/main.go; ./atomci
 ```
 
 ### 启动前端
