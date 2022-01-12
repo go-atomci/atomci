@@ -18,7 +18,6 @@ package kuberes
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/go-atomci/atomci/internal/core/settings"
 	"github.com/go-atomci/atomci/internal/dao"
