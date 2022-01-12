@@ -14,30 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package api
 
 import (
-	"runtime"
-
-	"github.com/astaxie/beego"
-	_ "github.com/go-sql-driver/mysql" // import your used driver
-
-	_ "github.com/go-atomci/atomci/internal/initialize"
-	_ "github.com/go-atomci/atomci/internal/models"
-	"github.com/go-atomci/atomci/pkg/kube"
-	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/internal/cronjob"
+	"github.com/go-atomci/atomci/internal/dao"
+	"github.com/go-atomci/atomci/internal/middleware/log"
 )
 
-func init() {
-	kube.Init()
+type AuditController struct {
+	BaseController
 }
 
-func main() {
-	cronjob.RunPublishJobServer()
-	beego.Info("Beego version:", beego.VERSION)
-
-	routers.RegisterRoutes()
-	beego.Info("Golang version:", runtime.Version())
-	beego.Run()
+func (ac *AuditController) AuditList() {
+	res, err := dao.AuditList()
+	if err != nil {
+		ac.HandleInternalServerError(err.Error())
+		log.Log.Error("Get audit list error: %s", err.Error())
+		return
+	}
+	ac.Data["json"] = NewResult(true, res, "")
+	ac.ServeJSON()
 }

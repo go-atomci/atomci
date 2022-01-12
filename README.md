@@ -67,7 +67,7 @@ url = root:root@tcp(127.0.0.1:3306)/atomci?charset=utf8mb4
 $ make run  
 
 # windowns环境，或是没有make命令
-$ go build -o atomci ; ./atomci
+$ go build -o atomci  cmd/atomci/main.go; ./atomci
 ```
 
 ### 启动前端
@@ -85,6 +85,13 @@ $ yarn run dev
 ```sh
 # 默认用户名/密码 admin/123456
 http://your-ip:8081
+```
+
+## 一键部署最新版本
+1. 准备一台可以正常运行的linux服务器（支持MacOS）
+2. 安装Docker 和 Docker Compose
+```sh
+curl -sSL https://raw.githubusercontent.com/go-atomci/atomci/master/deploy/docker-compose/quick_start.sh | bash
 ```
 
 ## 如何构建镜像
