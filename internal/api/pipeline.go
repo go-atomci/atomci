@@ -17,6 +17,7 @@ limitations under the License.
 package api
 
 import (
+	"github.com/go-atomci/atomci/internal/core/notification/impl"
 	"github.com/go-atomci/atomci/internal/core/pipelinemgr"
 	"github.com/go-atomci/atomci/internal/core/publish"
 	"github.com/go-atomci/atomci/internal/middleware/log"
@@ -118,6 +119,9 @@ func (p *PipelineController) RunStepCallback() {
 		log.Log.Error("RunStep callback, update publish Order occur error: %s", err.Error())
 		return
 	}
+
+	go notification.Send(publishID, publishStatus)
+
 	p.Data["json"] = NewResult(true, nil, "")
 	p.ServeJSON()
 }
