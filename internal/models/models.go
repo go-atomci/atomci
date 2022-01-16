@@ -18,6 +18,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/astaxie/beego/logs"
 	"os"
 	"time"
 
@@ -192,6 +193,8 @@ func initOrm() {
 		new(PublishApp),
 		new(PublishJob),
 		new(PublishJobApp),
+
+		new(RbacPolicy),
 	)
 
 	orm.RunSyncdb("default", false, true)
@@ -209,6 +212,8 @@ func initOrm() {
 		"sys_group_role_operation",
 		"sys_audit",
 		"sys_resource_router",
+
+		"rbac_policy",
 	}
 	if err := setCreateAt(tables); err != nil {
 		log.Log.Error(err.Error())
@@ -220,8 +225,32 @@ func initOrm() {
 	}
 }
 
+func initRbacPolicy() {
+
+	o := orm.NewOrm()
+
+	err := o.Begin()
+	if err != nil {
+		logs.Error("start the transaction failed")
+		return
+	}
+
+	if _, err := o.Raw("truncate table rbac_policy").Exec(); err != nil {
+		log.Log.Error(err.Error())
+		err = o.Rollback()
+	} else {
+		if _, err := o.InsertMulti(200, Policy()); err != nil {
+			log.Log.Error(err.Error())
+			err = o.Rollback()
+		} else {
+			err = o.Commit()
+		}
+	}
+}
+
 // Init ...
 func init() {
 	initOrm()
+	initRbacPolicy()
 	// orm.RunSyncdb("default", false, true)
 }

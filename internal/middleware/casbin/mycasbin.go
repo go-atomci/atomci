@@ -17,24 +17,18 @@ limitations under the License.
 package mycasbin
 
 import (
+	"github.com/astaxie/beego"
 	glog "log"
 
 	"github.com/go-atomci/atomci/internal/middleware/log"
-	tools "github.com/go-atomci/atomci/utils"
 
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
-	fileadapter "github.com/casbin/casbin/v2/persist/file-adapter"
+	gormadapter "github.com/casbin/gorm-adapter/v2"
 )
 
 // NewCasbin ..
 func NewCasbin() (*casbin.Enforcer, error) {
-	// TODO: changet to csv tmp, later add mysql apter
-	// databaseURL := beego.AppConfig.String("DB::url")
-	// Apter, err := gormadapter.NewAdapter("mysql", databaseURL, true)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	rbacModel, err := model.NewModelFromString(`
 [request_definition]
@@ -58,11 +52,9 @@ m = g(r.sub, p.sub) && keyMatch2(r.obj,p.obj) && (r.act == p.act || p.act == "*"
 		glog.Fatalf("error: model: %s", err)
 	}
 
-	rbacPolicyPath := tools.EnsureAbs("conf/rbac_policy.csv")
-	rbacPolicy := fileadapter.NewAdapter(rbacPolicyPath)
+	dbUrl := beego.AppConfig.String("DB::url")
+	rbacPolicy, _ := gormadapter.NewAdapter("mysql", dbUrl, true)
 
-	// TODO: change to csv tmp, enable mysql apter later
-	// e, err := casbin.NewEnforcer(rbacConf, Apter)
 	e, err := casbin.NewEnforcer(rbacModel, rbacPolicy)
 	if err != nil {
 		log.Log.Error("casbin new enforcer error: %s", err.Error())
