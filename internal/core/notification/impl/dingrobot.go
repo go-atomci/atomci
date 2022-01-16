@@ -24,7 +24,7 @@ func dingEventMessage(template INotifyTemplate, result messages.StepCallbackResu
 
 	var buf bytes.Buffer
 	template.GenSubject(&buf, result)
-	template.GenSubject(&buf, result)
+	template.GenContent(&buf, result)
 	template.GenFooter(&buf, result)
 
 	markdownText := &messages.MarkdownMessage{
