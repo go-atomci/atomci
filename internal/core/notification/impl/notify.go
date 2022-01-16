@@ -12,16 +12,16 @@ type INotify interface {
 
 func NewHandlers() []INotify {
 
-	ding := beego.AppConfig.String("notification::ding")
-	smtp := beego.AppConfig.String("notification::smtpHost")
+	dingEnable, _ := beego.AppConfig.Int("notification::dingEnable")
+	mailEnable, _ := beego.AppConfig.Int("notification::mailEnable")
 
 	var handlers []INotify
 
-	if len(ding) > 0 {
+	if dingEnable > 0 {
 		_ = append(handlers, DingRobotHandler())
 	}
 
-	if len(smtp) > 0 {
+	if mailEnable > 0 {
 		_ = append(handlers, EmailHandler())
 	}
 
