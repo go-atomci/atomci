@@ -57,6 +57,9 @@ github.com/go-atomci/go-scm/scm/transport
 github.com/go-atomci/workflow
 github.com/go-atomci/workflow/jenkins
 github.com/go-atomci/workflow/jenkins/templates
+# github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
+## explicit
+github.com/go-gomail/gomail
 # github.com/go-ldap/ldap/v3 v3.2.1
 github.com/go-ldap/ldap/v3
 # github.com/go-sql-driver/mysql v1.5.0
@@ -117,8 +120,6 @@ github.com/pmezard/go-difflib/difflib
 # github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644
 ## explicit
 github.com/shiena/ansicolor
-# github.com/spf13/cobra v1.0.0
-## explicit
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
 # github.com/stretchr/testify v1.7.0
@@ -200,7 +201,12 @@ google.golang.org/protobuf/runtime/protoimpl
 google.golang.org/protobuf/types/known/anypb
 google.golang.org/protobuf/types/known/durationpb
 google.golang.org/protobuf/types/known/timestamppb
+# gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc
+## explicit
+gopkg.in/alexcesaro/quotedprintable.v3
 # gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b
+## explicit
+# gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 ## explicit
 # gopkg.in/inf.v0 v0.9.1
 gopkg.in/inf.v0
