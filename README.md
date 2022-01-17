@@ -57,6 +57,16 @@ AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __�
 # conf/app.conf
 [DB]
 url = root:root@tcp(127.0.0.1:3306)/atomci?charset=utf8mb4
+
+[notification]
+dingEnable = 1 # 启用钉钉通知；0：不启用，1：启用
+ding = 钉钉机器人
+
+mailEnable = 1 # 启用邮件通知；0：不启用，1：启用
+smtpHost = SMTP服务器
+smtpPort = 465
+smtpAccount = 邮件账号
+smtpPassword = 邮件密码
 ```
 > 注: 对于`[ldap]`,`[jwt]`, `[atomci]`可以参照附录-『配置说明』进行修改
 

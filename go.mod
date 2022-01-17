@@ -40,6 +40,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-atomci/go-scm v1.13.2-0.20210629010829-147be8a9bdd3
 	github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab
+	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect
@@ -59,7 +60,9 @@ require (
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/api v0.18.0
