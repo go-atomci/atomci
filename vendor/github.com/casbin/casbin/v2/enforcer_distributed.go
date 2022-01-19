@@ -21,17 +21,22 @@ func NewDistributedEnforcer(params ...interface{}) (*DistributedEnforcer, error)
 	return e, nil
 }
 
-// AddPolicySelf provides a method for dispatcher to add authorization rules to the current policy.
-// The function returns the rules affected and error.
-func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error) {
-	var noExistsPolicy [][]string
-	for _, rule := range rules {
-		if !d.model.HasPolicy(sec, ptype, rule) {
-			noExistsPolicy = append(noExistsPolicy, rule)
-		}
-	}
+// SetDispatcher sets the current dispatcher.
+func (e *DistributedEnforcer) SetDispatcher(dispatcher persist.Dispatcher) {
+	e.dispatcher = dispatcher
+}
 
-	if shouldPersist() {
+// AddPoliciesSelf provides a method for dispatcher to add authorization rules to the current policy.
+// The function returns the rules affected and error.
+func (d *DistributedEnforcer) AddPoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error) {
+	if shouldPersist != nil && shouldPersist() {
+		var noExistsPolicy [][]string
+		for _, rule := range rules {
+			if !d.model.HasPolicy(sec, ptype, rule) {
+				noExistsPolicy = append(noExistsPolicy, rule)
+			}
+		}
+
 		if err := d.adapter.(persist.BatchAdapter).AddPolicies(sec, ptype, noExistsPolicy); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
@@ -39,22 +44,22 @@ func (d *DistributedEnforcer) AddPolicySelf(shouldPersist func() bool, sec strin
 		}
 	}
 
-	d.model.AddPolicies(sec, ptype, noExistsPolicy)
+	effected = d.model.AddPoliciesWithAffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, noExistsPolicy)
+		err := d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, effected)
 		if err != nil {
-			return noExistsPolicy, err
+			return effected, err
 		}
 	}
 
-	return rules, nil
+	return effected, nil
 }
 
-// RemovePolicySelf provides a method for dispatcher to remove policies from current policy.
+// RemovePoliciesSelf provides a method for dispatcher to remove a set of rules from current policy.
 // The function returns the rules affected and error.
-func (d *DistributedEnforcer) RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error) {
-	if shouldPersist() {
+func (d *DistributedEnforcer) RemovePoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error) {
+	if shouldPersist != nil && shouldPersist() {
 		if err := d.adapter.(persist.BatchAdapter).RemovePolicies(sec, ptype, rules); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
@@ -62,22 +67,22 @@ func (d *DistributedEnforcer) RemovePolicySelf(shouldPersist func() bool, sec st
 		}
 	}
 
-	d.model.RemovePolicies(sec, ptype, rules)
+	effected = d.model.RemovePoliciesWithEffected(sec, ptype, rules)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, rules)
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effected)
 		if err != nil {
-			return rules, err
+			return effected, err
 		}
 	}
 
-	return rules, err
+	return effected, err
 }
 
 // RemoveFilteredPolicySelf provides a method for dispatcher to remove an authorization rule from the current policy, field filters can be specified.
 // The function returns the rules affected and error.
-func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error) {
-	if shouldPersist() {
+func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effected [][]string, err error) {
+	if shouldPersist != nil && shouldPersist() {
 		if err := d.adapter.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...); err != nil {
 			if err.Error() != notImplemented {
 				return nil, err
@@ -85,21 +90,21 @@ func (d *DistributedEnforcer) RemoveFilteredPolicySelf(shouldPersist func() bool
 		}
 	}
 
-	_, effects = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
+	_, effected = d.model.RemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 
 	if sec == "g" {
-		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effects)
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, effected)
 		if err != nil {
-			return effects, err
+			return effected, err
 		}
 	}
 
-	return effects, nil
+	return effected, nil
 }
 
 // ClearPolicySelf provides a method for dispatcher to clear all rules from the current policy.
 func (d *DistributedEnforcer) ClearPolicySelf(shouldPersist func() bool) error {
-	if shouldPersist() {
+	if shouldPersist != nil && shouldPersist() {
 		err := d.adapter.SavePolicy(nil)
 		if err != nil {
 			return err
@@ -113,7 +118,7 @@ func (d *DistributedEnforcer) ClearPolicySelf(shouldPersist func() bool) error {
 
 // UpdatePolicySelf provides a method for dispatcher to update an authorization rule from the current policy.
 func (d *DistributedEnforcer) UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newRule []string) (effected bool, err error) {
-	if shouldPersist() {
+	if shouldPersist != nil && shouldPersist() {
 		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicy(sec, ptype, oldRule, newRule)
 		if err != nil {
 			return false, err
@@ -137,4 +142,66 @@ func (d *DistributedEnforcer) UpdatePolicySelf(shouldPersist func() bool, sec st
 	}
 
 	return ruleUpdated, nil
+}
+
+// UpdatePoliciesSelf provides a method for dispatcher to update a set of authorization rules from the current policy.
+func (d *DistributedEnforcer) UpdatePoliciesSelf(shouldPersist func() bool, sec string, ptype string, oldRules, newRules [][]string) (effected bool, err error) {
+	if shouldPersist != nil && shouldPersist() {
+		err := d.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	ruleUpdated := d.model.UpdatePolicies(sec, ptype, oldRules, newRules)
+	if !ruleUpdated {
+		return ruleUpdated, nil
+	}
+
+	if sec == "g" {
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+		err = d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rule
+		if err != nil {
+			return ruleUpdated, err
+		}
+	}
+
+	return ruleUpdated, nil
+}
+
+// UpdateFilteredPoliciesSelf provides a method for dispatcher to update a set of authorization rules from the current policy.
+func (d *DistributedEnforcer) UpdateFilteredPoliciesSelf(shouldPersist func() bool, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	var (
+		oldRules [][]string
+		err      error
+	)
+	if shouldPersist != nil && shouldPersist() {
+		oldRules, err = d.adapter.(persist.UpdatableAdapter).UpdateFilteredPolicies(sec, ptype, newRules, fieldIndex, fieldValues...)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	ruleChanged := !d.model.RemovePolicies(sec, ptype, oldRules)
+	d.model.AddPolicies(sec, ptype, newRules)
+	ruleChanged = ruleChanged && len(newRules) != 0
+	if !ruleChanged {
+		return ruleChanged, nil
+	}
+
+	if sec == "g" {
+		err := d.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rule
+		if err != nil {
+			return ruleChanged, err
+		}
+		err = d.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rule
+		if err != nil {
+			return ruleChanged, err
+		}
+	}
+
+	return true, nil
 }

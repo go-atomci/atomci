@@ -2,7 +2,7 @@ Casbin
 ====
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/casbin/casbin)](https://goreportcard.com/report/github.com/casbin/casbin)
-[![Build Status](https://travis-ci.org/casbin/casbin.svg?branch=master)](https://travis-ci.org/casbin/casbin)
+[![Build Status](https://travis-ci.com/casbin/casbin.svg?branch=master)](https://travis-ci.com/casbin/casbin)
 [![Coverage Status](https://coveralls.io/repos/github/casbin/casbin/badge.svg?branch=master)](https://coveralls.io/github/casbin/casbin?branch=master)
 [![Godoc](https://godoc.org/github.com/casbin/casbin?status.svg)](https://pkg.go.dev/github.com/casbin/casbin/v2)
 [![Release](https://img.shields.io/github/release/casbin/casbin.svg)](https://github.com/casbin/casbin/releases/latest)
@@ -136,7 +136,7 @@ What Casbin does NOT do:
 ## Installation
 
 ```
-go get github.com/casbin/casbin
+go get github.com/casbin/casbin/v2
 ```
 
 ## Documentation
@@ -168,7 +168,7 @@ Note: you can also initialize an enforcer with policy in DB instead of file, see
     obj := "data1" // the resource that is going to be accessed.
     act := "read" // the operation that the user performs on the resource.
 
-    if res := e.Enforce(sub, obj, act); res {
+    if res, _ := e.Enforce(sub, obj, act); res {
         // permit alice to read data1
     } else {
         // deny the request, show an error

@@ -16,7 +16,7 @@ package casbin
 
 import (
 	"github.com/Knetic/govaluate"
-	"github.com/casbin/casbin/v2/effect"
+	"github.com/casbin/casbin/v2/effector"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
 	"github.com/casbin/casbin/v2/rbac"
@@ -40,7 +40,7 @@ type IEnforcer interface {
 	SetWatcher(watcher persist.Watcher) error
 	GetRoleManager() rbac.RoleManager
 	SetRoleManager(rm rbac.RoleManager)
-	SetEffector(eft effect.Effector)
+	SetEffector(eft effector.Effector)
 	ClearPolicy()
 	LoadPolicy() error
 	LoadFilteredPolicy(filter interface{}) error
@@ -57,6 +57,8 @@ type IEnforcer interface {
 	EnforceWithMatcher(matcher string, rvals ...interface{}) (bool, error)
 	EnforceEx(rvals ...interface{}) (bool, []string, error)
 	EnforceExWithMatcher(matcher string, rvals ...interface{}) (bool, []string, error)
+	BatchEnforce(requests [][]interface{}) ([]bool, error)
+	BatchEnforceWithMatcher(matcher string, requests [][]interface{}) ([]bool, error)
 
 	/* RBAC API */
 	GetRolesForUser(name string, domain ...string) ([]string, error)
@@ -126,6 +128,10 @@ type IEnforcer interface {
 	RemoveNamedGroupingPolicies(ptype string, rules [][]string) (bool, error)
 	RemoveFilteredNamedGroupingPolicy(ptype string, fieldIndex int, fieldValues ...string) (bool, error)
 	AddFunction(name string, function govaluate.ExpressionFunction)
+
+	UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, error)
+	UpdatePolicies(oldPolicies [][]string, newPolicies [][]string) (bool, error)
+	UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error)
 }
 
 var _ IDistributedEnforcer = &DistributedEnforcer{}
@@ -133,10 +139,13 @@ var _ IDistributedEnforcer = &DistributedEnforcer{}
 // IDistributedEnforcer defines dispatcher enforcer.
 type IDistributedEnforcer interface {
 	IEnforcer
+	SetDispatcher(dispatcher persist.Dispatcher)
 	/* Management API for DistributedEnforcer*/
-	AddPolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemovePolicySelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effects [][]string, err error)
-	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effects [][]string, err error)
+	AddPoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error)
+	RemovePoliciesSelf(shouldPersist func() bool, sec string, ptype string, rules [][]string) (effected [][]string, err error)
+	RemoveFilteredPolicySelf(shouldPersist func() bool, sec string, ptype string, fieldIndex int, fieldValues ...string) (effected [][]string, err error)
 	ClearPolicySelf(shouldPersist func() bool) error
-	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newPolicy []string) (effected bool, err error)
+	UpdatePolicySelf(shouldPersist func() bool, sec string, ptype string, oldRule, newRule []string) (effected bool, err error)
+	UpdatePoliciesSelf(shouldPersist func() bool, sec string, ptype string, oldRules, newRules [][]string) (effected bool, err error)
+	UpdateFilteredPoliciesSelf(shouldPersist func() bool, sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error)
 }

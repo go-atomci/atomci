@@ -15,6 +15,7 @@
 package model
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/casbin/casbin/v2/rbac"
@@ -33,17 +34,18 @@ const (
 const DefaultSep = ","
 
 // BuildIncrementalRoleLinks provides incremental build the role inheritance relations.
-func (model Model) BuildIncrementalRoleLinks(rm rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
+func (model Model) BuildIncrementalRoleLinks(rmMap map[string]rbac.RoleManager, op PolicyOp, sec string, ptype string, rules [][]string) error {
 	if sec == "g" {
-		return model[sec][ptype].buildIncrementalRoleLinks(rm, op, rules)
+		return model[sec][ptype].buildIncrementalRoleLinks(rmMap[ptype], op, rules)
 	}
 	return nil
 }
 
 // BuildRoleLinks initializes the roles in RBAC.
-func (model Model) BuildRoleLinks(rm rbac.RoleManager) error {
+func (model Model) BuildRoleLinks(rmMap map[string]rbac.RoleManager) error {
 	model.PrintPolicy()
-	for _, ast := range model["g"] {
+	for ptype, ast := range model["g"] {
+		rm := rmMap[ptype]
 		err := ast.buildRoleLinks(rm)
 		if err != nil {
 			return err
@@ -129,7 +131,7 @@ func (model Model) HasPolicy(sec string, ptype string, rule []string) bool {
 	return ok
 }
 
-// HasPolicies determines whether a model has any of the specified policies. If one is found we return false.
+// HasPolicies determines whether a model has any of the specified policies. If one is found we return true.
 func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool {
 	for i := 0; i < len(rules); i++ {
 		if model.HasPolicy(sec, ptype, rules[i]) {
@@ -142,24 +144,53 @@ func (model Model) HasPolicies(sec string, ptype string, rules [][]string) bool 
 
 // AddPolicy adds a policy rule to the model.
 func (model Model) AddPolicy(sec string, ptype string, rule []string) {
-	model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-	model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+	assertion := model[sec][ptype]
+	assertion.Policy = append(assertion.Policy, rule)
+	assertion.PolicyMap[strings.Join(rule, DefaultSep)] = len(model[sec][ptype].Policy) - 1
+
+	if sec == "p" && assertion.priorityIndex >= 0 {
+		if idxInsert, err := strconv.Atoi(rule[assertion.priorityIndex]); err == nil {
+			i := len(assertion.Policy) - 1
+			for ; i > 0; i-- {
+				idx, err := strconv.Atoi(assertion.Policy[i-1][assertion.priorityIndex])
+				if err != nil {
+					break
+				}
+				if idx > idxInsert {
+					assertion.Policy[i] = assertion.Policy[i-1]
+					assertion.PolicyMap[strings.Join(assertion.Policy[i-1], DefaultSep)]++
+				} else {
+					break
+				}
+			}
+			assertion.Policy[i] = rule
+			assertion.PolicyMap[strings.Join(rule, DefaultSep)] = i
+		}
+	}
 }
 
 // AddPolicies adds policy rules to the model.
 func (model Model) AddPolicies(sec string, ptype string, rules [][]string) {
+	_ = model.AddPoliciesWithAffected(sec, ptype, rules)
+}
+
+// AddPoliciesWithAffected adds policy rules to the model, and returns effected rules.
+func (model Model) AddPoliciesWithAffected(sec string, ptype string, rules [][]string) [][]string {
+	var effected [][]string
 	for _, rule := range rules {
 		hashKey := strings.Join(rule, DefaultSep)
 		_, ok := model[sec][ptype].PolicyMap[hashKey]
 		if ok {
 			continue
 		}
-		model[sec][ptype].Policy = append(model[sec][ptype].Policy, rule)
-		model[sec][ptype].PolicyMap[hashKey] = len(model[sec][ptype].Policy) - 1
+		effected = append(effected, rule)
+		model.AddPolicy(sec, ptype, rule)
 	}
+	return effected
 }
 
 // RemovePolicy removes a policy rule from the model.
+// Deprecated: Using AddPoliciesWithAffected instead.
 func (model Model) RemovePolicy(sec string, ptype string, rule []string) bool {
 	index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 	if !ok {
@@ -190,21 +221,66 @@ func (model Model) UpdatePolicy(sec string, ptype string, oldRule []string, newR
 	return true
 }
 
+// UpdatePolicies updates a policy rule from the model.
+func (model Model) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) bool {
+	rollbackFlag := false
+	// index -> []{oldIndex, newIndex}
+	modifiedRuleIndex := make(map[int][]int)
+	// rollback
+	defer func() {
+		if rollbackFlag {
+			for index, oldNewIndex := range modifiedRuleIndex {
+				model[sec][ptype].Policy[index] = oldRules[oldNewIndex[0]]
+				oldPolicy := strings.Join(oldRules[oldNewIndex[0]], DefaultSep)
+				newPolicy := strings.Join(newRules[oldNewIndex[1]], DefaultSep)
+				delete(model[sec][ptype].PolicyMap, newPolicy)
+				model[sec][ptype].PolicyMap[oldPolicy] = index
+			}
+		}
+	}()
+
+	newIndex := 0
+	for oldIndex, oldRule := range oldRules {
+		oldPolicy := strings.Join(oldRule, DefaultSep)
+		index, ok := model[sec][ptype].PolicyMap[oldPolicy]
+		if !ok {
+			rollbackFlag = true
+			return false
+		}
+
+		model[sec][ptype].Policy[index] = newRules[newIndex]
+		delete(model[sec][ptype].PolicyMap, oldPolicy)
+		model[sec][ptype].PolicyMap[strings.Join(newRules[newIndex], DefaultSep)] = index
+		modifiedRuleIndex[index] = []int{oldIndex, newIndex}
+		newIndex++
+	}
+
+	return true
+}
+
 // RemovePolicies removes policy rules from the model.
 func (model Model) RemovePolicies(sec string, ptype string, rules [][]string) bool {
+	effected := model.RemovePoliciesWithEffected(sec, ptype, rules)
+	return len(effected) != 0
+}
+
+// RemovePoliciesWithEffected removes policy rules from the model, and returns effected rules.
+func (model Model) RemovePoliciesWithEffected(sec string, ptype string, rules [][]string) [][]string {
+	var effected [][]string
 	for _, rule := range rules {
 		index, ok := model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)]
 		if !ok {
 			continue
 		}
 
+		effected = append(effected, rule)
 		model[sec][ptype].Policy = append(model[sec][ptype].Policy[:index], model[sec][ptype].Policy[index+1:]...)
 		delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
 		for i := index; i < len(model[sec][ptype].Policy); i++ {
 			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
 		}
 	}
-	return true
+	return effected
 }
 
 // RemoveFilteredPolicy removes policy rules based on field filters from the model.
@@ -212,13 +288,9 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 	var tmp [][]string
 	var effects [][]string
 	res := false
-	firstIndex := -1
+	model[sec][ptype].PolicyMap = map[string]int{}
 
-	if len(fieldValues) == 0 {
-		return false, effects
-	}
-
-	for index, rule := range model[sec][ptype].Policy {
+	for _, rule := range model[sec][ptype].Policy {
 		matched := true
 		for i, fieldValue := range fieldValues {
 			if fieldValue != "" && rule[fieldIndex+i] != fieldValue {
@@ -228,22 +300,16 @@ func (model Model) RemoveFilteredPolicy(sec string, ptype string, fieldIndex int
 		}
 
 		if matched {
-			if firstIndex == -1 {
-				firstIndex = index
-			}
-			delete(model[sec][ptype].PolicyMap, strings.Join(rule, DefaultSep))
 			effects = append(effects, rule)
-			res = true
 		} else {
 			tmp = append(tmp, rule)
+			model[sec][ptype].PolicyMap[strings.Join(rule, DefaultSep)] = len(tmp) - 1
 		}
 	}
 
-	if firstIndex != -1 {
+	if len(tmp) != len(model[sec][ptype].Policy) {
 		model[sec][ptype].Policy = tmp
-		for i := firstIndex; i < len(model[sec][ptype].Policy); i++ {
-			model[sec][ptype].PolicyMap[strings.Join(model[sec][ptype].Policy[i], DefaultSep)] = i
-		}
+		res = true
 	}
 
 	return res, effects

@@ -36,6 +36,14 @@ func (a *Adapter) UpdatePolicy(sec string, ptype string, oldRule, newPolicy []st
 	return errors.New("not implemented")
 }
 
+func (a *Adapter) UpdatePolicies(sec string, ptype string, oldRules, newRules [][]string) error {
+	return errors.New("not implemented")
+}
+
+func (a *Adapter) UpdateFilteredPolicies(sec string, ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) ([][]string, error) {
+	return nil, errors.New("not implemented")
+}
+
 // NewAdapter is the constructor for Adapter.
 func NewAdapter(filePath string) *Adapter {
 	return &Adapter{filePath: filePath}

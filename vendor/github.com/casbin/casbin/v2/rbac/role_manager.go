@@ -23,6 +23,7 @@ type RoleManager interface {
 	// AddLink adds the inheritance link between two roles. role: name1 and role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
 	AddLink(name1 string, name2 string, domain ...string) error
+	BuildRelationship(name1 string, name2 string, domain ...string) error
 	// DeleteLink deletes the inheritance link between two roles. role: name1 and role: name2.
 	// domain is a prefix to the roles (can be used for other purposes).
 	DeleteLink(name1 string, name2 string, domain ...string) error
@@ -35,6 +36,8 @@ type RoleManager interface {
 	// GetUsers gets the users that inherits a role.
 	// domain is a prefix to the users (can be used for other purposes).
 	GetUsers(name string, domain ...string) ([]string, error)
+	// GetDomains gets domains that a user has
+	GetDomains(name string) ([]string, error)
 	// PrintRoles prints all the roles to log.
 	PrintRoles() error
 	// SetLogger sets role manager's logger.

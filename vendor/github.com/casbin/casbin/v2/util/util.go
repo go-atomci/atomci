@@ -28,7 +28,7 @@ func EscapeAssertion(s string) string {
 	if strings.HasPrefix(s, "r") || strings.HasPrefix(s, "p") {
 		s = strings.Replace(s, ".", "_", 1)
 	}
-	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)(r|p)\.`)
+	var regex = regexp.MustCompile(`(\|| |=|\)|\(|&|<|>|,|\+|-|!|\*|\/)((r|p)[0-9]*)\.`)
 	s = regex.ReplaceAllStringFunc(s, func(m string) string {
 		return strings.Replace(m, ".", "_", 1)
 	})
@@ -184,4 +184,16 @@ func GetEvalValue(s string) []string {
 		rules = append(rules, rule[1])
 	}
 	return rules
+}
+
+func RemoveDuplicateElement(s []string) []string {
+	result := make([]string, 0, len(s))
+	temp := map[string]struct{}{}
+	for _, item := range s {
+		if _, ok := temp[item]; !ok {
+			temp[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
 }

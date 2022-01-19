@@ -134,6 +134,7 @@ func (e *Enforcer) AddPolicies(rules [][]string) (bool, error) {
 // Otherwise the function returns true by adding the new rule.
 func (e *Enforcer) AddNamedPolicy(ptype string, params ...interface{}) (bool, error) {
 	if strSlice, ok := params[0].([]string); len(params) == 1 && ok {
+		strSlice = append(make([]string, 0, len(strSlice)), strSlice...)
 		return e.addPolicy("p", ptype, strSlice)
 	}
 	policy := make([]string, 0)
@@ -163,6 +164,23 @@ func (e *Enforcer) UpdatePolicy(oldPolicy []string, newPolicy []string) (bool, e
 
 func (e *Enforcer) UpdateNamedPolicy(ptype string, p1 []string, p2 []string) (bool, error) {
 	return e.updatePolicy("p", ptype, p1, p2)
+}
+
+// UpdatePolicies updates authorization rules from the current policies.
+func (e *Enforcer) UpdatePolicies(oldPolices [][]string, newPolicies [][]string) (bool, error) {
+	return e.UpdateNamedPolicies("p", oldPolices, newPolicies)
+}
+
+func (e *Enforcer) UpdateNamedPolicies(ptype string, p1 [][]string, p2 [][]string) (bool, error) {
+	return e.updatePolicies("p", ptype, p1, p2)
+}
+
+func (e *Enforcer) UpdateFilteredPolicies(newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.UpdateFilteredNamedPolicies("p", newPolicies, fieldIndex, fieldValues...)
+}
+
+func (e *Enforcer) UpdateFilteredNamedPolicies(ptype string, newPolicies [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	return e.updateFilteredPolicies("p", ptype, newPolicies, fieldIndex, fieldValues...)
 }
 
 // RemovePolicies removes authorization rules from the current policy.

@@ -15,6 +15,8 @@
 package casbin
 
 import (
+	"fmt"
+
 	Err "github.com/casbin/casbin/v2/errors"
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -58,7 +60,7 @@ func (e *Enforcer) addPolicy(sec string, ptype string, rule []string) (bool, err
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForAddPolicy(rule...)
+			err = watcher.UpdateForAddPolicy(sec, ptype, rule...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -96,10 +98,13 @@ func (e *Enforcer) addPolicies(sec string, ptype string, rules [][]string) (bool
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return true, err
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForAddPolicies(sec, ptype, rules...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return true, err
 	}
 
 	return true, nil
@@ -134,7 +139,7 @@ func (e *Enforcer) removePolicy(sec string, ptype string, rule []string) (bool, 
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemovePolicy(rule...)
+			err = watcher.UpdateForRemovePolicy(sec, ptype, rule...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -186,6 +191,48 @@ func (e *Enforcer) updatePolicy(sec string, ptype string, oldRule []string, newR
 	return ruleUpdated, nil
 }
 
+func (e *Enforcer) updatePolicies(sec string, ptype string, oldRules [][]string, newRules [][]string) (bool, error) {
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdatePolicies(sec, ptype, oldRules, newRules)
+	}
+
+	if e.shouldPersist() {
+		if err := e.adapter.(persist.UpdatableAdapter).UpdatePolicies(sec, ptype, oldRules, newRules); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
+	ruleUpdated := e.model.UpdatePolicies(sec, ptype, oldRules, newRules)
+	if !ruleUpdated {
+		return ruleUpdated, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
+		if err != nil {
+			return ruleUpdated, err
+		}
+		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
+		if err != nil {
+			return ruleUpdated, err
+		}
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
+			err = watcher.UpdateForUpdatePolicies(oldRules, newRules)
+		} else {
+			err = e.watcher.Update()
+		}
+		return ruleUpdated, err
+	}
+
+	return ruleUpdated, nil
+}
+
 // removePolicies removes rules from the current policy.
 func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (bool, error) {
 	if !e.model.HasPolicies(sec, ptype, rules) {
@@ -217,10 +264,13 @@ func (e *Enforcer) removePolicies(sec string, ptype string, rules [][]string) (b
 	}
 
 	if e.watcher != nil && e.autoNotifyWatcher {
-		err := e.watcher.Update()
-		if err != nil {
-			return rulesRemoved, err
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
+			err = watcher.UpdateForRemovePolicies(sec, ptype, rules...)
+		} else {
+			err = e.watcher.Update()
 		}
+		return true, err
 	}
 
 	return rulesRemoved, nil
@@ -255,11 +305,10 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 			return ruleRemoved, err
 		}
 	}
-
 	if e.watcher != nil && e.autoNotifyWatcher {
 		var err error
 		if watcher, ok := e.watcher.(persist.WatcherEx); ok {
-			err = watcher.UpdateForRemoveFilteredPolicy(fieldIndex, fieldValues...)
+			err = watcher.UpdateForRemoveFilteredPolicy(sec, ptype, fieldIndex, fieldValues...)
 		} else {
 			err = e.watcher.Update()
 		}
@@ -267,4 +316,66 @@ func (e *Enforcer) removeFilteredPolicy(sec string, ptype string, fieldIndex int
 	}
 
 	return ruleRemoved, nil
+}
+
+func (e *Enforcer) updateFilteredPolicies(sec string, ptype string, newRules [][]string, fieldIndex int, fieldValues ...string) (bool, error) {
+	var (
+		oldRules [][]string
+		err      error
+	)
+
+	if e.shouldPersist() {
+		if oldRules, err = e.adapter.(persist.UpdatableAdapter).UpdateFilteredPolicies(sec, ptype, newRules, fieldIndex, fieldValues...); err != nil {
+			if err.Error() != notImplemented {
+				return false, err
+			}
+		}
+	}
+
+	if e.dispatcher != nil && e.autoNotifyDispatcher {
+		return true, e.dispatcher.UpdateFilteredPolicies(sec, ptype, oldRules, newRules)
+	}
+
+	ruleChanged := e.model.RemovePolicies(sec, ptype, oldRules)
+	e.model.AddPolicies(sec, ptype, newRules)
+	ruleChanged = ruleChanged && len(newRules) != 0
+	if !ruleChanged {
+		return ruleChanged, nil
+	}
+
+	if sec == "g" {
+		err := e.BuildIncrementalRoleLinks(model.PolicyRemove, ptype, oldRules) // remove the old rules
+		if err != nil {
+			return ruleChanged, err
+		}
+		err = e.BuildIncrementalRoleLinks(model.PolicyAdd, ptype, newRules) // add the new rules
+		if err != nil {
+			return ruleChanged, err
+		}
+	}
+
+	if e.watcher != nil && e.autoNotifyWatcher {
+		var err error
+		if watcher, ok := e.watcher.(persist.WatcherUpdatable); ok {
+			err = watcher.UpdateForUpdatePolicies(oldRules, newRules)
+		} else {
+			err = e.watcher.Update()
+		}
+		return ruleChanged, err
+	}
+
+	return ruleChanged, nil
+}
+
+func (e *Enforcer) getDomainIndex(ptype string) int {
+	p := e.model["p"][ptype]
+	pattern := fmt.Sprintf("%s_dom", ptype)
+	index := len(p.Tokens)
+	for i, token := range p.Tokens {
+		if token == pattern {
+			index = i
+			break
+		}
+	}
+	return index
 }

@@ -15,7 +15,11 @@
 package model
 
 import (
+	"container/list"
+	"errors"
 	"fmt"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -29,6 +33,9 @@ type Model map[string]AssertionMap
 
 // AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
 type AssertionMap map[string]*Assertion
+
+const defaultDomain string = ""
+const defaultSeparator = "::"
 
 var sectionNameMap = map[string]string{
 	"r": "request_definition",
@@ -57,6 +64,7 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 	ast.Value = value
 	ast.PolicyMap = make(map[string]int)
 	ast.setLogger(model.GetLogger())
+	ast.initPriorityIndex()
 
 	if sec == "r" || sec == "p" {
 		ast.Tokens = strings.Split(ast.Value, ",")
@@ -65,6 +73,10 @@ func (model Model) AddDef(sec string, key string, value string) bool {
 		}
 	} else {
 		ast.Value = util.RemoveComments(util.EscapeAssertion(ast.Value))
+	}
+
+	if sec == "m" && strings.Contains(ast.Value, "in") {
+		ast.Value = strings.Replace(strings.Replace(ast.Value, "[", "(", -1), "]", ")", -1)
 	}
 
 	_, ok := model[sec]
@@ -201,4 +213,176 @@ func (model Model) PrintModel() {
 	}
 
 	model.GetLogger().LogModel(modelInfo)
+}
+
+func (model Model) SortPoliciesBySubjectHierarchy() error {
+	if model["e"]["e"].Value != "subjectPriority(p_eft) || deny" {
+		return nil
+	}
+	subIndex := 0
+	domainIndex := -1
+	for ptype, assertion := range model["p"] {
+		for index, token := range assertion.Tokens {
+			if token == fmt.Sprintf("%s_dom", ptype) {
+				domainIndex = index
+				break
+			}
+		}
+		policies := assertion.Policy
+		subjectHierarchyMap, err := getSubjectHierarchyMap(model["g"]["g"].Policy)
+		if err != nil {
+			return err
+		}
+		sort.SliceStable(policies, func(i, j int) bool {
+			domain1, domain2 := defaultDomain, defaultDomain
+			if domainIndex != -1 {
+				domain1 = policies[i][domainIndex]
+				domain2 = policies[j][domainIndex]
+			}
+			name1, name2 := getNameWithDomain(domain1, policies[i][subIndex]), getNameWithDomain(domain2, policies[j][subIndex])
+			p1 := subjectHierarchyMap[name1]
+			p2 := subjectHierarchyMap[name2]
+			return p1 > p2
+		})
+		for i, policy := range assertion.Policy {
+			assertion.PolicyMap[strings.Join(policy, ",")] = i
+		}
+	}
+	return nil
+}
+
+func getSubjectHierarchyMap(policies [][]string) (map[string]int, error) {
+	subjectHierarchyMap := make(map[string]int)
+	// Tree structure of role
+	policyMap := make(map[string][]string)
+	for _, policy := range policies {
+		if len(policy) < 2 {
+			return nil, errors.New("policy g expect 2 more params")
+		}
+		domain := defaultDomain
+		if len(policy) != 2 {
+			domain = policy[2]
+		}
+		child := getNameWithDomain(domain, policy[0])
+		parent := getNameWithDomain(domain, policy[1])
+		policyMap[parent] = append(policyMap[parent], child)
+		if _, ok := subjectHierarchyMap[child]; !ok {
+			subjectHierarchyMap[child] = 0
+		}
+		if _, ok := subjectHierarchyMap[parent]; !ok {
+			subjectHierarchyMap[parent] = 0
+		}
+		subjectHierarchyMap[child] = 1
+	}
+	// Use queues for levelOrder
+	queue := list.New()
+	for k, v := range subjectHierarchyMap {
+		root := k
+		if v != 0 {
+			continue
+		}
+		lv := 0
+		queue.PushBack(root)
+		for queue.Len() != 0 {
+			sz := queue.Len()
+			for i := 0; i < sz; i++ {
+				node := queue.Front()
+				queue.Remove(node)
+				nodeValue := node.Value.(string)
+				subjectHierarchyMap[nodeValue] = lv
+				if _, ok := policyMap[nodeValue]; ok {
+					for _, child := range policyMap[nodeValue] {
+						queue.PushBack(child)
+					}
+				}
+			}
+			lv++
+		}
+	}
+	return subjectHierarchyMap, nil
+}
+
+func getNameWithDomain(domain string, name string) string {
+	return domain + defaultSeparator + name
+}
+
+func (model Model) SortPoliciesByPriority() error {
+	for ptype, assertion := range model["p"] {
+		for index, token := range assertion.Tokens {
+			if token == fmt.Sprintf("%s_priority", ptype) {
+				assertion.priorityIndex = index
+				break
+			}
+		}
+		if assertion.priorityIndex == -1 {
+			continue
+		}
+		policies := assertion.Policy
+		sort.SliceStable(policies, func(i, j int) bool {
+			p1, err := strconv.Atoi(policies[i][assertion.priorityIndex])
+			if err != nil {
+				return true
+			}
+			p2, err := strconv.Atoi(policies[j][assertion.priorityIndex])
+			if err != nil {
+				return true
+			}
+			return p1 < p2
+		})
+		for i, policy := range assertion.Policy {
+			assertion.PolicyMap[strings.Join(policy, ",")] = i
+		}
+	}
+	return nil
+}
+
+func (model Model) ToText() string {
+	tokenPatterns := make(map[string]string)
+
+	pPattern, rPattern := regexp.MustCompile("^p_"), regexp.MustCompile("^r_")
+	for _, ptype := range []string{"r", "p"} {
+		for _, token := range model[ptype][ptype].Tokens {
+			tokenPatterns[token] = rPattern.ReplaceAllString(pPattern.ReplaceAllString(token, "p."), "r.")
+		}
+	}
+	s := strings.Builder{}
+	writeString := func(sec string) {
+		for ptype := range model[sec] {
+			value := model[sec][ptype].Value
+			for tokenPattern, newToken := range tokenPatterns {
+				value = strings.Replace(value, tokenPattern, newToken, -1)
+			}
+			s.WriteString(fmt.Sprintf("%s = %s\n", sec, value))
+		}
+	}
+	s.WriteString("[request_definition]\n")
+	writeString("r")
+	s.WriteString("[policy_definition]\n")
+	writeString("p")
+	if _, ok := model["g"]; ok {
+		s.WriteString("[role_definition]\n")
+		for ptype := range model["g"] {
+			s.WriteString(fmt.Sprintf("%s = %s\n", ptype, model["g"][ptype].Value))
+		}
+	}
+	s.WriteString("[policy_effect]\n")
+	writeString("e")
+	s.WriteString("[matchers]\n")
+	writeString("m")
+	return s.String()
+}
+
+func (model Model) Copy() Model {
+	newModel := NewModel()
+
+	for sec, m := range model {
+		newAstMap := make(AssertionMap)
+		for ptype, ast := range m {
+			newAstMap[ptype] = ast.copy()
+		}
+		newModel[sec] = newAstMap
+	}
+
+	newModel.SetLogger(model.GetLogger())
+	return newModel
 }
