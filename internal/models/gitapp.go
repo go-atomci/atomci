@@ -16,6 +16,12 @@ limitations under the License.
 
 package models
 
+import (
+	"crypto/aes"
+	"crypto/cipher"
+	"log"
+)
+
 // GitApp ...
 type GitApp struct {
 	Addons
@@ -70,4 +76,32 @@ type RepoServer struct {
 // TableName ...
 func (t *RepoServer) TableName() string {
 	return "pub_repo_server"
+}
+
+// crypto token && password
+const (
+	AES_KEY = "12345678abcdefgh"
+	AES_IV  = "abcdefgh12345678"
+)
+
+func AesEny(plaintext []byte) []byte {
+	var (
+		block cipher.Block
+		err   error
+	)
+	if block, err = aes.NewCipher([]byte(AES_KEY)); err != nil {
+		log.Fatal(err)
+	}
+	stream := cipher.NewCTR(block, []byte(AES_IV))
+	stream.XORKeyStream(plaintext, plaintext)
+	return plaintext
+}
+
+func (repo *RepoServer) Crypto() {
+	plainText := []byte(repo.Token)
+	repo.Token = string(AesEny(plainText))
+}
+
+func (repo *RepoServer) DecryptoToken() {
+	repo.Token = string(AesEny([]byte(repo.Token)))
 }
