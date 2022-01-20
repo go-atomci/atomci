@@ -18,11 +18,11 @@ func NewHandlers() []INotify {
 	var handlers []INotify
 
 	if dingEnable > 0 {
-		_ = append(handlers, DingRobotHandler())
+		handlers = append(handlers, DingRobotHandler())
 	}
 
 	if mailEnable > 0 {
-		_ = append(handlers, EmailHandler())
+		handlers = append(handlers, EmailHandler())
 	}
 
 	return handlers
