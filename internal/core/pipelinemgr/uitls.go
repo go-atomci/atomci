@@ -32,7 +32,7 @@ import (
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils"
 
-	"github.com/go-atomci/go-scm/scm"
+	"github.com/drone/go-scm/scm"
 	"github.com/go-atomci/workflow"
 	"github.com/go-atomci/workflow/jenkins"
 	"github.com/go-atomci/workflow/jenkins/templates"
@@ -637,10 +637,9 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 		return "", err
 	}
 	opt := scm.CommitListOptions{
-		Ref:   branchName,
-		Order: "topo",
-		Page:  1,
-		Size:  30,
+		Ref:  branchName,
+		Page: 1,
+		Size: 10,
 	}
 
 	got, _, err := client.Git.ListCommits(context.Background(), projectApp.FullName, opt)

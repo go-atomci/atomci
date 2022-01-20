@@ -27,10 +27,10 @@ import (
 
 	"github.com/go-atomci/atomci/utils"
 
-	"github.com/go-atomci/go-scm/scm"
-	"github.com/go-atomci/go-scm/scm/driver/github"
-	"github.com/go-atomci/go-scm/scm/driver/gitlab"
-	"github.com/go-atomci/go-scm/scm/transport"
+	"github.com/drone/go-scm/scm"
+	"github.com/drone/go-scm/scm/driver/github"
+	"github.com/drone/go-scm/scm/driver/gitlab"
+	"github.com/drone/go-scm/scm/transport"
 )
 
 // NewScmProvider ..
