@@ -24,6 +24,15 @@
    git push -u origin feat-17-support-statefulset
    ```
 
+   __注意__: 如果在自己分支开发阶段，如有需要合并最新的`master`, 请在本地环境配置 `git rebase` ，从而避免出现无效的提交信息，具体配置指令如下: 
+
+   ```sh
+   # branch.autosetuprebase only changes the default pull “mode” for new branches that have an upstream to track. 
+   git config branch.autosetuprebase always
+   # use the pull.rebase config option to change the behavior for every git pull (instead of only newly-created branches)
+   git config pull.rebase true
+   ```
+
 3. Create a pull request to the main repository on GitHub.
 4. When the reviewer makes some comments, address any feedback that comes and update the pull request.
 5. When your contribution is accepted, your pull request will be approved and merged to the main branch.
