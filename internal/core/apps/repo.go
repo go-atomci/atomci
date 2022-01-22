@@ -26,7 +26,7 @@ import (
 	"github.com/go-atomci/atomci/utils/query"
 
 	"github.com/astaxie/beego/orm"
-	"github.com/go-atomci/go-scm/scm"
+	"github.com/drone/go-scm/scm"
 )
 
 // AppManager ...

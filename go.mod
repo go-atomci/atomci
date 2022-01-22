@@ -36,8 +36,8 @@ require (
 	github.com/casbin/gorm-adapter/v3 v3.4.6
 	github.com/colynn/go-ldap-client/v3 v3.0.0-20201016034829-4c1455a490de
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/drone/go-scm v1.18.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-atomci/go-scm v1.13.2-0.20210629010829-147be8a9bdd3
 	github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-sql-driver/mysql v1.6.0
@@ -47,7 +47,6 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175
 	github.com/kr/text v0.2.0 // indirect
-	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pborman/uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
