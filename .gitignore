@@ -5,6 +5,9 @@
 .DS_Store
 debug
 *.tgz
+
+vendor
+
 /atomci.exe
 /atomci
 /cli
