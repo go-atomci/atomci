@@ -31,9 +31,10 @@ replace (
 )
 
 require (
-	github.com/astaxie/beego v1.12.0
+	github.com/astaxie/beego v1.12.1
+	github.com/casbin/beego-orm-adapter/v2 v2.0.2 // indirect
+	github.com/casbin/beego-orm-adapter/v3 v3.0.2
 	github.com/casbin/casbin/v2 v2.37.4
-	github.com/casbin/gorm-adapter/v3 v3.4.6
 	github.com/colynn/go-ldap-client/v3 v3.0.0-20201016034829-4c1455a490de
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/drone/go-scm v1.18.0
@@ -60,8 +61,6 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
-	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.22.3
 	k8s.io/api v0.18.0
 	k8s.io/apimachinery v0.21.1
 	k8s.io/client-go v0.18.0

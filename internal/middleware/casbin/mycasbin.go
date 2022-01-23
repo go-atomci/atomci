@@ -18,27 +18,23 @@ package mycasbin
 
 import (
 	"github.com/astaxie/beego"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"github.com/go-atomci/atomci/internal/middleware/log"
 	glog "log"
 
+	beegoormadapter "github.com/casbin/beego-orm-adapter/v3"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/go-atomci/atomci/internal/middleware/log"
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var casbinObj *casbin.Enforcer
+
 // NewCasbin ..
 func NewCasbin() (*casbin.Enforcer, error) {
-	// TODO: changet to csv tmp, later add mysql apter
-	// databaseURL := beego.AppConfig.String("DB::url")
-	// Apter, err := gormadapter.NewAdapter("mysql", databaseURL, true)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
-	rbacModel, err := model.NewModelFromString(`
+	if casbinObj == nil {
+
+		rbacModel, err := model.NewModelFromString(`
 [request_definition]
 r = sub, obj, act
 
@@ -56,22 +52,25 @@ e = some(where (p.eft == allow))
 # m = g(r.sub, p.sub) && r.obj == p.obj && (r.act == p.act || p.act == "*") || r.sub == "admin"
 m = g(r.sub, p.sub) && keyMatch2(r.obj,p.obj) && (r.act == p.act || p.act == "*") || r.sub == "admin"
 `)
-	if err != nil {
-		glog.Fatalf("error: model: %s", err)
-	}
+		if err != nil {
+			glog.Fatalf("error: model: %s", err)
+		}
 
-	dsn := beego.AppConfig.String("DB::url")
-	db, _ := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	rbacPolicy, _ := gormadapter.NewAdapterByDBWithCustomTable(db, &CasbinRule{})
+		dsn := beego.AppConfig.String("DB::url")
+		rbacPolicy, _ := beegoormadapter.NewAdapter("casbin", "mysql", dsn)
 
-	e, err := casbin.NewEnforcer(rbacModel, rbacPolicy)
-	if err != nil {
-		log.Log.Error("casbin new enforcer error: %s", err.Error())
+		e, err := casbin.NewEnforcer(rbacModel, rbacPolicy)
+		if err != nil {
+			log.Log.Error("casbin new enforcer error: %s", err.Error())
+			return nil, err
+		}
+		if err := e.LoadPolicy(); err == nil {
+			casbinObj = e
+			return e, err
+		}
+		log.Log.Error("casbin rbac_model or policy init error, message: %v", err)
 		return nil, err
 	}
-	if err := e.LoadPolicy(); err == nil {
-		return e, err
-	}
-	log.Log.Error("casbin rbac_model or policy init error, message: %v", err)
-	return nil, err
+
+	return casbinObj, nil
 }
