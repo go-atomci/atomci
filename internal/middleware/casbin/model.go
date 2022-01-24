@@ -18,13 +18,14 @@ package mycasbin
 
 // CasbinRule ..
 type CasbinRule struct {
-	PType string `json:"p_type" gorm:"type:varchar(100);"`
-	V0    string `json:"v0" orm:"size(100);"`
-	V1    string `json:"v1" orm:"size(100);"`
-	V2    string `json:"v2" orm:"size(100);"`
-	V3    string `json:"v3" orm:"size(100);"`
-	V4    string `json:"v4" orm:"size(100);"`
-	V5    string `json:"v5" orm:"size(100);"`
+	ID    uint   `gorm:"primaryKey;autoIncrement"`
+	Ptype string `gorm:"size:512"`
+	V0    string `gorm:"size:512"`
+	V1    string `gorm:"size:512"`
+	V2    string `gorm:"size:512"`
+	V3    string `gorm:"size:512"`
+	V4    string `gorm:"size:512"`
+	V5    string `gorm:"size:512"`
 }
 
 // TableName ..

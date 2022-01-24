@@ -18,7 +18,6 @@ package dao
 
 import (
 	"fmt"
-
 	mycasbin "github.com/go-atomci/atomci/internal/middleware/casbin"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
@@ -229,11 +228,19 @@ func GenerateCasbinrules(role string, operations []int64) error {
 			return err
 		}
 		log.Log.Debug("role: %s, casbin rules length: %v", role, len(casbinRules))
-		addFlag, err := e.AddPolicies(casbinRules)
+
+		// it seems beegormadapter doesn't implement batch adapter, replaced AddPolicies by AddPolicy
+		for _, value := range casbinRules {
+			_, err = e.AddPolicy(value)
+			if err != nil {
+				log.Log.Error("add policys error: %s", err.Error())
+			}
+		}
+		//addFlag, err := e.AddPolicies(casbinRules)
 		if err != nil {
 			log.Log.Error("add policys error: %s", err.Error())
 		}
-		log.Log.Info("add policy to casbin rule, flag: %v", addFlag)
+		//log.Log.Info("add policy to casbin rule, flag: %v", addFlag)
 		if err := e.SavePolicy(); err != nil {
 			log.Log.Error("save casbin policy error: %s", err.Error())
 			return err
