@@ -365,7 +365,6 @@ func formatIntegrateSettingResponse(items []*models.IntegrateSetting) []*Integra
 }
 
 func formatSignalIntegrateSetting(item *models.IntegrateSetting, config *Config) *IntegrateSettingResponse {
-	item.DecryptConfig()
 	configJSON, err := config.Struct(item.DecryptConfig(), item.Type)
 	if err != nil {
 		log.Log.Error("parse config error: %s", err.Error())
