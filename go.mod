@@ -31,15 +31,17 @@ replace (
 )
 
 require (
-	github.com/astaxie/beego v1.12.0
-	github.com/casbin/casbin/v2 v2.19.4
+	github.com/astaxie/beego v1.12.1
+	github.com/casbin/beego-orm-adapter/v2 v2.0.2 // indirect
+	github.com/casbin/beego-orm-adapter/v3 v3.0.2
+	github.com/casbin/casbin/v2 v2.37.4
 	github.com/colynn/go-ldap-client/v3 v3.0.0-20201016034829-4c1455a490de
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/drone/go-scm v1.18.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
-	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/google/uuid v1.2.0 // indirect
@@ -50,12 +52,9 @@ require (
 	github.com/pborman/uuid v1.2.0
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
-	golang.org/x/net v0.0.0-20210224082022-3d97a244fca7 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/oauth2 v0.0.0-20210126194326-f9ce19ea3013 // indirect
-	golang.org/x/sys v0.0.0-20210225134936-a50acf3fe073 // indirect
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
-	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect

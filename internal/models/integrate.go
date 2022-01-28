@@ -16,6 +16,11 @@ limitations under the License.
 
 package models
 
+import (
+	"encoding/base64"
+	"github.com/go-atomci/atomci/utils"
+)
+
 // IntegrateSetting the Basic Data of stages based on commpany
 type IntegrateSetting struct {
 	Addons
@@ -29,4 +34,23 @@ type IntegrateSetting struct {
 // TableName ...
 func (t *IntegrateSetting) TableName() string {
 	return "sys_integrate_setting"
+}
+
+func (t *IntegrateSetting) CryptoConfig(raw string) {
+	t.crypto(raw)
+	t.Config = t.crypto(raw)
+}
+
+func (t *IntegrateSetting) DecryptConfig() string {
+	return t.decrypt()
+}
+
+func (t *IntegrateSetting) crypto(raw string) string {
+	plainText := []byte(raw)
+	return base64.StdEncoding.EncodeToString(utils.AesEny(plainText))
+}
+
+func (t *IntegrateSetting) decrypt() string {
+	cfg, _ := base64.StdEncoding.DecodeString(t.Config)
+	return string(utils.AesEny(cfg))
 }

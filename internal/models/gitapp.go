@@ -17,9 +17,7 @@ limitations under the License.
 package models
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
-	"log"
+	"github.com/go-atomci/atomci/utils"
 )
 
 // GitApp ...
@@ -68,8 +66,8 @@ type RepoServer struct {
 	Type     string `orm:"column(type);" json:"type"`
 	BaseURL  string `orm:"column(base_url);" json:"base_url"`
 	User     string `orm:"column(user);" json:"user"`
-	Token    string `orm:"column(token);" json:"token"`
-	Password string `orm:"column(password);" json:"password"`
+	token    string `orm:"column(token);" json:"token"`
+	password string `orm:"column(password);" json:"password"`
 	CID      int64  `orm:"column(cid);" json:"cid"`
 }
 
@@ -78,30 +76,26 @@ func (t *RepoServer) TableName() string {
 	return "pub_repo_server"
 }
 
-// crypto token && password
-const (
-	AES_KEY = "12345678abcdefgh"
-	AES_IV  = "abcdefgh12345678"
-)
+func (repo *RepoServer) SetToken(token string) {
+	plainText := []byte(token)
+	repo.token = string(utils.AesEny(plainText))
+}
 
-func AesEny(plaintext []byte) []byte {
-	var (
-		block cipher.Block
-		err   error
-	)
-	if block, err = aes.NewCipher([]byte(AES_KEY)); err != nil {
-		log.Fatal(err)
+func (repo *RepoServer) GetToken() string {
+	if len(repo.token) == 0 {
+		return ""
 	}
-	stream := cipher.NewCTR(block, []byte(AES_IV))
-	stream.XORKeyStream(plaintext, plaintext)
-	return plaintext
+	return string(utils.AesEny([]byte(repo.token)))
 }
 
-func (repo *RepoServer) Crypto() {
-	plainText := []byte(repo.Token)
-	repo.Token = string(AesEny(plainText))
+func (repo *RepoServer) SetPassword(password string) {
+	plainText := []byte(password)
+	repo.password = string(utils.AesEny(plainText))
 }
 
-func (repo *RepoServer) DecryptoToken() {
-	repo.Token = string(AesEny([]byte(repo.Token)))
+func (repo *RepoServer) GetPassword() string {
+	if len(repo.password) == 0 {
+		return ""
+	}
+	return string(utils.AesEny([]byte(repo.password)))
 }
