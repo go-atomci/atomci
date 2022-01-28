@@ -79,13 +79,13 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 
 // SyncAppBranches ...
 func (manager *AppManager) SyncAppBranches(appID int64) error {
-	projectApp, err := manager.projectModel.GetProjectApp(appID)
+	projectApp, _ := manager.projectModel.GetProjectApp(appID)
 	repoModel, err := manager.gitAppModel.GetRepoByID(projectApp.RepoID)
 	if err != nil {
 		log.Log.Error("GetRepoByID occur error: %v", err.Error())
 		return fmt.Errorf("网络错误，请重试")
 	}
-	client, err := NewScmProvider(repoModel.Type, projectApp.Path, repoModel.User, repoModel.Token)
+	client, _ := NewScmProvider(repoModel.Type, projectApp.Path, repoModel.User, repoModel.GetToken())
 	branchList := []*scm.Reference{}
 	listOptions := scm.ListOptions{
 		Page: 1,
