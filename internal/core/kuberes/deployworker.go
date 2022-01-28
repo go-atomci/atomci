@@ -148,7 +148,7 @@ func getDefaultPullSecretAndRegistryAddr(envID int64) (string, string, error) {
 		return "", "", err
 	}
 	config := settings.Config{}
-	configJSON, err := config.Struct(integrateSettingRegistry.Config, integrateSettingRegistry.Type)
+	configJSON, err := config.Struct(integrateSettingRegistry.DecryptConfig(), integrateSettingRegistry.Type)
 	if err != nil {
 		log.Log.Error("when parse registry config error: %s", err.Error())
 		return "", "", err

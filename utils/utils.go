@@ -17,6 +17,9 @@ limitations under the License.
 package utils
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -34,7 +37,7 @@ const (
 )
 
 func Krand(size int, kind int) []byte {
-	ikind, kinds, result := kind, [][]int{[]int{10, 48}, []int{26, 97}, []int{26, 65}}, make([]byte, size)
+	ikind, kinds, result := kind, [][]int{{10, 48}, {26, 97}, {26, 65}}, make([]byte, size)
 	is_all := kind > 2 || kind < 0
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < size; i++ {
@@ -132,12 +135,12 @@ func GetRootPath(path string) string {
 // 验证字符长度
 func IsIllegalLength(s string, min int, max int) bool {
 	if min == -1 {
-		return (len(s) > max)
+		return len(s) > max
 	}
 	if max == -1 {
-		return (len(s) <= min)
+		return len(s) <= min
 	}
-	return (len(s) < min || len(s) > max)
+	return len(s) < min || len(s) > max
 }
 
 const (
@@ -150,4 +153,24 @@ func Restricted(s, regdata string) bool {
 	validName := regexp.MustCompile(`^` + regdata + `$`)
 	legal := validName.MatchString(s)
 	return legal
+}
+
+// crypto && decrypt
+const (
+	AES_KEY = "12345678abcdefgh"
+	AES_IV  = "abcdefgh12345678"
+)
+
+// CTR 128bit no padding
+func AesEny(plaintext []byte) []byte {
+	var (
+		block cipher.Block
+		err   error
+	)
+	if block, err = aes.NewCipher([]byte(AES_KEY)); err != nil {
+		log.Fatal(err)
+	}
+	stream := cipher.NewCTR(block, []byte(AES_IV))
+	stream.XORKeyStream(plaintext, plaintext)
+	return plaintext
 }
