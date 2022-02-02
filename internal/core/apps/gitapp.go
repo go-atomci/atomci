@@ -66,7 +66,10 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 
 	case "gitee":
 
-		client = gitee.NewDefault()
+		client, err = gitee.New(vcsPath)
+		if err != nil {
+			fmt.Errorf("%s", err.Error())
+		}
 		client.Client = &http.Client{
 			Transport: &transport.BearerToken{
 				Token: token,
