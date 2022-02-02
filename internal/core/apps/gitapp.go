@@ -28,6 +28,7 @@ import (
 	"github.com/go-atomci/atomci/utils"
 
 	"github.com/drone/go-scm/scm"
+	"github.com/drone/go-scm/scm/driver/gitee"
 	"github.com/drone/go-scm/scm/driver/github"
 	"github.com/drone/go-scm/scm/driver/gitlab"
 	"github.com/drone/go-scm/scm/transport"
@@ -55,19 +56,19 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 			},
 		}
 	case "github":
-		if strings.HasSuffix(vcsPath, ".git") {
-			vcsPath = strings.Replace(vcsPath, ".git", "", -1)
-		}
-		// TODO: verify vcsPath, only support http, do not support git@github.com:/dddd.git
-		projectPathSplit := strings.Split(strings.Split(vcsPath, "://")[1], "/")
-		projectName := strings.Join(projectPathSplit[1:], "/")
-		log.Log.Debug("git projectpathsplit: %s,\tprojectName: %s", projectPathSplit, projectName)
 
-		// TODO: github does not work
-		schema := strings.Split(vcsPath, "://")[0]
-		client, err = github.New(schema + "://" + projectPathSplit[0])
+		client = github.NewDefault()
 		client.Client = &http.Client{
-			Transport: &transport.PrivateToken{
+			Transport: &transport.BearerToken{
+				Token: token,
+			},
+		}
+
+	case "gitee":
+
+		client = gitee.NewDefault()
+		client.Client = &http.Client{
+			Transport: &transport.BearerToken{
 				Token: token,
 			},
 		}
