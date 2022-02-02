@@ -323,6 +323,7 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 			return err
 		}
 	}
+
 	newIntegrateSetting := &models.IntegrateSetting{
 		Name:        request.Name,
 		Description: request.Description,
@@ -330,6 +331,8 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 		Type:        request.Type,
 		Config:      config,
 	}
+
+	newIntegrateSetting.CryptoConfig(config)
 
 	if request.Type == KubernetesType {
 		kube := &KubeConfig{}
