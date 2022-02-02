@@ -54,8 +54,8 @@
                           <el-input v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitlab.com"></el-input>
                         </el-form-item>
                         <el-form-item v-else label="地址" prop="base_url">
-                          <el-input v-if="item.type == 'github'" v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://api.github.com"></el-input>
-                          <el-input v-else="item.type == 'gitee'" v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitee.com/api/v5"></el-input>
+                          <el-input v-if="item.type == 'github'" v-model.trim="item.base_url" auto-complete="off" placeholder="https://api.github.com"></el-input>
+                          <el-input v-else="item.type == 'gitee'" v-model.trim="item.base_url" auto-complete="off" placeholder="https://gitee.com/api/v5"></el-input>
                         </el-form-item>
                       </div>
                       <div class="labelSize" v-if="item.type == 'gitlab'">
@@ -64,7 +64,7 @@
                         </el-form-item>
                       </div>
                       <div class="labelSize">
-                        <el-form-item label="Token" prop="token">
+                        <el-form-item label="Token" prop="token" :rules="[{ required: true, message: '请输入Token', trigger: 'blur' }]">
                           <el-input v-model.trim="item.token" auto-complete="off" maxlength="128" placeholder="请输入Token"></el-input>
                         </el-form-item>
                       </div>
@@ -275,25 +275,30 @@
       secondStep(index) {
         this.$refs['listRef' + index][0].validate((valid) => {
           if (valid) {
-            let url = new URL(this.getTabs[index].base_url);
-            if(url.pathname !=="/" && this.getTabs[index].type == 'gitlab'){
-              let new_base_url = url.origin;
-              MessageBox.confirm('看起来您的地址不是仓库的主地址，需要主动为您修改为['+new_base_url+']吗？',
-                this.$t('bm.infrast.tips'),
-                {
-                  confirmButtonText: '确定修改',
-                  cancelButtonText: '保持原状',
-                  type: 'warning'
-                 }
+            if (this.getTabs[index].type == 'gitlab') {
+              let url = new URL(this.getTabs[index].base_url);
+              if (url.pathname !== "/") {
+                let new_base_url = url.origin;
+                MessageBox.confirm('看起来您的地址不是仓库的主地址，需要主动为您修改为[' + new_base_url + ']吗？',
+                  this.$t('bm.infrast.tips'),
+                  {
+                    confirmButtonText: '确定修改',
+                    cancelButtonText: '保持原状',
+                    type: 'warning'
+                  }
                 )
-              .then(() => {
-                this.getTabs[index].base_url=new_base_url;
+                  .then(() => {
+                    this.getTabs[index].base_url = new_base_url;
+                    this.getReposList(index);
+                  })
+                  .catch(() => {
+                    this.getReposList(index);
+                  });
+              } else {
                 this.getReposList(index);
-              })
-              .catch(() => {
-                this.getReposList(index);
-              });
-            }else{
+              }
+            }
+            else{
               this.getReposList(index);
             }
           }

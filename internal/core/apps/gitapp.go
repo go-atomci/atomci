@@ -57,7 +57,14 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 		}
 	case "github":
 
-		client = github.NewDefault()
+		if len(vcsPath) == 0 {
+			client = github.NewDefault()
+		} else {
+			client, err = github.New(vcsPath)
+			if err != nil {
+				fmt.Errorf("%s", err.Error())
+			}
+		}
 		client.Client = &http.Client{
 			Transport: &transport.BearerToken{
 				Token: token,
@@ -66,9 +73,13 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 
 	case "gitee":
 
-		client, err = gitee.New(vcsPath)
-		if err != nil {
-			fmt.Errorf("%s", err.Error())
+		if len(vcsPath) == 0 {
+			client = gitee.NewDefault()
+		} else {
+			client, err = gitee.New(vcsPath)
+			if err != nil {
+				fmt.Errorf("%s", err.Error())
+			}
 		}
 		client.Client = &http.Client{
 			Transport: &transport.BearerToken{
