@@ -16,10 +16,6 @@ limitations under the License.
 
 package models
 
-import (
-	"github.com/go-atomci/atomci/utils"
-)
-
 // GitApp ...
 type GitApp struct {
 	Addons
@@ -66,36 +62,12 @@ type RepoServer struct {
 	Type     string `orm:"column(type);" json:"type"`
 	BaseURL  string `orm:"column(base_url);" json:"base_url"`
 	User     string `orm:"column(user);" json:"user"`
-	token    string `orm:"column(token);" json:"token"`
-	password string `orm:"column(password);" json:"password"`
+	Token    string `orm:"column(Token);" json:"token"`
+	Password string `orm:"column(Password);" json:"password"`
 	CID      int64  `orm:"column(cid);" json:"cid"`
 }
 
 // TableName ...
 func (t *RepoServer) TableName() string {
 	return "pub_repo_server"
-}
-
-func (repo *RepoServer) SetToken(token string) {
-	plainText := []byte(token)
-	repo.token = string(utils.AesEny(plainText))
-}
-
-func (repo *RepoServer) GetToken() string {
-	if len(repo.token) == 0 {
-		return ""
-	}
-	return string(utils.AesEny([]byte(repo.token)))
-}
-
-func (repo *RepoServer) SetPassword(password string) {
-	plainText := []byte(password)
-	repo.password = string(utils.AesEny(plainText))
-}
-
-func (repo *RepoServer) GetPassword() string {
-	if len(repo.password) == 0 {
-		return ""
-	}
-	return string(utils.AesEny([]byte(repo.password)))
 }

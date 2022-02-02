@@ -355,7 +355,7 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 	if strings.HasSuffix(baseURL, "/") {
 		baseURL = strings.Replace(baseURL, "/", "", -1)
 	}
-	repoConfStr := fmt.Sprintf("{\"%s\":[\"%s\",\"%s\"]}", baseURL, repoModel.User, repoModel.GetToken())
+	repoConfStr := fmt.Sprintf("{\"%s\":[\"%s\",\"%s\"]}", baseURL, repoModel.User, repoModel.Token)
 
 	adminToken, err := pm.getUserToken("admin")
 	if err != nil {
@@ -632,7 +632,7 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 		return "", err
 	}
 
-	client, err := apps.NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.User, repoModel.GetToken())
+	client, err := apps.NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.User, repoModel.Token)
 	if err != nil {
 		return "", err
 	}
