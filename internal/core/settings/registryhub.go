@@ -14,7 +14,7 @@ func TryLoginRegistry(basicUrl, username, password string, insecure bool) error 
 	} else {
 		schema = "https"
 	}
-	url := fmt.Sprintf("%s://%s/v2", schema, strings.TrimRight(basicUrl, "/"))
+	url := fmt.Sprintf("%s://%s/v2/", schema, strings.TrimRight(basicUrl, "/"))
 	resp, err := http.Get(url)
 	if err != nil || resp.StatusCode != 401 {
 		return errors.New("error basicUrl")
