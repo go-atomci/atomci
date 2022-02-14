@@ -35,7 +35,7 @@ import (
 )
 
 // NewScmProvider ..
-func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
+func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 	var err error
 	var client *scm.Client
 	switch strings.ToLower(vcsType) {
@@ -56,15 +56,8 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 			},
 		}
 	case "github":
+		client = github.NewDefault()
 
-		if len(vcsPath) == 0 {
-			client = github.NewDefault()
-		} else {
-			client, err = github.New(vcsPath)
-			if err != nil {
-				fmt.Errorf("%s", err.Error())
-			}
-		}
 		client.Client = &http.Client{
 			Transport: &transport.BearerToken{
 				Token: token,
@@ -72,15 +65,8 @@ func NewScmProvider(vcsType, vcsPath, user, token string) (*scm.Client, error) {
 		}
 
 	case "gitee":
+		client = gitee.NewDefault()
 
-		if len(vcsPath) == 0 {
-			client = gitee.NewDefault()
-		} else {
-			client, err = gitee.New(vcsPath)
-			if err != nil {
-				fmt.Errorf("%s", err.Error())
-			}
-		}
 		client.Client = &http.Client{
 			Transport: &transport.BearerToken{
 				Token: token,
@@ -100,7 +86,7 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 		log.Log.Error("GetRepoByID occur error: %v", err.Error())
 		return fmt.Errorf("网络错误，请重试")
 	}
-	client, err := NewScmProvider(repoModel.Type, projectApp.Path, repoModel.User, repoModel.Token)
+	client, err := NewScmProvider(repoModel.Type, projectApp.Path, repoModel.Token)
 	branchList := []*scm.Reference{}
 	listOptions := scm.ListOptions{
 		Page: 1,

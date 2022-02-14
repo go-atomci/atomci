@@ -54,8 +54,8 @@
                           <el-input v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitlab.com"></el-input>
                         </el-form-item>
                         <el-form-item v-else label="地址" prop="base_url">
-                          <el-input v-if="item.type == 'github'" v-model.trim="item.base_url" auto-complete="off" placeholder="https://api.github.com"></el-input>
-                          <el-input v-else="item.type == 'gitee'" v-model.trim="item.base_url" auto-complete="off" placeholder="https://gitee.com/api/v5"></el-input>
+                          <el-input v-if="item.type == 'github'" v-model.trim="item.base_url" auto-complete="off" :readonly="true" placeholder="https://github.com"></el-input>
+                          <el-input v-else="item.type == 'gitee'" v-model.trim="item.base_url" auto-complete="off" :readonly="true" placeholder="https://gitee.com"></el-input>
                         </el-form-item>
                       </div>
                       <div class="labelSize" v-if="item.type == 'gitlab'">
