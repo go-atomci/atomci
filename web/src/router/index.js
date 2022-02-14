@@ -89,7 +89,7 @@ export const asyncRoutes = [
             {
                 path: '/settings/compile_env',
                 component: () => import('@/views/setting/CompileEnv.vue'),
-                name: 'taskTemplate',
+                name: 'compileEnv',
                 meta: { title: '编译环境', noCache: true }
             },
         ]

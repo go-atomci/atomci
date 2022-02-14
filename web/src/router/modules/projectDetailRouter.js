@@ -18,7 +18,7 @@ export function projectDetailRouter() {
     },
     {
       path: '/project/:projectID/detail/app',
-      name: 'projectApp',
+      name: 'projectAppHome',
       component: Layout,
       meta: { title: '应用代码', noCache: true},
       children: [
@@ -46,7 +46,7 @@ export function projectDetailRouter() {
     },
     {
       path: '/project/:projectID/detail/ci',
-      name: 'projectCI',
+      name: 'projectCIHome',
       component: Layout,
       meta: { title: '构建部署', noCache: true },
       children: [
@@ -74,7 +74,7 @@ export function projectDetailRouter() {
     },
     {
       path: '/project/:projectID/detail/service',
-      name: 'projectService',
+      name: 'projectServiceHome',
       component: Layout,
       meta: { title: '应用服务', noCache: true },
       children: [
@@ -82,7 +82,6 @@ export function projectDetailRouter() {
           path: '/project/:projectID/detail/service',
           meta: { title: '应用服务', noCache: true },
           name: 'projectService',
-          iconCls: 'service',
           component: () => import('@/views/project/Service.vue'),
         },
         {

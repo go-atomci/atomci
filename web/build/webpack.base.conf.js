@@ -41,9 +41,9 @@ module.exports = {
     }
   },
   externals: {
-    'vue': 'Vue',
-    'vue-router': 'VueRouter',
-    'vue-resource':'VueResource',
+    // 'vue': 'Vue',
+    // 'vue-router': 'VueRouter',
+    // 'vue-resource':'VueResource',
   },
   module: {
     noParse:[/vue\.runtime\.min\.js$/, /vue\-resource\.min\.js$/,/vue\-router\.min\.js$/],
