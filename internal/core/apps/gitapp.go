@@ -80,7 +80,7 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 
 // SyncAppBranches ...
 func (manager *AppManager) SyncAppBranches(appID int64) error {
-	projectApp, err := manager.projectModel.GetProjectApp(appID)
+	projectApp, _ := manager.projectModel.GetProjectApp(appID)
 	repoModel, err := manager.gitAppModel.GetRepoByID(projectApp.RepoID)
 	if err != nil {
 		log.Log.Error("GetRepoByID occur error: %v", err.Error())
