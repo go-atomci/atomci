@@ -22,11 +22,11 @@ import (
 	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 
+	"github.com/go-atomci/atomci/internal/cronjob"
 	_ "github.com/go-atomci/atomci/internal/initialize"
 	_ "github.com/go-atomci/atomci/internal/models"
-	"github.com/go-atomci/atomci/pkg/kube"
 	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/internal/cronjob"
+	"github.com/go-atomci/atomci/pkg/kube"
 )
 
 func init() {
