@@ -101,7 +101,7 @@ body > .el-menu--horizontal .el-menu-item:not(.is-disabled):not(:first-child):ho
         <a href="/project"><span><img src="@/assets/logo.png"></span></a>
       </div>
       <div class="topbar-title">
-            <el-menu :default-active="defaultActiveIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" router="true">
+            <el-menu :default-active="defaultActiveIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" router>
               <el-menu-item index="/project" >我的项目</el-menu-item>
               <el-menu-item index="/settings" v-if="menuTrue">系统管理</el-menu-item>
             </el-menu>
