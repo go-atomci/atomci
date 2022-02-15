@@ -99,7 +99,7 @@ func (manager *AppManager) SetRepoAndGetProjects(cID, repoID int64, request *Set
 	if err != nil {
 		return nil, err
 	}
-	if len(request.User) > 0 && len(request.Token) > 0 {
+	if len(request.Token) > 0 {
 		repoModel.Token = request.Token
 		repoModel.User = request.User
 		repoModel.BaseURL = request.BaseURL
@@ -107,12 +107,12 @@ func (manager *AppManager) SetRepoAndGetProjects(cID, repoID int64, request *Set
 			log.Log.Error("when setRepoGetprojects, update repomodel failed: %v", err.Error())
 		}
 	} else {
-		if len(repoModel.Token) == 0 {
+		if len(request.User) == 0 {
 			return nil, fmt.Errorf("首次同步，麻烦输入相关验证信息")
 		}
 	}
 
-	scmClient, err := NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.User, repoModel.Token)
+	scmClient, err := NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.Token)
 	if err != nil {
 		log.Log.Error("init scm Client occur error: %v", err.Error())
 		return nil, fmt.Errorf("网络错误，请重试")

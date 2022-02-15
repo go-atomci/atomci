@@ -632,7 +632,7 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 		return "", err
 	}
 
-	client, err := apps.NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.User, repoModel.Token)
+	client, err := apps.NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.Token)
 	if err != nil {
 		return "", err
 	}

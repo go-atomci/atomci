@@ -333,7 +333,7 @@ const backendAPI = {
   getListdetail(projectId, publishid, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/publishes/${publishid}`, cb);
   },
-  
+
   // 删除项目
   delProject(key, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/projects/${key}`, cb);
@@ -473,7 +473,7 @@ const backendAPI = {
     Package.httpMethods('get', '/atomci/api/v1/audit', cb);
   },
 
-    
+
   // 获得权限列表数据
   getPermissionList(cb) {
     Package.httpMethods('get', '/atomci/api/v1/permissions', cb);
@@ -560,8 +560,8 @@ const backendAPI = {
   },
   // 获得应用日志信息
   getServiceLog(clusterName, namespace, serviceID, podName, containerName, cb) {
-    Package.httpMethods('get', 
-      `/atomci/api/v1/clusters/${clusterName}/namespaces/${namespace}/apps/${serviceID}/log` + `?podName=${podName}&containerName=${containerName}`, 
+    Package.httpMethods('get',
+      `/atomci/api/v1/clusters/${clusterName}/namespaces/${namespace}/apps/${serviceID}/log` + `?podName=${podName}&containerName=${containerName}`,
       cb
     );
   },
@@ -579,7 +579,7 @@ const backendAPI = {
   logout(cb, errCb){
     Package.httpMethods('get', '/atomci/api/v1/logout', cb, null, errCb);
   },
-  
+
   // 查询角色列表
   getGroupRoleList(cb) {
     Package.httpMethods('get', `/atomci/api/v1/roles`, cb);
@@ -598,7 +598,7 @@ const backendAPI = {
   getResourcesOperation(cb) {
     Package.httpMethods('get', '/atomci/api/v1/resources-operations', cb);
   },
-    
+
   // 创建权限策略
   addPolicies(group, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/groups/${group}/policies`, cb, body);
@@ -732,7 +732,7 @@ const backendAPI = {
   getAllIntegrateSettings(cb) {
     Package.httpMethods('get', '/atomci/api/v1/integrate/settings', cb);
   },
-    
+
   //阶段列表
   getProjectEnvs(projectID, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${projectID}/envs`, cb, body);
@@ -749,7 +749,7 @@ const backendAPI = {
   delProjectEnv(projectID, idStep, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/projects/${projectID}/envs/${idStep}`, cb);
   },
-  
+
   //步骤列表
   getStep(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/pipelines/flow/steps', cb, body);
@@ -799,14 +799,11 @@ const backendAPI = {
   editProjectPipe(projectID, pipelineId, body, cb) {
     Package.httpMethods('put', `/atomci/api/v1/projects/${projectID}/pipelines/${pipelineId}`, cb, body);
   },
-  delProjectPipe(projectID, pipelineId, cb) {
-    Package.httpMethods('delete', `/atomci/api/v1/projects/${projectID}/pipelines/${pipelineId}`, cb);
-  },
   //流水线详情
   getProjectPipeDetail(projectID, pipelineId, cb) {
       Package.httpMethods('get', `/atomci/api/v1/projects/${projectID}/pipelines/${pipelineId}`, cb);
   },
-    
+
   //流程图
   getPipe(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/pipelines', cb, body);
