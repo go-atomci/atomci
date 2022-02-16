@@ -313,9 +313,6 @@ export default {
   mounted() {
     this.getVersionInfo();
   },
-  mounted() {
-
-  },
   methods: {
     getVersionInfo() {
       backend.getListdetail(this.$route.params.projectID, this.$route.params.versionId, (data) => {
