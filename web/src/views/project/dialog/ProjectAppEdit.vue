@@ -101,9 +101,6 @@ export default {
       }
     });
   },
-  mounted() {
-
-  },
   methods: {
     handleSelect(index) {
       

@@ -224,12 +224,10 @@
     created() {},
     mounted() {
       backend.getCompileEnvAll((data) => {
-      if(data){
-        this.compileEnvs = data;
-      }
+        if(data){
+          this.compileEnvs = data;
+        }
       });
-    },
-    mounted() {
       this.getRepos();
     },
     methods: {
