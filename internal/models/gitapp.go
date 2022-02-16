@@ -62,8 +62,8 @@ type RepoServer struct {
 	Type     string `orm:"column(type);" json:"type"`
 	BaseURL  string `orm:"column(base_url);" json:"base_url"`
 	User     string `orm:"column(user);" json:"user"`
-	Token    string `orm:"column(token);" json:"token"`
-	Password string `orm:"column(password);" json:"password"`
+	Token    string `orm:"column(Token);" json:"token"`
+	Password string `orm:"column(Password);" json:"password"`
 	CID      int64  `orm:"column(cid);" json:"cid"`
 }
 

@@ -190,7 +190,8 @@ func (pm *SettingManager) UpdateIntegrateSetting(request *IntegrateSettingReq, s
 		log.Log.Error("json marshal error: %s", err.Error())
 		return err
 	}
-	stageModel.Config = config
+	//stageModel.Config = config
+	stageModel.CryptoConfig(config)
 	if request.Type == KubernetesType {
 		kube := &KubeConfig{}
 		err := json.Unmarshal([]byte(config), kube)
@@ -322,6 +323,7 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 			return err
 		}
 	}
+
 	newIntegrateSetting := &models.IntegrateSetting{
 		Name:        request.Name,
 		Description: request.Description,
@@ -329,6 +331,8 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 		Type:        request.Type,
 		Config:      config,
 	}
+
+	newIntegrateSetting.CryptoConfig(config)
 
 	if request.Type == KubernetesType {
 		kube := &KubeConfig{}
@@ -364,7 +368,7 @@ func formatIntegrateSettingResponse(items []*models.IntegrateSetting) []*Integra
 }
 
 func formatSignalIntegrateSetting(item *models.IntegrateSetting, config *Config) *IntegrateSettingResponse {
-	configJSON, err := config.Struct(item.Config, item.Type)
+	configJSON, err := config.Struct(item.DecryptConfig(), item.Type)
 	if err != nil {
 		log.Log.Error("parse config error: %s", err.Error())
 	}
