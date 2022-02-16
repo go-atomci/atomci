@@ -253,7 +253,7 @@ export default router;
 
 export function getUserSibeBarRoutes(routerPath) {
     let routers = []
-    console.log('current path: ', routerPath)
+    // console.log('current path: ', routerPath)
     if (routerPath.startsWith('/settings/') || routerPath.startsWith('/sysusers') || routerPath.startsWith('/sysroles') || routerPath === '/sysaudit' || routerPath === "/environment" || routerPath === "/node" || routerPath === "/pipelines") {
         routers = asyncRoutes
     } else if (routerPath.startsWith('/project/')) {

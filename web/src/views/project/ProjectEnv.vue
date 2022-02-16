@@ -17,7 +17,7 @@
           </el-row>
         </div>
         <template>
-          <el-table :data="dataList">
+          <el-table :data="curList">
             <span slot="empty">
               {{loading?$t('bm.add.dataLoading'):noDataTxt}}
             </span>
@@ -86,9 +86,6 @@ export default {
     CommonDelete,
   },
   mounted() {
-    // this.getList();
-  },
-  mounted() {
     this.getAllIntegrateSettings();
     this.getList(true);
   },
@@ -97,10 +94,6 @@ export default {
       loading: 'getLoading',
       projectID: 'projectID',
     }),
-    dataList() {
-      // 强制替换dataList替代listtemplate中的方法
-      return this.curList;
-    },
   },
   methods: {
     goEdit(user) {

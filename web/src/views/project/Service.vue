@@ -126,22 +126,8 @@ export default {
     this.getList();
   },
   watch: {
-    // 如果是从应用编排提交过来则必须重新刷新列表数据
-    $route(to, from) {
-      if (this.$route.query.isRefresh && from.name === 'projectAppDetail') {
-        this.getList(true);
-      }
-    },
   },
   methods: {
-    goDeploy() {
-      this.$router.push({
-        name: 'deployMirror',
-        params: {
-          cluster: this.cluster,
-        },
-      });
-    },
     changeCluster(cluster) {
       if (this.cluster !== cluster) {
         this.cluster = cluster;
