@@ -222,7 +222,7 @@
     components: {
     },
     created() {},
-    activated() {
+    mounted() {
       backend.getCompileEnvAll((data) => {
       if(data){
         this.compileEnvs = data;

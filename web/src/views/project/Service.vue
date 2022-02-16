@@ -122,7 +122,7 @@ export default {
       return this.curList;
     },
   },
-  activated() {
+  mounted() {
     this.getList();
   },
   watch: {

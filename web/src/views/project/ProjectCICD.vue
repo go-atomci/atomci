@@ -147,7 +147,7 @@
 
       </el-row> -->
       <template>
-        <el-table stripe="true" :data="projectReleaseListData" class="mt16">
+        <el-table stripe :data="projectReleaseListData" class="mt16">
           <el-table-column sortable prop="version_no" min-width="10%" :label="$t('bm.deployCenter.pipelineName')">
             <template slot-scope="scope">
               <el-button type="text" @click="gotoDetail(scope.row.id)">{{scope.row.version_no}}</el-button>
@@ -274,7 +274,7 @@
       ProjectMark,
       ProjectDeploy,
     },
-    activated() {
+    mounted() {
       this.getStageList();
     },
     computed: {

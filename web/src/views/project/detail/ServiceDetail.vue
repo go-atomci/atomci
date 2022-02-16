@@ -248,7 +248,7 @@ export default {
     FlowControl,
     CommonDelete
   },
-  activated() {
+  mounted() {
     this.getDetail();
   },
   computed: {

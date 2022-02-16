@@ -201,7 +201,7 @@ export default {
       window.location.reload();
     },
     handleSelect(index) {
-      this.defaultActiveIndex = index;
+      // this.defaultActiveIndex = index;
     },
     // 获取详情的地址
     initDetailNav(truePath, origin) {

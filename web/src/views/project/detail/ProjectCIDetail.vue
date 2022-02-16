@@ -68,7 +68,7 @@
           <el-tab-pane label="操作历史" name="history">
             <template>
               <el-table
-                stripe="true"
+                stripe
                 :data="historyData"
                 style="width: 100%">
                 <el-table-column
@@ -310,7 +310,7 @@ export default {
     versionAdd,
     PublishEdit,
   },
-  activated() {
+  mounted() {
     this.getVersionInfo();
   },
   mounted() {

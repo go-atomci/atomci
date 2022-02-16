@@ -43,7 +43,6 @@
         </template>
         <common-delete ref="commonDelete" v-on:getlist="getList"></common-delete>
         <compile-env-create ref="create" v-on:getlist="getList"></compile-env-create>
-        <node-view ref="view"></node-view>
       </div>
     </div>
   </template>
@@ -82,9 +81,6 @@
       PageNav,
     },
     mounted() {
-      this.getList();
-    },
-    activated() {
       this.getList(true);
     },
     computed: {

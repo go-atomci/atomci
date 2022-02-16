@@ -94,7 +94,7 @@ export default {
   mounted() {
     // this.getList();
   },
-  activated() {
+  mounted() {
     this.getList(true);
   },
   computed: {

@@ -88,7 +88,7 @@ export default {
   mounted() {
     // this.getList();
   },
-  activated() {
+  mounted() {
     this.getAllIntegrateSettings();
     this.getList(true);
   },

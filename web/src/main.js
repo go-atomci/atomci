@@ -5,7 +5,7 @@ import Cookies from 'js-cookie'
 import VueClipboard from 'vue-clipboard2';
 import VueResource from 'vue-resource';
 import VueCodeMirror from 'vue-codemirror';
-
+import './icons' 
 import './style';
 import '@/assets/iconfont.css';
 import '@/assets/css/style.css';

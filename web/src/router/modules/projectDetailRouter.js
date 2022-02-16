@@ -17,7 +17,7 @@ export function projectDetailRouter() {
       ]
     },
     {
-      path: '/project/:projectID/detail/app',
+      path: '/project/:projectID/appdetail',
       name: 'projectAppHome',
       component: Layout,
       meta: { title: '应用代码', noCache: true},
@@ -45,7 +45,7 @@ export function projectDetailRouter() {
       ]
     },
     {
-      path: '/project/:projectID/detail/ci',
+      path: '/project/:projectID/cidetail',
       name: 'projectCIHome',
       component: Layout,
       meta: { title: '构建部署', noCache: true },
@@ -73,7 +73,7 @@ export function projectDetailRouter() {
       ]
     },
     {
-      path: '/project/:projectID/detail/service',
+      path: '/project/:projectID/svcdetail',
       name: 'projectServiceHome',
       component: Layout,
       meta: { title: '应用服务', noCache: true },

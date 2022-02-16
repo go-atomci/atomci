@@ -154,7 +154,6 @@ export default {
       currentImageMappings: [],
       dialogVisible: false,
       appID: 0,
-      appList: [],
       imageTagType: [
         {
           name: '保持不变',
