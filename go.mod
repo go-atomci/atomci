@@ -37,7 +37,7 @@ require (
 	github.com/casbin/casbin/v2 v2.37.4
 	github.com/colynn/go-ldap-client/v3 v3.0.0-20201016034829-4c1455a490de
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/drone/go-scm v1.18.0
+	github.com/drone/go-scm v1.19.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
