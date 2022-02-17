@@ -19,6 +19,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"github.com/drone/go-scm/scm/driver/gitea"
 	"net/http"
 	"strings"
 
@@ -39,9 +40,9 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 	var err error
 	var client *scm.Client
 	switch strings.ToLower(vcsType) {
-	case "gitlab":
+	case "gitea", "gitlab":
 		if strings.HasSuffix(vcsPath, ".git") {
-			vcsPath = strings.Replace(vcsPath, ".git", "", -1)
+			vcsPath = strings.TrimSuffix(vcsPath, ".git")
 		}
 		// TODO: verify vcsPath, only support http, do not support git@gitlab.com:/dddd.git
 		projectPathSplit := strings.Split(strings.Split(vcsPath, "://")[1], "/")
@@ -49,11 +50,23 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 		log.Log.Debug("git projectpathsplit: %s,\tprojectName: %s", projectPathSplit, projectName)
 
 		schema := strings.Split(vcsPath, "://")[0]
-		client, err = gitlab.New(schema + "://" + projectPathSplit[0])
-		client.Client = &http.Client{
-			Transport: &transport.PrivateToken{
-				Token: token,
-			},
+		gitRepo := strings.ToLower(vcsType)
+
+		if "gitea" == gitRepo {
+			client, err = gitea.New(schema + "://" + projectPathSplit[0])
+			client.Client = &http.Client{
+				Transport: &transport.BearerToken{
+					Token: token,
+				},
+			}
+		} else {
+			client, err = gitlab.New(schema + "://" + projectPathSplit[0])
+
+			client.Client = &http.Client{
+				Transport: &transport.PrivateToken{
+					Token: token,
+				},
+			}
 		}
 	case "github":
 		client = github.NewDefault()
@@ -72,6 +85,7 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 				Token: token,
 			},
 		}
+
 	default:
 		err = fmt.Errorf("source code management system not configured")
 	}

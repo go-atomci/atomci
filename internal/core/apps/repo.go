@@ -54,7 +54,7 @@ func (manager *AppManager) AppBranches(appID int64, filter *query.FilterQuery) (
 func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 	repos := []*models.RepoServer{}
 	// TODO: support code repository defined,
-	defaultRepos := []string{"gitlab", "github", "gitee"}
+	defaultRepos := []string{"gitlab", "github", "gitee", "gitea"}
 	// defaultRepos := []string{"gitlab"}
 	for _, item := range defaultRepos {
 		_, err := manager.gitAppModel.GetRepoBycIDAndType(projectID, item)
