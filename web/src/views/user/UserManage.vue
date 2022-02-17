@@ -95,7 +95,7 @@ export default {
       curList: [],
       searchList: [
         { key: 'name', txt: this.$t('bm.authorManage.userName') },
-        { key: 'user', txt: this.$t('bm.depManage.userAccount') },
+        { key: 'user', txt: '账号' },
         { key: 'create_at', txt: this.$t('bm.serviceM.creationTime') },
       ],
       searchListResource: [

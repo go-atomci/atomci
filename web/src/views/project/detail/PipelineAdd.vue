@@ -182,6 +182,8 @@ export default {
       list: [],
       listData: {},
       initHeight: 100,
+      envList:[],
+      taskList:[]
     };
   },
   components: {
@@ -194,8 +196,7 @@ export default {
     }),
   },
   mounted() {},
-  created() {},
-  activated() {
+  created() {
     backend.getProjectEnvsAll(this.projectID, (data) => {
       this.envList = data
     }),

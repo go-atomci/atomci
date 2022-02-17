@@ -89,9 +89,6 @@ export default {
     CommonDelete,
   },
   mounted() {
-    // this.getList();
-  },
-  activated() {
     this.getList(true);
   },
   computed: {

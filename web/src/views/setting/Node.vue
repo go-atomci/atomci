@@ -42,7 +42,6 @@
         </template>
         <common-delete ref="commonDelete" v-on:getlist="getList"></common-delete>
         <node-create ref="create" v-on:getlist="getList"></node-create>
-        <node-view ref="view"></node-view>
       </div>
     </div>
   </template>
@@ -52,7 +51,6 @@
   import ListSearch from '@/components/utils/ListSearch';
   import PageNav from '@/components/utils/PageList';
   import NodeCreate from './dialog/NodeCreate';
-  import NodeView from './dialog/NodeView';
   import CommonDelete from '@/components/utils/Delete';
   import Refresh from '@/components/utils/Refresh';
   import listTemplate from '@/common/listTemplate';
@@ -78,14 +76,10 @@
       ListSearch,
       Refresh,
       NodeCreate,
-      NodeView,
       CommonDelete,
       PageNav,
     },
     mounted() {
-      this.getList();
-    },
-    activated() {
       this.getList(true);
     },
     computed: {

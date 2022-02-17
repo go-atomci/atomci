@@ -110,10 +110,6 @@ export default {
           key: 'description',
           txt: this.$t('bm.serviceM.description'),
         },
-        {
-          key: 'policy',
-          txt: this.$t('bm.add.perPolicy'),
-        },
       ],
       filterTxt: '',
       // TODO: default group use system, tmp

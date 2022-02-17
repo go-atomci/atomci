@@ -159,8 +159,6 @@ export default {
     this.appDetail();
   },
   mounted() {
-  },
-  activated() {
     this.getList();
   },
   methods: {

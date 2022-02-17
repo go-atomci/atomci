@@ -222,14 +222,12 @@
     components: {
     },
     created() {},
-    activated() {
-      backend.getCompileEnvAll((data) => {
-      if(data){
-        this.compileEnvs = data;
-      }
-      });
-    },
     mounted() {
+      backend.getCompileEnvAll((data) => {
+        if(data){
+          this.compileEnvs = data;
+        }
+      });
       this.getRepos();
     },
     methods: {

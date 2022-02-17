@@ -278,11 +278,10 @@
       }),
     },
     components: {},
-    activated() {
+    created() {
       this.getProjectInfo();
       // this.getChartData();
     },
-    created() {},
     mounted() {
       window.addEventListener('resize', () => {
         this.$nextTick(() => {

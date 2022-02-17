@@ -49,7 +49,7 @@ export default {
       clusterList: 'getClusterList',
     }),
   },
-  created() {
+  mounted() {
     // 初始化的时候数据如果有，就直接获取，如果没有就通过watch监听获取
     this.getClusterList();
   },

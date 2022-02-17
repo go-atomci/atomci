@@ -94,15 +94,12 @@ export default {
       loading: 'getPopLoading',
     }),
   },
-  activated() {
+  mounted() {
     backend.getCompileEnvAll((data) => {
       if(data){
         this.compileEnvs = data;
       }
     });
-  },
-  mounted() {
-
   },
   methods: {
     handleSelect(index) {

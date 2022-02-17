@@ -84,7 +84,7 @@
         </el-table>
       </template>
       <page-nav ref="pages" :list="listCol" v-on:getlist="getList"></page-nav>
-      <app-arrange ref="appArrange" :envList="envList" :appList="appList"></app-arrange>
+      <app-arrange ref="appArrange" :envList="envStageList" :appList="projectAppList"></app-arrange>
     </div>
   </div>
 </template>
@@ -108,7 +108,8 @@ export default {
         { key: 'path', txt: this.$t('bm.deployCenter.path') },
       ],
       listCol: [],
-      dependList: [],
+      envStageList: [],
+      projectAppList: [],
       filterTxt: '',
       searchVal: '',
       searchType: '',
@@ -156,14 +157,11 @@ export default {
     },
   },
   mounted() {
-    // this.getList();
-  },
-  activated() {
     backend.getProjectEnvsAll(this.projectID, (data) => {
-      this.envList = data
+      this.envStageList = data
     }),
     backend.getAppAll(this.projectID, (data) => {
-      this.appList = data
+      this.projectAppList = data
     }),
     this.getList(true);
   },
@@ -189,14 +187,7 @@ export default {
       }
       backend.getApp(this.projectID, params, (data) => {
         this.$refs.pages.total = data.total;
-        this.listCol = data.item.map((item) => {
-          item.enable_trunk_test = item.enable_trunk_test ? this.$t('bm.other.yes') : this.$t('bm.other.no');
-          return item;
-        });
-        this.dependList = this.listCol.filter((i) => {
-          // return i.app_type;
-          return i.app_type === 'module' || i.app_type === 'open';
-        });
+        this.listCol = data.item
       });
     },
     handleSelectAll(val) {
