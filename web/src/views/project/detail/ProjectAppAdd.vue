@@ -2,7 +2,7 @@
   <div class="page-content">
     <div class="portlet-body projectMember">
       <template>
-        <el-form :model="form" ref="ruleForm" :rules="rules">
+        <el-form ref="ruleForm" :model="form" :rules="rules">
           <!-- <el-form-item label="类型" prop="type" >
             <el-select v-model="form.type" placeholder="请选择应用类型" filterable style="width: 300px">
               <el-option v-for="(item, index) in typeList" :key="index" :label="item.description" :value="item.name">
@@ -14,7 +14,7 @@
           </el-form-item>
 
           <el-form-item label="语言类型" prop="language">
-            <el-select v-model="form.language" placeholder="请选择语言类型" filterable style="width: 300px">
+            <el-select v-model="form.language" filterable placeholder="请选择语言类型" style="width: 300px">
               <el-option v-for="(item, index) in languageList" :key="index" :label="item.description" :value="item.name">
               </el-option>
             </el-select>
@@ -29,7 +29,7 @@
           </el-form-item>
 
           <el-form-item label="编译环境" prop="compile_env_id">
-            <el-select v-model="form.compile_env_id" placeholder="请选择编译环境" clearable filterable style="width: 300px">
+            <el-select v-model="form.compile_env_id" clearable filterable placeholder="请选择编译环境" style="width: 300px">
               <el-option v-for="(item, index) in compileEnvs" :key="index" :label="item.name" :value="item.id">
             </el-option>
         </el-select>
@@ -41,30 +41,31 @@
         <el-tabs v-model="activeName" @tab-click="handleClick">
           <template v-if="getTabs">
             <template v-for="(item,index) in getTabs">
-              <el-tab-pane :label="item.type"  :key="`${index}`"   :name="`${index}`" ref="tabPanel">
+              <el-tab-pane :key="`${index}`"  ref="tabPanel"   :label="item.type" :name="`${index}`">
                 <div class="pv30">
                   <div v-show="item.stepsNum === 1" class="containerMember">
                     {{item.type}}提供丰富的代码管理功能，是目前主流的企业内部代码仓库解决方案
                     <el-button type="primary" @click="firstStep(index)">同步代码源</el-button>
                   </div>
                   <div v-show="item.stepsNum === 2">
-                    <el-form :model="item" :ref="'listRef'+index">
+                    <el-form :ref="'listRef'+index" :model="item">
                       <div class="labelSize" >
-                        <el-form-item v-if="item.type == 'gitlab'" label="地址" prop="base_url" :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]">
-                          <el-input v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitlab.com"></el-input>
+                        <el-form-item v-if="['gitlab', 'gitea'].includes(item.type)" :rules="[{ required: true, message: '请输入地址', trigger: 'blur' }]" label="地址" prop="base_url">
+                          <el-input v-if="item.type === 'gitlab'" v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitlab.yourrepo.com"></el-input>
+                          <el-input v-if="item.type === 'gitea'" v-model.trim="item.base_url" auto-complete="off" placeholder="请输入地址, 如：https://gitea.yourrepo.com"></el-input>
                         </el-form-item>
                         <el-form-item v-else label="地址" prop="base_url">
-                          <el-input v-if="item.type == 'github'" v-model.trim="item.base_url" auto-complete="off" :readonly="true" placeholder="https://github.com"></el-input>
-                          <el-input v-else="item.type == 'gitee'" v-model.trim="item.base_url" auto-complete="off" :readonly="true" placeholder="https://gitee.com"></el-input>
+                          <el-input v-if="item.type === 'github'" v-model.trim="item.base_url" :readonly="true" auto-complete="off" placeholder="https://github.com"></el-input>
+                          <el-input v-else-if="item.type === 'gitee'" v-model.trim="item.base_url" :readonly="true" auto-complete="off" placeholder="https://gitee.com"></el-input>
                         </el-form-item>
                       </div>
-                      <div class="labelSize" v-if="item.type == 'gitlab'">
+                      <div v-if="item.type == 'gitlab'" class="labelSize">
                         <el-form-item label="用户名" prop="user">
                           <el-input v-model.trim="item.user" auto-complete="off" maxlength="128" placeholder="请输入用户名"></el-input>
                         </el-form-item>
                       </div>
                       <div class="labelSize">
-                        <el-form-item label="Token" prop="token" :rules="[{ required: true, message: '请输入Token', trigger: 'blur' }]">
+                        <el-form-item :rules="[{ required: true, message: '请输入Token', trigger: 'blur' }]" label="Token" prop="token">
                           <el-input v-model.trim="item.token" auto-complete="off" maxlength="128" placeholder="请输入Token"></el-input>
                         </el-form-item>
                       </div>
@@ -73,12 +74,12 @@
                       <el-button type="primary" @click="secondStep(index)">同步代码源</el-button>
                     </div>
                   </div>
-                  <div class="" v-show="item.stepsNum === 3">
-                    <div class="editBtn">要改变当前绑定的代码库？<el-button type="text" size="small" @click="editPath(index)">解除绑定</el-button></div>
+                  <div v-show="item.stepsNum === 3" class="">
+                    <div class="editBtn">要改变当前绑定的代码库？<el-button size="small" type="text" @click="editPath(index)">解除绑定</el-button></div>
                     <div class="sel-fl">
-                      <el-form :model="item" :ref="'listRefs'+index">
-                        <el-form-item label="仓库名称" prop="path" :rules="[{ required: true, message: '请选择代码库', trigger: 'change' }]">
-                          <el-select v-model="item.path" placeholder="请选择代码库" filterable :loading="getRepoLoading" :key="`sel${index}`">
+                      <el-form :ref="'listRefs'+index" :model="item">
+                        <el-form-item :rules="[{ required: true, message: '请选择代码库', trigger: 'change' }]" label="仓库名称" prop="path">
+                          <el-select :key="`sel${index}`" v-model="item.path" :loading="getRepoLoading" filterable placeholder="请选择代码库">
                             <el-option v-for="(term, indexs) in item.proCol" :key="indexs" :label="term.full_name" :value="indexs">
                             </el-option>
                           </el-select>

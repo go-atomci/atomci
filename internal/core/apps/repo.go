@@ -54,7 +54,7 @@ func (manager *AppManager) AppBranches(appID int64, filter *query.FilterQuery) (
 func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 	repos := []*models.RepoServer{}
 	// TODO: support code repository defined,
-	defaultRepos := []string{"gitlab", "github", "gitee"}
+	defaultRepos := []string{"gitlab", "github", "gitee", "gitea"}
 	// defaultRepos := []string{"gitlab"}
 	for _, item := range defaultRepos {
 		_, err := manager.gitAppModel.GetRepoBycIDAndType(projectID, item)
@@ -107,7 +107,7 @@ func (manager *AppManager) SetRepoAndGetProjects(cID, repoID int64, request *Set
 			log.Log.Error("when setRepoGetprojects, update repomodel failed: %v", err.Error())
 		}
 	} else {
-		if len(request.User) == 0 {
+		if len(repoModel.Token) == 0 && len(repoModel.BaseURL) == 0 {
 			return nil, fmt.Errorf("首次同步，麻烦输入相关验证信息")
 		}
 	}
