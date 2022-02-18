@@ -42,11 +42,8 @@ const TableNamePrefix = "atom"
 
 // NewAddons basic fields
 func NewAddons() Addons {
-	timeNow, _ := time.Parse("2006-01-02 15:04:05", time.Now().Local().Format("2006-01-02 15:04:05"))
 	return Addons{
 		Deleted:  false,
-		CreateAt: timeNow,
-		UpdateAt: timeNow,
 		DeleteAt: nil,
 	}
 }
