@@ -19,7 +19,6 @@ package apps
 import (
 	"context"
 	"fmt"
-
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
