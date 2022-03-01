@@ -1,4 +1,4 @@
-name: Compile&Publish
+name: Tests
 
 on:
   pull_request:
