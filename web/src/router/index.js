@@ -81,6 +81,12 @@ export const asyncRoutes = [
                 meta: { title: '服务集成', noCache: true }
             },
             {
+                path: '/settings/smcintegrate',
+                component: () => import('@/views/setting/ScmIntegrate.vue'),
+                name: 'scmIntegrate',
+                meta: { title: '代码源集成', noCache: true }
+            },
+            {
                 path: '/settings/task',
                 component: () => import('@/views/setting/Node.vue'),
                 name: 'taskTemplate',

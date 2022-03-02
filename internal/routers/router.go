@@ -81,6 +81,7 @@ func RegisterRoutes() {
 				// Integrate Settings
 				beego.NSRouter("/integrate/settings", &api.IntegrateController{}, "get:GetIntegrateSettings;post:GetIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/create", &api.IntegrateController{}, "post:CreateIntegrateSetting"),
+				beego.NSRouter("/integrate/settings/scms", &api.IntegrateController{}, "post:GetSCMIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/:id", &api.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &api.IntegrateController{}, "post:VerifyIntegrateSetting"),
 				beego.NSRouter("/integrate/clusters", &api.IntegrateController{}, "get:GetClusterIntegrateSettings"),
