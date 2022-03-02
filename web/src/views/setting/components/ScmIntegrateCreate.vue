@@ -131,10 +131,11 @@ export default {
             this.disabledEditURL = true
             break;
           case 'github':
-            this.form.config.url = 'https://gitee.com'
+            this.form.config.url = 'https://github.com'
             this.disabledEditURL = true
             break;
           default:
+            this.form.config.url = ''
             this.disabledEditURL = false
       }
     },
