@@ -1,3 +1,6 @@
+
+[![codecov](https://codecov.io/gh/fanhousanbu/atomci/branch/master/graph/badge.svg?token=RCJWENIENM)](https://codecov.io/gh/fanhousanbu/atomci)
+
 # atomci
 
 AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
