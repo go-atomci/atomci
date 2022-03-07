@@ -713,8 +713,8 @@ const backendAPI = {
   getIntegrateSettings(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/integrate/settings', cb, body);
   },
-  getStagesAll(cb) {
-    Package.httpMethods('get', '/atomci/api/v1/integrate/settings', cb);
+  getSCMIntegrateSettings(body, cb) {
+    Package.httpMethods('post', '/atomci/api/v1/integrate/settings/scms', cb, body);
   },
   AddIntegrateSetting(body,cb) {
     Package.httpMethods('post', '/atomci/api/v1/integrate/settings/create', cb, body);
