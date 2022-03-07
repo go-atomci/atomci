@@ -167,6 +167,7 @@ func initOrm() {
 		new(Audit),
 		new(GatewayRouter),
 
+		new(ScmApp),
 		new(Project),
 		new(ProjectUser),
 		new(ProjectApp),

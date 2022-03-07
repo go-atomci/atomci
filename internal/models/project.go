@@ -106,8 +106,10 @@ func (t *ProjectUser) TableName() string {
 // ProjectApp ...
 type ProjectApp struct {
 	Addons
-	Creator           string   `orm:"column(creator);size(64);null" json:"creator"`
-	ProjectID         int64    `orm:"column(project_id)" json:"project_id"`
+	Creator   string `orm:"column(creator);size(64);null" json:"creator"`
+	ProjectID int64  `orm:"column(project_id)" json:"project_id"`
+	ScmID     int64  `orm:"column(scm_id)" json:"scm_id"`
+	// TODO: clean
 	Name              string   `orm:"column(name);size(64)" json:"name"`
 	FullName          string   `orm:"column(full_name);size(64)" json:"full_name"`
 	Language          string   `orm:"column(language);size(64)" json:"language"`
