@@ -895,10 +895,14 @@ const backendAPI = {
   getRepos(cb) {
     Package.httpMethods('get', `/atomci/api/v1/repos`, cb);
   },
-  getReposList(repo_id, project_id, body, cb, errcb) {
-    Package.httpMethods('post', `/atomci/api/v1/repos/${repo_id}/projects?project_id=${project_id}`, cb, body, errcb);
+  getReposList(repo_id, cb, errcb) {
+    Package.httpMethods('post', `/atomci/api/v1/repos/${repo_id}/projects`, cb, errcb);
   },
   //新增
+  addScmAppPro(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/create`, cb, body);
+  },
+  // TODO: clean
   addAppPro(project_id, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/create`, cb, body);
   },

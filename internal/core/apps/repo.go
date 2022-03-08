@@ -19,6 +19,8 @@ package apps
 import (
 	"context"
 	"fmt"
+
+	"github.com/go-atomci/atomci/internal/core/settings"
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
@@ -30,17 +32,19 @@ import (
 
 // AppManager ...
 type AppManager struct {
-	model        *dao.AppArrangeModel
-	gitAppModel  *dao.GitAppModel
-	projectModel *dao.ProjectModel
+	model           *dao.AppArrangeModel
+	gitAppModel     *dao.GitAppModel
+	projectModel    *dao.ProjectModel
+	settingsHandler *settings.SettingManager
 }
 
 // NewAppManager ...
 func NewAppManager() *AppManager {
 	return &AppManager{
-		model:        dao.NewAppArrangeModel(),
-		gitAppModel:  dao.NewGitAppModel(),
-		projectModel: dao.NewProjectModel(),
+		model:           dao.NewAppArrangeModel(),
+		gitAppModel:     dao.NewGitAppModel(),
+		projectModel:    dao.NewProjectModel(),
+		settingsHandler: settings.NewSettingManager(),
 	}
 }
 
@@ -50,6 +54,7 @@ func (manager *AppManager) AppBranches(appID int64, filter *query.FilterQuery) (
 }
 
 // GetRepos ..
+// TODO: clean
 func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 	repos := []*models.RepoServer{}
 	// TODO: support code repository defined,
@@ -92,26 +97,13 @@ func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 	return rsp, nil
 }
 
-// SetRepoAndGetProjects ..
-func (manager *AppManager) SetRepoAndGetProjects(cID, repoID int64, request *SetupRepo) (interface{}, error) {
-	repoModel, err := manager.gitAppModel.GetRepoByID(repoID)
+// GetScmProjectsByRepoID ..
+func (manager *AppManager) GetScmProjectsByRepoID(repoID int64) (interface{}, error) {
+	scmIntegrateResp, err := manager.settingsHandler.GetSCMIntegrateSettinByID(repoID)
 	if err != nil {
 		return nil, err
 	}
-	if len(request.Token) > 0 {
-		repoModel.Token = request.Token
-		repoModel.User = request.User
-		repoModel.BaseURL = request.BaseURL
-		if err := manager.gitAppModel.UpdateRepo(repoModel); err != nil {
-			log.Log.Error("when setRepoGetprojects, update repomodel failed: %v", err.Error())
-		}
-	} else {
-		if len(repoModel.Token) == 0 && len(repoModel.BaseURL) == 0 {
-			return nil, fmt.Errorf("首次同步，麻烦输入相关验证信息")
-		}
-	}
-
-	scmClient, err := NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.Token)
+	scmClient, err := NewScmProvider(scmIntegrateResp.Type, scmIntegrateResp.ScmAuthConf.URL, scmIntegrateResp.ScmAuthConf.Token)
 	if err != nil {
 		log.Log.Error("init scm Client occur error: %v", err.Error())
 		return nil, fmt.Errorf("网络错误，请重试")

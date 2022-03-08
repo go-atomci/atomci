@@ -10,6 +10,7 @@
               filterable
               placeholder="请选择代码源"
               style="width: 300px"
+              @change="getReposList()"
             >
               <el-option
                 v-for="(item, index) in integrateRepos"
@@ -28,10 +29,10 @@
               style="width: 300px"
             >
               <el-option
-                v-for="(item, index) in languageList"
+                v-for="(item, index) in scmProjects"
                 :key="index"
-                :label="item.description"
-                :value="item.name"
+                :label="item.full_name"
+                :value="item.path"
               >
               </el-option>
             </el-select>
@@ -183,7 +184,7 @@ export default {
     return {
       integrateRepos: [],
       compileEnvs: [],
-      proStep: {},
+      scmProjects: [],
       languageList: [
         { description: 'Static', name: 'static' },
         { description: 'Java', name: 'Java' },
@@ -198,11 +199,13 @@ export default {
         language: 'Java',
         build_path: '/',
         dockerfile: 'Dockerfile',
+        integrate_repo_id: undefined,
       },
       getRepoLoading: true,
       rules: {
         type: [{ required: true, message: '请选择应用类型', trigger: 'change' }],
         integrate_repo_id: [{ required: true, message: '请选择代码源', trigger: 'change' }],
+        path: [{ required: true, message: '请选择仓库地址', trigger: 'change' }],
         compile_env_id: [{ required: false, message: '请选择应用编译环境', trigger: 'change' }],
         language: [{ required: true, message: '请选择语言类型', trigger: 'change' }],
       },
@@ -226,88 +229,24 @@ export default {
   methods: {
     handleClick(index) {},
     getIntegrateRepos() {
-      // TODO: use 2 for tmp
       backend.getRepos((data) => {
         if (data) {
           this.integrateRepos = data;
         }
       });
     },
-    getList(data) {
-      data.map((item, index) => {
-        if (item.base_url) {
-          const cl = {
-            addr: item.base_url,
-            user: item.user,
-          };
-          // TODO: use 2 for tmp
-          backend.getReposList(item.repo_id, 2, cl, (col) => {
-            this.getTabs[index].proCol = col;
-            this.getRepoLoading = false;
-          });
-        }
-      });
-    },
-    firstStep(index) {
-      this.getTabs[index].stepsNum = 2;
-    },
-    secondStep(index) {
-      this.$refs['listRef' + index][0].validate((valid) => {
-        if (valid) {
-          if (this.getTabs[index].type == 'gitlab') {
-            let url = new URL(this.getTabs[index].base_url);
-            if (url.pathname !== '/') {
-              let new_base_url = url.origin;
-              MessageBox.confirm(
-                '看起来您的地址不是仓库的主地址，需要主动为您修改为[' + new_base_url + ']吗？',
-                this.$t('bm.infrast.tips'),
-                {
-                  confirmButtonText: '确定修改',
-                  cancelButtonText: '保持原状',
-                  type: 'warning',
-                }
-              )
-                .then(() => {
-                  this.getTabs[index].base_url = new_base_url;
-                  this.getReposList(index);
-                })
-                .catch(() => {
-                  this.getReposList(index);
-                });
-            } else {
-              this.getReposList(index);
-            }
-          } else {
-            this.getReposList(index);
-          }
-        }
-      });
-    },
-    getReposList(index) {
-      const cl = {
-        base_url: this.getTabs[index].base_url,
-        user: this.getTabs[index].user,
-        token: this.getTabs[index].token,
-      };
-      // TODO: use 2 for tmp
-      backend.getReposList(this.getTabs[index].repo_id, 2, cl, (data) => {
+    getReposList() {
+      backend.getReposList(this.form.integrate_repo_id, (data) => {
         if (data) {
-          this.getTabs[index].proCol = data;
+          this.scmProjects = data;
           this.getRepoLoading = false;
-          this.getTabs[index].stepsNum = 3;
         }
       });
     },
     addApp() {
-      const nums = parseInt(this.activeName);
-      const arr = this.getTabs[nums];
-      if (this.getTabs[nums].stepsNum < 3) {
-        Message.error('请先同步代码源！');
-        return;
-      }
       this.$refs['ruleForm'].validate((valid) => {
         if (valid) {
-          this.$refs['listRefs' + nums][0].validate((valid) => {
+          this.$refs.rules.validate((valid) => {
             if (valid) {
               const pathNum = arr.path;
               let cl = arr.proCol[pathNum];
@@ -319,8 +258,7 @@ export default {
               if (this.form.name !== '') {
                 cl.name = this.form.name;
               }
-              // TODO: use 2 for tmp
-              backend.addAppPro(2, cl, (data) => {
+              backend.addScmAppPro(cl, (data) => {
                 Message.success('添加成功！');
                 this.$router.push({ name: 'scmappIndex' });
               });

@@ -122,17 +122,9 @@ func (a *AppController) GetRepos() {
 
 // GetGitProjectsByRepoID ..
 func (a *AppController) GetGitProjectsByRepoID() {
-	// TODO: change url query
-	projectID, _ := a.GetInt64FromQuery("project_id")
-	if projectID == 0 {
-		projectID = 1
-	}
-	log.Log.Debug("args projectID: %v", projectID)
 	repoID, _ := a.GetInt64FromPath(":repo_id")
-	request := apps.SetupRepo{}
-	a.DecodeJSONReq(&request)
 	mgr := apps.NewAppManager()
-	rsp, err := mgr.SetRepoAndGetProjects(projectID, repoID, &request)
+	rsp, err := mgr.GetScmProjectsByRepoID(repoID)
 	if err != nil {
 		a.HandleInternalServerError(err.Error())
 		log.Log.Error("get repo's projects error: %s", err.Error())
