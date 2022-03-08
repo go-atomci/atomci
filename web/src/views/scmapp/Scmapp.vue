@@ -23,8 +23,7 @@
         <div class="table-toolbar">
           <el-row class="mt16">
             <el-col :span="16" style='text-align:left;'>
-              <el-button type="primary" @click="$refs.create.doCreate(false)">
-                <i class='icon-plus' /> +创建应用</el-button>
+              <el-button :plain="false" type="primary" @click="addApp()"> +创建应用</el-button>
             </el-col>
           </el-row>
         </div>
@@ -220,6 +219,12 @@ export default {
       this.filter_key = type;
       this.filter_val = val;
       this.getList(true);
+    },
+    // 添加应用模块
+    addApp(flag) {
+      this.$router.push({
+        name: 'addScmApp',
+      });
     },
     doEdit(id) {
       backend.getProjectDetail(id, (data) => {

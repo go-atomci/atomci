@@ -27,21 +27,17 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <div v-if="form.type ==='gitlab'">
-        <el-form-item label="地址" prop="config.url" class="form-item">
-          <el-input v-model.trim="form.config.url" auto-complete="off" placeholder="请输入gitlab地址,eg: https://gitlab.com"></el-input>
+      <div>
+        <el-form-item label="地址" prop="config.url" class="form-item" >
+          <el-input v-model="form.config.url" auto-complete="off" :disabled="disabledEditURL" placeholder="请输入代码源地址"></el-input>
         </el-form-item>
+      </div>
+      <div v-if="form.type ==='gitlab'">
         <el-form-item label="用户名" prop="config.user" class="form-item">
           <el-input v-model.trim="form.config.user" auto-complete="off" placeholder="请输入gitlab用户名"></el-input>
         </el-form-item>
-        <el-form-item label="Token" prop="config.token" class="form-item">
-          <el-input v-model.trim="form.config.token" placeholder="请输入gitlab用户名对应token"></el-input>
-        </el-form-item>
       </div>
-      <div v-else-if="form.type ==='github' || form.type ==='gitee' || form.type ==='gitea'">
-        <el-form-item label="地址" prop="config.url" class="form-item" >
-          <el-input v-model.trim="form.config.url" auto-complete="off" :disabled="disabledEditURL" placeholder="请输入代码源地址"></el-input>
-        </el-form-item>
+      <div>  
         <el-form-item label="Token" prop="config.token" class="form-item">
           <el-input v-model.trim="form.config.token" auto-complete="off" maxlength="120" placeholder="请输入代码源Token"></el-input>
         </el-form-item>
@@ -67,7 +63,11 @@ import validate from '@/common/validate';
 const formData = {
   name: '',
   type: '',
-  config: {},
+  config: {
+    url: '',
+    user: '',
+    token: ''
+  },
   description: '',
 };
 
@@ -95,16 +95,13 @@ export default {
           { required: true, message: '请输入名称', trigger: 'blur' },
         ],
         type: [
-          { required: true, message: '请选择集成服务的类型', trigger: 'blur' },
+          { required: true, message: '请选择代码源类型', trigger: 'blur' },
         ],
         'config.url': [
           { required: true, message: '请输入url信息', trigger: 'blur' },
         ],
         'config.user': [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-        ],
-        'config.conf': [
-          { required: true, message: '请输入kubernetes conf', trigger: 'blur' },
         ],
         'config.token': [
           { required: true, message: '请输入token信息', trigger: 'blur' },
@@ -137,6 +134,7 @@ export default {
           default:
             this.form.config.url = ''
             this.disabledEditURL = false
+            break;
       }
     },
     handleClose(done) {
@@ -163,17 +161,11 @@ export default {
           case 'github':
             this.disabledEditURL = true
             break;
-          default:
         }
         this.rowId = item.id;
       } else {
         this.title = '新增配置';
-        this.form = {
-          name: '',
-          type: '',
-          config: {},
-          description: '',
-        };
+        this.form = JSON.parse(JSON.stringify(formData))
         this.rowId = '';
       }
       this.dialogFormVisible = true

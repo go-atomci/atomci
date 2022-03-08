@@ -3,12 +3,6 @@
     <div class="portlet-body projectMember">
       <template>
         <el-form ref="ruleForm" :model="form" :rules="rules">
-          <!-- <el-form-item label="类型" prop="type" >
-            <el-select v-model="form.type" placeholder="请选择应用类型" filterable style="width: 300px">
-              <el-option v-for="(item, index) in typeList" :key="index" :label="item.description" :value="item.name">
-              </el-option>
-            </el-select>
-          </el-form-item> -->
           <el-form-item label="应用名" prop="build_path">
             <el-input v-model="form.name" placeholder="请输入应用名" style="width: 300px"></el-input>
           </el-form-item>

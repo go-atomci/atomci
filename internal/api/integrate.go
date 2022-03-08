@@ -81,6 +81,23 @@ func (p *IntegrateController) GetSCMIntegrateSettingsByPagination() {
 	p.ServeJSON()
 }
 
+// GetScmRepos ..
+func (p *IntegrateController) GetScmRepos() {
+	pm := settings.NewSettingManager()
+	rsp, err := pm.GetIntegrateSettings([]string{constant.SCMGitea, constant.SCMGitee, constant.SCMGithub, constant.SCMGitlab})
+	if err != nil {
+		p.HandleInternalServerError(err.Error())
+		log.Log.Error("Get integrate settings occur error: %s", err.Error())
+		return
+	}
+	// for security hidden config content
+	for _, item := range rsp {
+		item.IntegrateSettingReq.Config = nil
+	}
+	p.Data["json"] = NewResult(true, rsp, "")
+	p.ServeJSON()
+}
+
 // CreateIntegrateSetting ..
 func (p *IntegrateController) CreateIntegrateSetting() {
 	request := settings.IntegrateSettingReq{}

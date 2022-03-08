@@ -892,8 +892,8 @@ const backendAPI = {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/syncBranches`, cb);
   },
   //新增应用模块
-  getRepos(project_id, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/repos?project_id=${project_id}`, cb);
+  getRepos(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/repos`, cb);
   },
   getReposList(repo_id, project_id, body, cb, errcb) {
     Package.httpMethods('post', `/atomci/api/v1/repos/${repo_id}/projects?project_id=${project_id}`, cb, body, errcb);

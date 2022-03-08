@@ -82,6 +82,8 @@ func RegisterRoutes() {
 				beego.NSRouter("/integrate/settings", &api.IntegrateController{}, "get:GetIntegrateSettings;post:GetIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/create", &api.IntegrateController{}, "post:CreateIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/scms", &api.IntegrateController{}, "post:GetSCMIntegrateSettingsByPagination"),
+				// Git Repository
+				beego.NSRouter("/repos", &api.IntegrateController{}, "get:GetScmRepos"),
 				beego.NSRouter("/integrate/settings/:id", &api.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &api.IntegrateController{}, "post:VerifyIntegrateSetting"),
 				beego.NSRouter("/integrate/clusters", &api.IntegrateController{}, "get:GetClusterIntegrateSettings"),
@@ -90,8 +92,6 @@ func RegisterRoutes() {
 				beego.NSRouter("/integrate/compile_envs/create", &api.IntegrateController{}, "post:CreateCompileEnv"),
 				beego.NSRouter("/integrate/compile_envs/:id", &api.IntegrateController{}, "put:UpdateCompileEnv;delete:DeleteCompileEnv"),
 
-				// Git Repository
-				beego.NSRouter("/repos", &api.AppController{}, "get:GetRepos"),
 				beego.NSRouter("/repos/:repo_id/projects", &api.AppController{}, "post:GetGitProjectsByRepoID"),
 
 				// Project
