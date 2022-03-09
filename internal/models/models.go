@@ -18,10 +18,8 @@ package models
 
 import (
 	"fmt"
-	"os"
+	"github.com/go-atomci/atomci/internal/migrations"
 	"time"
-
-	"github.com/go-atomci/atomci/internal/middleware/log"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -35,6 +33,12 @@ type Addons struct {
 	CreateAt time.Time  `orm:"column(create_at);auto_now_add;type(datetime)" json:"create_at"`
 	UpdateAt time.Time  `orm:"column(update_at);auto_now;type(datetime)" json:"update_at"`
 	DeleteAt *time.Time `orm:"column(delete_at);type(datetime);index;null" json:"delete_at"`
+}
+
+// db migration base interface
+type Migration interface {
+	GetCreateAt() time.Time
+	Upgrade(ormer orm.Ormer)
 }
 
 // TableNamePrefix ..
@@ -62,53 +66,10 @@ func (a *Addons) MarkDeleted() {
 }
 
 var (
-	dbName     string
-	tableNames []string
+	dbName         string
+	tableNames     []string
+	migrationTypes []Migration
 )
-
-func setCreateAt(tables []string) error {
-	for _, table := range tables {
-		var count int
-		sql := `SELECT count(1) FROM INFORMATION_SCHEMA.Columns WHERE table_schema=DATABASE() AND table_name=? 
-				AND column_name='create_at' AND  COLUMN_DEFAULT='CURRENT_TIMESTAMP'`
-		ormer := orm.NewOrm()
-		if err := ormer.Raw(sql, table).QueryRow(&count); err != nil {
-			return err
-		}
-		if count == 0 {
-			sql = `alter table ` + table + ` modify column create_at datetime not null DEFAULT CURRENT_TIMESTAMP`
-			if _, err := ormer.Raw(sql).Exec(); err != nil {
-				return err
-			}
-			log.Log.Info(sql)
-		} else {
-			log.Log.Debug(fmt.Sprintf("table `%v` already alter create_at, skip", table))
-		}
-	}
-	return nil
-}
-
-func setUpdateAt(tables []string) error {
-	for _, table := range tables {
-		var count int
-		sql := `SELECT count(1) FROM INFORMATION_SCHEMA.Columns WHERE table_schema=DATABASE() AND table_name=? 
-				AND column_name='update_at' AND COLUMN_DEFAULT='CURRENT_TIMESTAMP' AND EXTRA='on update CURRENT_TIMESTAMP'`
-		ormer := orm.NewOrm()
-		if err := ormer.Raw(sql, table).QueryRow(&count); err != nil {
-			return err
-		}
-		if count == 0 {
-			sql = `alter table ` + table + ` modify column update_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP`
-			if _, err := ormer.Raw(sql).Exec(); err != nil {
-				return err
-			}
-			log.Log.Info(sql)
-		} else {
-			log.Log.Debug(fmt.Sprintf("table `%v` already alter update_at, skip", table))
-		}
-	}
-	return nil
-}
 
 func initOrm() {
 	DatabaseURL := beego.AppConfig.String("DB::url")
@@ -193,27 +154,18 @@ func initOrm() {
 
 	orm.RunSyncdb("default", false, true)
 
-	tables := []string{
-		"sys_resource_type",
-		"sys_resource_operation",
-		"sys_resource_constraint",
-		"sys_user",
-		"sys_group",
-		"sys_group_user_rel",
-		"sys_group_user_constraint",
-		"sys_group_role",
-		"sys_group_role_user",
-		"sys_group_role_operation",
-		"sys_audit",
-		"sys_resource_router",
+}
+
+//db migration register
+func initMigration() {
+	migrationTypes = []Migration{
+		new(migrations.Migration20220101),
+		new(migrations.Migration20220309),
 	}
-	if err := setCreateAt(tables); err != nil {
-		log.Log.Error(err.Error())
-		os.Exit(2)
-	}
-	if err := setUpdateAt(tables); err != nil {
-		log.Log.Error(err.Error())
-		os.Exit(2)
+
+	//数据迁移
+	for _, m := range migrationTypes {
+		m.Upgrade(orm.NewOrm())
 	}
 }
 
@@ -223,5 +175,6 @@ func init() {
 		return
 	}
 	initOrm()
+	initMigration()
 	// orm.RunSyncdb("default", false, true)
 }
