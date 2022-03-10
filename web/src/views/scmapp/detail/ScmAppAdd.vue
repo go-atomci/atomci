@@ -3,9 +3,9 @@
     <div class="portlet-body projectMember">
       <template>
         <el-form ref="ruleForm" :model="form" :rules="rules">
-          <el-form-item label="代码源" prop="integrate_repo_id">
+          <el-form-item label="代码源" prop="repo_id">
             <el-select
-              v-model="form.integrate_repo_id"
+              v-model="form.repo_id"
               clearable
               filterable
               placeholder="请选择代码源"
@@ -27,6 +27,7 @@
               filterable
               placeholder="请选择语言类型"
               style="width: 300px"
+              @change="setScmAppName()"
             >
               <el-option
                 v-for="(item, index) in scmProjects"
@@ -195,16 +196,17 @@ export default {
       ],
       form: {
         name: '',
+        full_name: '',
         type: 'app',
         language: 'Java',
         build_path: '/',
         dockerfile: 'Dockerfile',
-        integrate_repo_id: undefined,
+        repo_id: undefined,
       },
       getRepoLoading: true,
       rules: {
         type: [{ required: true, message: '请选择应用类型', trigger: 'change' }],
-        integrate_repo_id: [{ required: true, message: '请选择代码源', trigger: 'change' }],
+        repo_id: [{ required: true, message: '请选择代码源', trigger: 'change' }],
         path: [{ required: true, message: '请选择仓库地址', trigger: 'change' }],
         compile_env_id: [{ required: false, message: '请选择应用编译环境', trigger: 'change' }],
         language: [{ required: true, message: '请选择语言类型', trigger: 'change' }],
@@ -227,7 +229,18 @@ export default {
     this.getIntegrateRepos();
   },
   methods: {
-    handleClick(index) {},
+    setScmAppName() {
+      if (this.form.path == undefined) {
+        return
+      }
+      for (let i = 0; i < this.scmProjects.length; i++) {
+          if (this.scmProjects[i].path == this.form.path) {
+            this.form.name = this.scmProjects[i].name
+            this.form.full_name = this.scmProjects[i].full_name
+            break
+          }
+      }
+    },
     getIntegrateRepos() {
       backend.getRepos((data) => {
         if (data) {
@@ -236,7 +249,7 @@ export default {
       });
     },
     getReposList() {
-      backend.getReposList(this.form.integrate_repo_id, (data) => {
+      backend.getReposList(this.form.repo_id, (data) => {
         if (data) {
           this.scmProjects = data;
           this.getRepoLoading = false;
@@ -244,27 +257,21 @@ export default {
       });
     },
     addApp() {
-      this.$refs['ruleForm'].validate((valid) => {
+      this.$refs.ruleForm.validate((valid) => {
         if (valid) {
-          this.$refs.rules.validate((valid) => {
-            if (valid) {
-              const pathNum = arr.path;
-              let cl = arr.proCol[pathNum];
-              cl.language = this.form.language;
-              cl.type = 'app';
-              cl.build_path = this.form.build_path;
-              cl.dockerfile = this.form.dockerfile || 'Dockerfile';
-              cl.compile_env_id = this.form.compile_env_id || 0;
-              if (this.form.name !== '') {
-                cl.name = this.form.name;
-              }
-              backend.addScmAppPro(cl, (data) => {
-                Message.success('添加成功！');
-                this.$router.push({ name: 'scmappIndex' });
-              });
-            }
-          });
-        }
+          const cl = this.form
+          cl.type = 'app';
+          cl.dockerfile = this.form.dockerfile || 'Dockerfile';
+          cl.compile_env_id = this.form.compile_env_id || 0;
+          if (this.form.name !== '') {
+            cl.name = this.form.name;
+          }
+  
+          backend.addScmAppPro(cl, (data) => {
+            Message.success('添加成功！');
+              this.$router.push({ name: 'scmappIndex' });
+            });
+          }
       });
     },
     editPath(index) {

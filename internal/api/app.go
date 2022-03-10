@@ -28,6 +28,35 @@ type AppController struct {
 	BaseController
 }
 
+// CreateSCMApp for project
+func (a *AppController) CreateSCMApp() {
+	req := &apps.ScmAppReq{}
+	a.DecodeJSONReq(&req)
+	mgr := apps.NewAppManager()
+	result := mgr.CreateSCMApp(req, a.User)
+	if result != nil {
+		a.HandleInternalServerError(result.Error())
+		log.Log.Error("add project app error: %s", result.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
+// GetAppsByPagination ..
+func (a *AppController) GetAppsByPagination() {
+	filterQuery := a.GetFilterQuery()
+	mgr := apps.NewAppManager()
+	result, err := mgr.GetScmAppsByPagination(filterQuery)
+	if err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("get project app list error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
 // GetArrange ...
 func (a *AppController) GetArrange() {
 	appID, err := a.GetInt64FromPath(":app_id")

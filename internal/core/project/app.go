@@ -28,27 +28,12 @@ import (
 func (pm *ProjectManager) CreateProjectApp(projectID int64, item *ProjectAppReq, creator, cName string) error {
 	log.Log.Debug("request params: %+v", item)
 
-	if item.BranchName == "" {
-		// reset default value is master
-		item.BranchName = "master"
-	}
-
-	if item.Dockerfile == "" {
-		item.Dockerfile = "Dockerfile"
-	}
 	projectAppModel := models.ProjectApp{
-		Addons:       models.NewAddons(),
-		Creator:      creator,
-		ProjectID:    projectID,
-		CompileEnvID: item.CompileEnvID,
-		Name:         item.Name,
-		FullName:     item.FullName,
-		Language:     item.Language,
-		BranchName:   item.BranchName,
-		Path:         item.Path,
-		RepoID:       item.RepoID,
-		BuildPath:    item.BuildPath,
-		Dockerfile:   item.Dockerfile,
+		Addons:    models.NewAddons(),
+		Creator:   creator,
+		ProjectID: projectID,
+		// TODO: need added
+		ScmID: 0,
 	}
 
 	_, err := pm.model.CreateProjectAppIfNotExist(&projectAppModel)
@@ -151,7 +136,7 @@ func (pm *ProjectManager) UpdateProjectApp(projectID, projectAppID int64, req *P
 // SwitchAppBranch ..
 func (pm *ProjectManager) SwitchAppBranch(projectID, projectAppID int64, req *ProjectAppBranchUpdateReq) error {
 	log.Log.Debug("switch app branch projectAppID: %v, params: %+v", projectAppID, req)
-	branch, err := pm.gitAppModel.GetAppBranchByName(req.AppID, req.BranchName)
+	branch, err := pm.scmAppModel.GetAppBranchByName(req.AppID, req.BranchName)
 	if err != nil {
 		return fmt.Errorf("when get app branch, occur error: %s", err.Error())
 	}

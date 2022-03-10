@@ -26,26 +26,72 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-// GitAppModel ...
-type GitAppModel struct {
+// ScmAppModel ...
+type ScmAppModel struct {
 	ormer               orm.Ormer
-	gitAppTableName     string
+	scmAppTableName     string
 	repoServerTableName string
 	AppBranchTableName  string
 }
 
 // NewGitAppModel ...
-func NewGitAppModel() (model *GitAppModel) {
-	return &GitAppModel{
+func NewScmAppModel() (model *ScmAppModel) {
+	return &ScmAppModel{
 		ormer:               GetOrmer(),
-		gitAppTableName:     (&models.GitApp{}).TableName(),
+		scmAppTableName:     (&models.ScmApp{}).TableName(),
 		repoServerTableName: (&models.RepoServer{}).TableName(),
 		AppBranchTableName:  (&models.AppBranch{}).TableName(),
 	}
 }
 
+// CreateProjectAppIfNotExist ...
+func (model *ScmAppModel) CreateScmAppIfNotExist(app *models.ScmApp) (int64, error) {
+	created, id, err := model.ormer.ReadOrCreate(app, "name", "repo_id", "deleted")
+	if err == nil {
+		if !created {
+			err = fmt.Errorf(fmt.Sprintf("app: %v existed in project", app.FullName))
+		}
+	}
+	return id, err
+}
+
+func (model *ScmAppModel) GetScmApps() ([]*models.ScmApp, error) {
+	app := []*models.ScmApp{}
+	qs := model.ormer.QueryTable(model.scmAppTableName).Filter("deleted", false)
+	// TODO: add scm app tags
+	_, err := qs.All(&app)
+	return app, err
+}
+
+// GetCompileEnvsByPagination ..
+func (model *ScmAppModel) GetScmAppsByPagination(filter *query.FilterQuery) (*query.QueryResult, error) {
+	rst := &query.QueryResult{Item: []*models.ScmApp{}}
+	queryCond := orm.NewCondition().AndCond(orm.NewCondition().And("deleted", false))
+
+	if filterCond := query.FilterCondition(filter, filter.FilterKey); filterCond != nil {
+		queryCond = queryCond.AndCond(filterCond)
+	}
+	qs := model.ormer.QueryTable(model.scmAppTableName).OrderBy("-create_at").SetCond(queryCond)
+	count, err := qs.Count()
+	if err != nil {
+		return nil, err
+	}
+	if err = query.FillPageInfo(rst, filter.PageIndex, filter.PageSize, int(count)); err != nil {
+		return nil, err
+	}
+
+	scmApplist := []*models.ScmApp{}
+	_, err = qs.Limit(filter.PageSize, filter.PageSize*(filter.PageIndex-1)).All(&scmApplist)
+	if err != nil {
+		return nil, err
+	}
+	rst.Item = scmApplist
+
+	return rst, nil
+}
+
 // GetGitRepoByID ...
-func (model *GitAppModel) GetGitRepoByID(repoID int64) (*models.RepoServer, error) {
+func (model *ScmAppModel) GetGitRepoByID(repoID int64) (*models.RepoServer, error) {
 	app := models.RepoServer{}
 	err := model.ormer.QueryTable(model.repoServerTableName).
 		Filter("deleted", false).
@@ -54,7 +100,7 @@ func (model *GitAppModel) GetGitRepoByID(repoID int64) (*models.RepoServer, erro
 }
 
 // GetReposByprojectID ..
-func (model *GitAppModel) GetReposByprojectID(cID int64) ([]*models.RepoServer, error) {
+func (model *ScmAppModel) GetReposByprojectID(cID int64) ([]*models.RepoServer, error) {
 	repos := []*models.RepoServer{}
 	_, err := model.ormer.QueryTable(model.repoServerTableName).
 		Filter("deleted", false).
@@ -63,7 +109,7 @@ func (model *GitAppModel) GetReposByprojectID(cID int64) ([]*models.RepoServer, 
 }
 
 // GetRepoBycIDAndType ..
-func (model *GitAppModel) GetRepoBycIDAndType(cID int64, repoType string) (*models.RepoServer, error) {
+func (model *ScmAppModel) GetRepoBycIDAndType(cID int64, repoType string) (*models.RepoServer, error) {
 	repo := models.RepoServer{}
 	err := model.ormer.QueryTable(model.repoServerTableName).
 		Filter("deleted", false).
@@ -73,7 +119,7 @@ func (model *GitAppModel) GetRepoBycIDAndType(cID int64, repoType string) (*mode
 }
 
 // GetRepoByID ..
-func (model *GitAppModel) GetRepoByID(repoID int64) (*models.RepoServer, error) {
+func (model *ScmAppModel) GetRepoByID(repoID int64) (*models.RepoServer, error) {
 	repo := models.RepoServer{}
 	err := model.ormer.QueryTable(model.repoServerTableName).
 		Filter("deleted", false).
@@ -82,7 +128,7 @@ func (model *GitAppModel) GetRepoByID(repoID int64) (*models.RepoServer, error) 
 }
 
 // CreateDefaultRepo ..
-func (model *GitAppModel) CreateDefaultRepo(cID int64, repoType string) error {
+func (model *ScmAppModel) CreateDefaultRepo(cID int64, repoType string) error {
 	rs := &models.RepoServer{
 		CID:  cID,
 		Type: strings.ToLower(repoType),
@@ -94,20 +140,20 @@ func (model *GitAppModel) CreateDefaultRepo(cID int64, repoType string) error {
 }
 
 // UpdateRepo ...
-func (model *GitAppModel) UpdateRepo(repo *models.RepoServer) error {
+func (model *ScmAppModel) UpdateRepo(repo *models.RepoServer) error {
 	_, err := model.ormer.Update(repo)
 	return err
 }
 
-func (model *GitAppModel) createRepo(rs *models.RepoServer) (int64, error) {
+func (model *ScmAppModel) createRepo(rs *models.RepoServer) (int64, error) {
 	_, id, err := model.ormer.ReadOrCreate(rs, "type", "deleted", "cid")
 	return id, err
 }
 
 // GetGitApps ...
-func (model *GitAppModel) GetGitApps(appIDs []int64) ([]*models.GitApp, error) {
-	apps := []*models.GitApp{}
-	qs := model.ormer.QueryTable(model.gitAppTableName).Filter("deleted", false)
+func (model *ScmAppModel) GetGitApps(appIDs []int64) ([]*models.ScmApp, error) {
+	apps := []*models.ScmApp{}
+	qs := model.ormer.QueryTable(model.scmAppTableName).Filter("deleted", false)
 	if appIDs != nil {
 		qs = qs.Filter("id__in", appIDs)
 	}
@@ -117,7 +163,7 @@ func (model *GitAppModel) GetGitApps(appIDs []int64) ([]*models.GitApp, error) {
 }
 
 // CreateAppBranchIfNotExist ...
-func (model *GitAppModel) CreateAppBranchIfNotExist(branch *models.AppBranch) (int64, error) {
+func (model *ScmAppModel) CreateAppBranchIfNotExist(branch *models.AppBranch) (int64, error) {
 	created, id, err := model.ormer.ReadOrCreate(branch, "branch_name", "app_id", "deleted")
 	if err == nil {
 		if !created {
@@ -128,19 +174,19 @@ func (model *GitAppModel) CreateAppBranchIfNotExist(branch *models.AppBranch) (i
 }
 
 // UpdateAppBranch ...
-func (model *GitAppModel) UpdateAppBranch(branch *models.AppBranch) error {
+func (model *ScmAppModel) UpdateAppBranch(branch *models.AppBranch) error {
 	_, err := model.ormer.Update(branch)
 	return err
 }
 
 // SoftDeleteAppBranch ...
-func (model *GitAppModel) SoftDeleteAppBranch(branch *models.AppBranch) error {
+func (model *ScmAppModel) SoftDeleteAppBranch(branch *models.AppBranch) error {
 	branch.MarkDeleted()
 	return model.UpdateAppBranch(branch)
 }
 
 // GetAppBranchesByPagination ...
-func (model *GitAppModel) GetAppBranchesByPagination(appID int64, filter *query.FilterQuery) (*query.QueryResult, error) {
+func (model *ScmAppModel) GetAppBranchesByPagination(appID int64, filter *query.FilterQuery) (*query.QueryResult, error) {
 	rst := &query.QueryResult{Item: []*models.AppBranch{}}
 	queryCond := orm.NewCondition().AndCond(orm.NewCondition().And("deleted", false))
 
@@ -169,7 +215,7 @@ func (model *GitAppModel) GetAppBranchesByPagination(appID int64, filter *query.
 }
 
 // GetAppBranches ...
-func (model *GitAppModel) GetAppBranches(appID int64) ([]*models.AppBranch, error) {
+func (model *ScmAppModel) GetAppBranches(appID int64) ([]*models.AppBranch, error) {
 	branches := []*models.AppBranch{}
 	qs := model.ormer.QueryTable(model.AppBranchTableName).Filter("deleted", false)
 	if appID != 0 {
@@ -180,7 +226,7 @@ func (model *GitAppModel) GetAppBranches(appID int64) ([]*models.AppBranch, erro
 }
 
 // GetAppBranchByName ...
-func (model *GitAppModel) GetAppBranchByName(appID int64, branchName string) (*models.AppBranch, error) {
+func (model *ScmAppModel) GetAppBranchByName(appID int64, branchName string) (*models.AppBranch, error) {
 	branch := models.AppBranch{}
 	err := model.ormer.QueryTable(model.AppBranchTableName).
 		Filter("deleted", false).

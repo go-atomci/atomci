@@ -19,12 +19,14 @@ package apps
 import (
 	"context"
 	"fmt"
-	"github.com/drone/go-scm/scm/driver/gitea"
 	"net/http"
 	"strings"
 
+	"github.com/drone/go-scm/scm/driver/gitea"
+
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
+	"github.com/go-atomci/atomci/utils/query"
 
 	"github.com/go-atomci/atomci/utils"
 
@@ -97,7 +99,7 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 // SyncAppBranches ...
 func (manager *AppManager) SyncAppBranches(appID int64) error {
 	projectApp, _ := manager.projectModel.GetProjectApp(appID)
-	repoModel, err := manager.gitAppModel.GetRepoByID(projectApp.RepoID)
+	repoModel, err := manager.scmAppModel.GetRepoByID(projectApp.RepoID)
 	if err != nil {
 		log.Log.Error("GetRepoByID occur error: %v", err.Error())
 		return fmt.Errorf("网络错误，请重试")
@@ -127,7 +129,7 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 		if strings.HasPrefix(branch.Name, "release_") {
 			continue
 		}
-		originBranch, err := manager.gitAppModel.GetAppBranchByName(appID, branch.Name)
+		originBranch, err := manager.scmAppModel.GetAppBranchByName(appID, branch.Name)
 		if err != nil {
 			if strings.Contains(err.Error(), "no row found") {
 				err = nil
@@ -141,18 +143,18 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 				Path:       projectApp.Path,
 				AppID:      appID,
 			}
-			if _, err := manager.gitAppModel.CreateAppBranchIfNotExist(appBranch); err != nil {
+			if _, err := manager.scmAppModel.CreateAppBranchIfNotExist(appBranch); err != nil {
 				return err
 			}
 		} else {
 			originBranch.Path = projectApp.Path
-			if err := manager.gitAppModel.UpdateAppBranch(originBranch); err != nil {
+			if err := manager.scmAppModel.UpdateAppBranch(originBranch); err != nil {
 				return err
 			}
 		}
 	}
 
-	branchListInDB, err := manager.gitAppModel.GetAppBranches(appID)
+	branchListInDB, err := manager.scmAppModel.GetAppBranches(appID)
 	if err != nil {
 		return err
 	}
@@ -162,8 +164,48 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 	}
 	for _, branchDBItem := range branchListInDB {
 		if !utils.Contains(branchNameList, branchDBItem.BranchName) {
-			manager.gitAppModel.SoftDeleteAppBranch(branchDBItem)
+			manager.scmAppModel.SoftDeleteAppBranch(branchDBItem)
 		}
 	}
 	return nil
+}
+
+// CreateSCMApp ...
+func (manager *AppManager) CreateSCMApp(item *ScmAppReq, creator string) error {
+	log.Log.Debug("request params: %+v", item)
+
+	if item.BranchName == "" {
+		// reset default value is master
+		item.BranchName = "master"
+	}
+
+	if item.Dockerfile == "" {
+		item.Dockerfile = "Dockerfile"
+	}
+	scmAppModel := models.ScmApp{
+		Addons:       models.NewAddons(),
+		Creator:      creator,
+		CompileEnvID: item.CompileEnvID,
+		Name:         item.Name,
+		FullName:     item.FullName,
+		Language:     item.Language,
+		BranchName:   item.BranchName,
+		Path:         item.Path,
+		RepoID:       item.RepoID,
+		BuildPath:    item.BuildPath,
+		Dockerfile:   item.Dockerfile,
+	}
+
+	_, err := manager.scmAppModel.CreateScmAppIfNotExist(&scmAppModel)
+	if err != nil {
+		log.Log.Error("create scm app error: %s", err)
+		return err
+	}
+
+	return nil
+}
+
+// GetProjectAppsByPagination ..
+func (manager *AppManager) GetScmAppsByPagination(filter *query.FilterQuery) (*query.QueryResult, error) {
+	return manager.scmAppModel.GetScmAppsByPagination(filter)
 }

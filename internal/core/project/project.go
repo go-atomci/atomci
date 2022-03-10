@@ -38,7 +38,7 @@ import (
 type ProjectManager struct {
 	model          *dao.ProjectModel
 	pipelineModel  *dao.PipelineStageModel
-	gitAppModel    *dao.GitAppModel
+	scmAppModel    *dao.ScmAppModel
 	k8sModel       *dao.K8sClusterModel
 	userrolesModel *dao.UserRolesModel
 	publishModel   *dao.PublishModel
@@ -51,7 +51,7 @@ func NewProjectManager() *ProjectManager {
 		model:          dao.NewProjectModel(),
 		pipelineModel:  dao.NewPipelineStageModel(),
 		settingModel:   dao.NewSysSettingModel(),
-		gitAppModel:    dao.NewGitAppModel(),
+		scmAppModel:    dao.NewScmAppModel(),
 		k8sModel:       dao.NewK8sClusterModel(),
 		userrolesModel: dao.NewUserRolesModel(),
 		publishModel:   dao.NewPublishModel(),

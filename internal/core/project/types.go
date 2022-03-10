@@ -75,15 +75,7 @@ type ProjectNumberReq struct {
 
 // ProjectAppReq add app into project request body.
 type ProjectAppReq struct {
-	Name         string `json:"name"`
-	CompileEnvID int64  `json:"compile_env_id"`
-	Language     string `json:"language"`
-	Path         string `json:"path"`
-	RepoID       int64  `json:"repo_id"`
-	FullName     string `json:"full_name"`
-	BranchName   string `json:"branch_name"`
-	BuildPath    string `json:"build_path"`
-	Dockerfile   string `json:"dockerfile"`
+	AppID int64 `json:"app_id"`
 }
 
 // ProjectAppRsp ..

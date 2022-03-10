@@ -33,7 +33,7 @@ import (
 // AppManager ...
 type AppManager struct {
 	model           *dao.AppArrangeModel
-	gitAppModel     *dao.GitAppModel
+	scmAppModel     *dao.ScmAppModel
 	projectModel    *dao.ProjectModel
 	settingsHandler *settings.SettingManager
 }
@@ -42,7 +42,7 @@ type AppManager struct {
 func NewAppManager() *AppManager {
 	return &AppManager{
 		model:           dao.NewAppArrangeModel(),
-		gitAppModel:     dao.NewGitAppModel(),
+		scmAppModel:     dao.NewScmAppModel(),
 		projectModel:    dao.NewProjectModel(),
 		settingsHandler: settings.NewSettingManager(),
 	}
@@ -50,7 +50,7 @@ func NewAppManager() *AppManager {
 
 // AppBranches ...
 func (manager *AppManager) AppBranches(appID int64, filter *query.FilterQuery) (*query.QueryResult, error) {
-	return manager.gitAppModel.GetAppBranchesByPagination(appID, filter)
+	return manager.scmAppModel.GetAppBranchesByPagination(appID, filter)
 }
 
 // GetRepos ..
@@ -61,14 +61,14 @@ func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 	defaultRepos := []string{"gitlab", "github", "gitee", "gitea"}
 	// defaultRepos := []string{"gitlab"}
 	for _, item := range defaultRepos {
-		_, err := manager.gitAppModel.GetRepoBycIDAndType(projectID, item)
+		_, err := manager.scmAppModel.GetRepoBycIDAndType(projectID, item)
 		if err != nil {
 			if err == orm.ErrNoRows {
-				if err := manager.gitAppModel.CreateDefaultRepo(projectID, item); err != nil {
+				if err := manager.scmAppModel.CreateDefaultRepo(projectID, item); err != nil {
 					log.Log.Error("create default repos failed: %v", err.Error())
 					return nil, fmt.Errorf("网络异常，请重试")
 				}
-				_, err = manager.gitAppModel.GetRepoBycIDAndType(projectID, item)
+				_, err = manager.scmAppModel.GetRepoBycIDAndType(projectID, item)
 				if err != nil {
 					log.Log.Error("after create, get repos occur error: %v", err.Error())
 					return nil, fmt.Errorf("网络异常，请重试")
@@ -78,7 +78,7 @@ func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
 			}
 		}
 	}
-	repos, err := manager.gitAppModel.GetReposByprojectID(projectID)
+	repos, err := manager.scmAppModel.GetReposByprojectID(projectID)
 	if err != nil {
 		return nil, fmt.Errorf("网络异常，请重试")
 	}

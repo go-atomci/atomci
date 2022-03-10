@@ -862,6 +862,10 @@ const backendAPI = {
     Package.httpMethods('delete', `/atomci/api/v1/projects/${projectId}/pipelines/${stepId}`, cb);
   },
   // 应用列表
+  getScmApps(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps`, cb, body);
+  },
+
   getApp(projectId, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${projectId}/apps`, cb, body);
   },

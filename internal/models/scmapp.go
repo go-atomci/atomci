@@ -16,31 +16,25 @@ limitations under the License.
 
 package models
 
-// GitApp ...
-type GitApp struct {
+// ScmApp ...
+type ScmApp struct {
 	Addons
-	Name        string `orm:"column(name);size(64)" json:"name"`
-	Description string `orm:"column(description);size(256)" json:"description"`
-	Department  string `orm:"column(department);size(64)" json:"department"`
-	Product     string `orm:"column(product);size(64)" json:"product"`
-	Language    string `orm:"column(language);size(64)" json:"language"`
-	Type        string `orm:"column(type);size(64)" json:"type"`
-	VcsType     string `orm:"column(vcs_type);size(64)" json:"vcs_type"`
-	Path        string `orm:"column(path);size(256)" json:"path"`
-	BuildPath   string `orm:"column(build_path);size(256)" json:"build_path"`
-	IsArranged  bool   `orm:"column(is_arranged);default(true)" json:"is_arranged"`
+	Creator           string   `orm:"column(creator);size(64);null" json:"creator"`
+	Name              string   `orm:"column(name);size(64)" json:"name"`
+	FullName          string   `orm:"column(full_name);size(64)" json:"full_name"`
+	Language          string   `orm:"column(language);size(64)" json:"language"`
+	BranchName        string   `orm:"column(branch_name);size(64)" json:"branch_name"`
+	Path              string   `orm:"column(path);size(255)" json:"path"`
+	RepoID            int64    `orm:"column(repo_id)" json:"repo_id"`
+	CompileEnvID      int64    `orm:"column(compile_env_id);size(64)" json:"compile_env_id"`
+	BuildPath         string   `orm:"column(build_path);size(64)" json:"build_path"`
+	Dockerfile        string   `orm:"column(dockerfile);size(256)" json:"dockerfile"`
+	BranchHistoryList []string `orm:"-" json:"branch_history_list"`
 }
 
-// TableName ...
-func (t *GitApp) TableName() string {
-	return "pub_gitapp"
-}
-
-// TableUnique ...
-func (t *GitApp) TableUnique() [][]string {
-	return [][]string{
-		[]string{"Name", "Department"},
-	}
+// TableName ..
+func (t *ScmApp) TableName() string {
+	return "pub_scm_app"
 }
 
 // AppBranch ...

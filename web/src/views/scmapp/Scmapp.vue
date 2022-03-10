@@ -248,8 +248,7 @@ export default {
         createAtEnd: this.searchTime[1]
       };
       if(this.searchStatus === 1 || this.searchStatus ===2) params.status = this.searchStatus;
-      if (this.cluster === '') return;
-      backend.getApp(2, params, (data) => {
+      backend.getScmApps(params, (data) => {
         if (data) {
           this.$refs.pages.total = data.total;
           this.curList = data.item.map((i) => {

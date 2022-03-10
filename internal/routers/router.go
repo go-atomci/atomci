@@ -94,6 +94,10 @@ func RegisterRoutes() {
 
 				beego.NSRouter("/repos/:repo_id/projects", &api.AppController{}, "post:GetGitProjectsByRepoID"),
 
+				// scm apps
+				beego.NSRouter("/apps/create", &api.AppController{}, "post:CreateSCMApp"),
+				beego.NSRouter("/apps", &api.AppController{}, "post:GetAppsByPagination"),
+
 				// Project
 				beego.NSRouter("/projects", &api.ProjectController{}, "post:ProjectList"),
 				beego.NSRouter("/projects/create", &api.ProjectController{}, "post:Create"),

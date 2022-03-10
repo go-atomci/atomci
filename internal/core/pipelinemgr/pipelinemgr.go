@@ -36,7 +36,8 @@ type PipelineManager struct {
 	modelPublishJob *dao.PublishJobModel
 	modelK8s        *dao.K8sClusterModel
 	appHandler      *appmgr.AppManager
-	modelApp        *dao.GitAppModel
+	// TODO: model app, model app arrnage  change to appHandler
+	modelApp        *dao.ScmAppModel
 	modelAppArrange *dao.AppArrangeModel
 	settingsHandler *settings.SettingManager
 }
@@ -50,7 +51,7 @@ func NewPipelineManager() *PipelineManager {
 		modelArrange:    dao.NewAppArrangeModel(),
 		modelPublishJob: dao.NewPublishJobModel(),
 		modelK8s:        dao.NewK8sClusterModel(),
-		modelApp:        dao.NewGitAppModel(),
+		modelApp:        dao.NewScmAppModel(),
 		modelAppArrange: dao.NewAppArrangeModel(),
 		appHandler:      appmgr.NewAppManager(),
 		settingsHandler: settings.NewSettingManager(),
