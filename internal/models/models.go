@@ -219,6 +219,9 @@ func initOrm() {
 
 // Init ...
 func init() {
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		return
+	}
 	initOrm()
 	// orm.RunSyncdb("default", false, true)
 }
