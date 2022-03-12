@@ -54,3 +54,17 @@ const (
 	// HelmDeployType helm 部署
 	HelmDeployType = "helm"
 )
+
+// integrate type
+const (
+	SCMGitlab           = "gitlab"
+	SCMGithub           = "github"
+	SCMGitea            = "gitea"
+	SCMGitee            = "gitee"
+	IntegrateKubernetes = "kubernetes"
+	IntegrateJenkins    = "jenkins"
+	IntegrateRegistry   = "registry"
+)
+
+var Integratetypes = []string{IntegrateKubernetes, IntegrateJenkins, IntegrateRegistry}
+var ScmIntegratetypes = []string{SCMGitlab, SCMGithub, SCMGitea, SCMGitee}

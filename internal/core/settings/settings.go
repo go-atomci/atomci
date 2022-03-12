@@ -89,6 +89,16 @@ type RegistryConfig struct {
 	IsHttps  bool   `json:"isHttps,omitempty"`
 }
 
+type ScmBaseConfig struct {
+	URL   string `json:"url,omitempty"`
+	Token string `json:"token,omitempty"`
+}
+
+type ScmGitlabConfig struct {
+	ScmBaseConfig
+	User string `json:"user,omitempty"`
+}
+
 type JenkinsConfig struct {
 	BaseConfig
 	Token     string `json:"token,omitempty"`
@@ -116,6 +126,14 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		registry := &RegistryConfig{}
 		err := json.Unmarshal([]byte(sc), registry)
 		return registry, err
+	case "gitlab":
+		scmConf := &ScmGitlabConfig{}
+		err := json.Unmarshal([]byte(sc), scmConf)
+		return scmConf, err
+	case "gitea", "gitee", "github":
+		scmConf := &ScmBaseConfig{}
+		err := json.Unmarshal([]byte(sc), scmConf)
+		return scmConf, err
 	default:
 		log.Log.Warn("this settings type %s is not support, return origin string", settingType)
 		return sc, nil
@@ -130,8 +148,8 @@ func NewSettingManager() *SettingManager {
 }
 
 // GetIntegrateSettings ..
-func (pm *SettingManager) GetIntegrateSettings(integrateType string) ([]*IntegrateSettingResponse, error) {
-	items, err := pm.model.GetIntegrateSettings(integrateType)
+func (pm *SettingManager) GetIntegrateSettings(integrateTypes []string) ([]*IntegrateSettingResponse, error) {
+	items, err := pm.model.GetIntegrateSettings(integrateTypes)
 	if err != nil {
 		log.Log.Error("get interate settings error: %s", err.Error())
 		return nil, err
@@ -152,8 +170,8 @@ func (pm *SettingManager) GetIntegrateSettingByID(id int64) (*IntegrateSettingRe
 }
 
 // GetIntegrateSettingsByPagination ..
-func (pm *SettingManager) GetIntegrateSettingsByPagination(filter *query.FilterQuery) (*query.QueryResult, error) {
-	queryResult, settingsList, err := pm.model.GetIntegrateSettingsByPagination(filter)
+func (pm *SettingManager) GetIntegrateSettingsByPagination(filter *query.FilterQuery, intergrateTypes []string) (*query.QueryResult, error) {
+	queryResult, settingsList, err := pm.model.GetIntegrateSettingsByPagination(filter, intergrateTypes)
 	if err != nil {
 		return nil, err
 	}
