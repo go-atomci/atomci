@@ -35,12 +35,6 @@ type Addons struct {
 	DeleteAt *time.Time `orm:"column(delete_at);type(datetime);index;null" json:"delete_at"`
 }
 
-// db migration base interface
-type Migration interface {
-	GetCreateAt() time.Time
-	Upgrade(ormer orm.Ormer)
-}
-
 // TableNamePrefix ..
 const TableNamePrefix = "atom"
 
@@ -66,9 +60,8 @@ func (a *Addons) MarkDeleted() {
 }
 
 var (
-	dbName         string
-	tableNames     []string
-	migrationTypes []Migration
+	dbName     string
+	tableNames []string
 )
 
 func initOrm() {
@@ -156,25 +149,12 @@ func initOrm() {
 
 }
 
-//db migration register
-func initMigration() {
-	migrationTypes = []Migration{
-		new(migrations.Migration20220101),
-		new(migrations.Migration20220309),
-	}
-
-	//数据迁移
-	for _, m := range migrationTypes {
-		m.Upgrade(orm.NewOrm())
-	}
-}
-
 // Init ...
 func init() {
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		return
 	}
 	initOrm()
-	initMigration()
+	migrations.InitMigration()
 	// orm.RunSyncdb("default", false, true)
 }
