@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/orm"
 	"github.com/go-atomci/atomci/internal/middleware/log"
-	"os"
 	"time"
 )
 
@@ -15,7 +14,7 @@ func (m Migration20220101) GetCreateAt() time.Time {
 	return time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
 }
 
-func (m Migration20220101) Upgrade(ormer orm.Ormer) {
+func (m Migration20220101) Upgrade(ormer orm.Ormer) error {
 	tables := []string{
 		"sys_resource_type",
 		"sys_resource_operation",
@@ -33,12 +32,13 @@ func (m Migration20220101) Upgrade(ormer orm.Ormer) {
 
 	if err := setCreateAt(ormer, tables); err != nil {
 		log.Log.Error(err.Error())
-		os.Exit(2)
+		return err
 	}
 	if err := setUpdateAt(ormer, tables); err != nil {
 		log.Log.Error(err.Error())
-		os.Exit(2)
+		return err
 	}
+	return nil
 }
 
 func setCreateAt(ormer orm.Ormer, tables []string) error {
