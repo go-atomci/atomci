@@ -19,6 +19,7 @@ package models
 import (
 	"fmt"
 	"github.com/go-atomci/atomci/internal/migrations"
+	"os"
 	"time"
 
 	"github.com/astaxie/beego"
