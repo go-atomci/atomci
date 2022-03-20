@@ -23,7 +23,7 @@
         <div class="table-toolbar">
           <el-row class="mt16">
             <el-col :span="16" style='text-align:left;'>
-              <el-button :plain="false" type="primary" @click="addApp()"> +创建应用</el-button>
+              <el-button :plain="false" type="primary" @click="$refs.create.doCreate()"> +创建应用</el-button>
             </el-col>
           </el-row>
         </div>
@@ -45,13 +45,13 @@
           </el-table-column>
           <el-table-column :label="$t('bm.deployCenter.operation')" min-width="15%">
             <template slot-scope="scope">
-                <el-button type="text" size="small" @click="$refs.appArrange.doSetup(scope.row)">详情</el-button>
-                <el-button type="text" size="small" @click="appDetail(scope.row.id, 1)">{{$t('bm.deployCenter.branchManage')}}</el-button>
+                <el-button type="text" size="small" @click="appDetail(scope.row.id)">详情</el-button>
             </template>
           </el-table-column>
         </el-table>
       </template>
         <page-nav ref="pages" :list='curList' v-on:getlist="getList"></page-nav>
+        <app-add ref="create" v-on:getlist="getList"></app-add>
       </div>
     </div>
 </div>
@@ -164,7 +164,7 @@ import CommonClose from '@/components/utils/Close';
 import Refresh from '@/components/utils/Refresh';
 import utils from '@/common/utils';
 import NoticeBar from '@/components/utils/NoticeBar';
-
+import AppAdd from './components/AppAdd';
 
 export default {
   data() {
@@ -205,6 +205,7 @@ export default {
     CommonDelete,
     CommonClose,
     NoticeBar,
+    AppAdd,
   },
   mounted() {
     this.getList();
@@ -224,6 +225,15 @@ export default {
     addApp(flag) {
       this.$router.push({
         name: 'addScmApp',
+      });
+    },
+    // 代码仓库详情
+    appDetail(scmAppId) {
+      this.$router.push({
+        name: 'scmAppDetail',
+        params: {
+          appId: scmAppId,
+        },
       });
     },
     doEdit(id) {

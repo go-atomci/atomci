@@ -506,10 +506,6 @@ const backendAPI = {
   updateProjectApp(id, projectAppId, body, cb) {
     Package.httpMethods('put', `/atomci/api/v1/projects/${id}/apps/${projectAppId}`, cb, body);
   },
-  // 同步远程分支
-  synBranch(appID, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/apps/${appID}/syncBranches`, cb);
-  },
 
   // 获得部门列表
   getBus(cb) {
@@ -865,7 +861,22 @@ const backendAPI = {
   getScmApps(body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/apps`, cb, body);
   },
-
+  // 获取单个代码仓库详情
+  getScmAppDetail(appID, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/apps/${appID}`, cb);
+  },
+  updateScmAppInfo(appId, body, cb) {
+    Package.httpMethods('put', `/atomci/api/v1/apps/${appId}`, cb, body);
+  },
+  delScmApp(scmAppID, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/apps/${scmAppID}`, cb);
+  },
+  asyncBranch(app_id, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/${app_id}/syncBranches`, cb);
+  },
+  getScmBranch(app_id, body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/${app_id}/branches`, cb, body);
+  },
   getApp(projectId, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${projectId}/apps`, cb, body);
   },
@@ -886,14 +897,8 @@ const backendAPI = {
   changeBranch(id, projectAppId, body, cb) {
     Package.httpMethods('patch', `/atomci/api/v1/projects/${id}/apps/${projectAppId}`, cb, body);
   },
-  getProjectBranch(project_id, app_id, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/branches`, cb, body);
-  },
   createBranch(project_id, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/branches`, cb, body);
-  },
-  asyncBranch(project_id, app_id, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/syncBranches`, cb);
   },
   //新增应用模块
   getRepos(cb) {

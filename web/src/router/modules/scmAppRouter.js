@@ -1,7 +1,7 @@
 import Layout from '@/layout'
 
 const scmAppRouter = {
-  path: '/scmapp',
+  path: '/scmapps',
   component: Layout,
   redirect: '/scmapp',
   name: 'scmapp',
@@ -21,6 +21,13 @@ const scmAppRouter = {
       name: 'addScmApp',
       meta: { title: '新增应用', noCache: true },
       component: () => import('@/views/scmapp/detail/ScmAppAdd.vue'),
+      hidden: true
+    },
+    {
+      path: '/scmapp/:appId',
+      name: 'scmAppDetail',
+      meta: { title: '代码仓库详情', noCache: true },
+      component: () => import('@/views/scmapp/detail/AppDetail.vue'),
       hidden: true
     },
   ],

@@ -5,7 +5,7 @@
         <el-col :span="24" class="app-title clearfix">
           <div class="f-r">
             <el-button type="primary" @click="appDetail(true)">编辑</el-button>
-            <el-button type="danger" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectID,$route.params.appId)">删除</el-button>
+            <el-button type="danger" @click="$refs.commonDelete.doDelete('delScmApp',$route.params.appId)">删除</el-button>
           </div>
           {{detailInfo.name}}
         </el-col>
@@ -41,9 +41,6 @@
                 </el-table-column>
                 <el-table-column :label="$t('bm.deployCenter.operation')" min-width="10%">
                   <template slot-scope="scope">
-                    <el-button type="text" size="small" @click="checkBranch(scope.row)">
-                      {{$t('bm.deployCenter.setupCurrentBranch')}}
-                    </el-button>
                   </template>
                 </el-table-column>
               </el-table>
@@ -52,7 +49,7 @@
           </el-tab-pane>
         </el-tabs>
       <common-delete ref="commonDelete" v-on:getlist="backTo"></common-delete>
-      <project-app-edit ref="projectEdit" v-on:getList="appDetail"></project-app-edit>
+      <scm-app-edit ref="appEdit" v-on:getList="appDetail"></scm-app-edit>
     </div>
   </div>
 </template>
@@ -131,7 +128,7 @@ import Refresh from '@/components/utils/Refresh';
 import listTemplate from '@/common/listTemplate';
 import CommonDelete from '@/components/utils/Delete';
 import Utils from '@/common/utils';
-import ProjectAppEdit from '../dialog/ProjectAppEdit';
+import scmAppEdit from '../components/AppEdit';
 import PageNav from '@/components/utils/PageList';
 
 export default {
@@ -143,7 +140,6 @@ export default {
       filterTxt: '',
       activeName: '',
       envList: [],
-      icon: ['', 'app-test', 'app-prod'],
       detailInfo: {},
     };
   },
@@ -152,10 +148,10 @@ export default {
     PageNav,
     Refresh,
     CommonDelete,
-    ProjectAppEdit,
+    scmAppEdit,
   },
   created() {
-    this.activeName = this.$route.params.tabs != 1 ? 'second' : 'first';
+    this.activeName = 'first';
     this.appDetail();
   },
   mounted() {
@@ -167,7 +163,7 @@ export default {
         page_size: this.$refs.pages.pageSize,
         page_index: this.$refs.pages.currentPage,
       };
-      backend.getProjectBranch(this.$route.params.projectID, this.$route.params.appId, params, (data) => {
+      backend.getScmBranch(this.$route.params.appId, params, (data) => {
         this.listCol = data.item;
         this.$refs.pages.total = data.total;
       });
@@ -176,25 +172,6 @@ export default {
       if(val.name === 'first') {
         this.getList();
       }
-    },
-    // 切换新分支
-    checkBranch(item) {
-      MessageBox.confirm('确定切换为当前分支吗？', this.$t('bm.infrast.tips'), { type: 'warning' })
-        .then(() => {
-          const params = {
-            app_id: parseInt(this.$route.params.appId),
-            branch_name: item.branch_name
-          };
-          backend.changeBranch(
-            this.$route.params.projectID,
-            this.$route.params.appId,
-            params,
-            () => {
-              this.getList();
-            }
-          );
-        })
-        .catch(() => {});
     },
     // 同步远程分支
     synBranch() {
@@ -208,14 +185,14 @@ export default {
         .catch(() => {});
     },
     appDetail(flag) {
-      backend.getAppDetail(this.$route.params.projectID, this.$route.params.appId, (data) => {
+      backend.getScmAppDetail(this.$route.params.appId, (data) => {
         if(flag) {
           let history = [];
           this.listCol.map((i) => {
             history.push(i.branch_name);
           });
           const cl = Object.assign({"branch_history_list": history},data);
-          this.$refs.projectEdit.doCreate(true, cl);
+          this.$refs.appEdit.doCreate(true, cl);
         } else {
           data.create_at = Utils.format(new Date(data.create_at), 'yyyy-MM-dd hh:mm:ss');
           this.detailInfo = Object.assign({},data);
@@ -224,7 +201,7 @@ export default {
     },
     backTo() {
       this.$router.push({
-        name: 'projectApp', params: {projectID: this.$route.params.projectID}
+        name: 'scmappIndex',
       });
     },
   }
