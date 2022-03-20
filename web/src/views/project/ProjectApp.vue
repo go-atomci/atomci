@@ -51,7 +51,7 @@
       <div class="table-toolbar">
         <el-row class="mt16">
           <el-col :span="16">
-            <el-button :plain="false" type="primary" @click="addApp()">+{{$t('bm.deployCenter.addRepository')}}</el-button>
+            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate(false)">+{{$t('bm.deployCenter.addRepository')}}</el-button>
           </el-col>
         </el-row>
       </div>
@@ -85,6 +85,7 @@
       </template>
       <page-nav ref="pages" :list="listCol" v-on:getlist="getList"></page-nav>
       <app-arrange ref="appArrange" :envList="envStageList" :appList="projectAppList"></app-arrange>
+      <project-app-register ref="appRegister" :scmAppList="scmAppList"></project-app-register>
     </div>
   </div>
 </template>
@@ -97,6 +98,7 @@ import PageNav from '@/components/utils/PageList';
 import Refresh from '@/components/utils/Refresh';
 import listTemplate from '@/common/listTemplate';
 import AppArrange from './components/AppArrange';
+import ProjectAppRegister from './components/ProjectAppRegister';
 
 export default {
   mixins: [listTemplate],
@@ -110,6 +112,7 @@ export default {
       listCol: [],
       envStageList: [],
       projectAppList: [],
+      scmAppList: [],
       filterTxt: '',
       searchVal: '',
       searchType: '',
@@ -145,6 +148,7 @@ export default {
     PageNav,
     Refresh,
     AppArrange,
+    ProjectAppRegister,
   },
   computed: {
     ...mapGetters({
@@ -162,6 +166,9 @@ export default {
     }),
     backend.getAppAll(this.projectID, (data) => {
       this.projectAppList = data
+    }),
+    backend.getAllScmApps( (data) => {
+      this.scmAppList = data
     }),
     this.getList(true);
   },

@@ -350,10 +350,6 @@ const backendAPI = {
   getProjectApp(id, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${id}/apps`, cb);
   },
-  // 获得应用仓库列表
-  getWarehouse(body, cb) {
-    Package.httpMethods('post', '/atomci/api/v1/apps', cb, body);
-  },
   // 关联应用
   postWarehouse(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/apps/create', cb, body);
@@ -860,6 +856,9 @@ const backendAPI = {
   // 应用列表
   getScmApps(body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/apps`, cb, body);
+  },
+  getAllScmApps(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/apps`, cb);
   },
   // 获取单个代码仓库详情
   getScmAppDetail(appID, cb) {
