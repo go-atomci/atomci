@@ -213,17 +213,9 @@ func (pm *SettingManager) UpdateIntegrateSetting(request *IntegrateSettingReq, s
 		log.Log.Error("json marshal error: %s", err.Error())
 		return err
 	}
-	//stageModel.Config = config
+
 	stageModel.CryptoConfig(config)
-	if request.Type == KubernetesType {
-		kube := &KubeConfig{}
-		err := json.Unmarshal([]byte(config), kube)
-		if err == nil {
-			pm.createOrupateKubernetesConfig(request.Name, kube.Conf)
-		} else {
-			log.Log.Error("kuber conf format error:  %v", err.Error())
-		}
-	}
+
 	return pm.model.UpdateIntegrateSetting(stageModel)
 }
 
@@ -371,21 +363,6 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 
 	newIntegrateSetting.CryptoConfig(config)
 
-	if request.Type == KubernetesType {
-		kube := &KubeConfig{}
-		err := json.Unmarshal([]byte(config), kube)
-		if err != nil {
-			msg := fmt.Sprintf("kuber conf format error:  %v", err.Error())
-			log.Log.Error(msg)
-			return fmt.Errorf(msg)
-		}
-
-		if err := pm.createOrupateKubernetesConfig(request.Name, kube.Conf); err != nil {
-			log.Log.Error("create or update k8s config file error: %s", err.Error())
-		} else {
-			log.Log.Debug("create or update k8s config file success.")
-		}
-	}
 	return pm.model.CreateIntegrateSetting(newIntegrateSetting)
 }
 
