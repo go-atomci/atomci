@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"k8s.io/client-go/rest"
 	"os"
 	"strings"
 	"time"
@@ -69,6 +70,9 @@ const (
 	KubernetesType = "kubernetes"
 	RegistryType   = "registry"
 	JenkinsType    = "jenkins"
+
+	KubernetesConfig = "kubernetesConfig"
+	KubernetesToken  = "kubernetesToken"
 )
 
 type Config struct{}
@@ -81,6 +85,7 @@ type BaseConfig struct {
 type KubeConfig struct {
 	URL  string `json:"url,omitempty"`
 	Conf string `json:"conf,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 type RegistryConfig struct {
 	BaseConfig
@@ -258,16 +263,30 @@ func (pm *SettingManager) VerifyIntegrateSetting(request *IntegrateSettingReq) V
 	case KubernetesType:
 		kube := &KubeConfig{}
 		err := json.Unmarshal([]byte(config), kube)
+		if kube.Type == "" {
+			kube.Type = KubernetesConfig
+		}
 		if err != nil {
 			log.Log.Error("kuber conf format error:  %v", err.Error())
 			resp.Error = err
 			return resp
 		}
-		k8sconf, err := clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
-		if err != nil {
-			resp.Error = err
-			return resp
+		var k8sconf *rest.Config
+		switch kube.Type {
+		case KubernetesConfig:
+			k8sconf, err = clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
+			if err != nil {
+				resp.Error = err
+				return resp
+			}
+		case KubernetesToken:
+			k8sconf = &rest.Config{
+				BearerToken:     kube.Conf,
+				TLSClientConfig: rest.TLSClientConfig{Insecure: true},
+				Host:            "https://81.68.216.88:6443",
+			}
 		}
+
 		clientset, err := kubernetes.NewForConfig(k8sconf)
 		if err != nil {
 			resp.Error = err
