@@ -17,53 +17,46 @@ limitations under the License.
 package kube
 
 import (
-	"sync"
-
+	"encoding/json"
+	"github.com/go-atomci/atomci/internal/core/settings"
+	"github.com/go-atomci/atomci/internal/models"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
-
-var (
-	clusterClientsetMapMutex sync.RWMutex
-	clusterClientsetMap      = make(map[string]kubernetes.Interface)
-)
-
-func findClientset(cluster string) (client kubernetes.Interface, ok bool) {
-	clusterClientsetMapMutex.RLock()
-	defer clusterClientsetMapMutex.RUnlock()
-	client, ok = clusterClientsetMap[cluster]
-	return client, ok
-}
-
-func newClientset(cluster string) (client kubernetes.Interface, err error) {
-	var ok bool
-	clusterClientsetMapMutex.Lock()
-	defer clusterClientsetMapMutex.Unlock()
-	client, ok = clusterClientsetMap[cluster]
-	if !ok {
-		client, err = clientsetProvider(cluster)
-		if err == nil {
-			clusterClientsetMap[cluster] = client
-		}
-	}
-	return client, err
-}
 
 func GetClientset(cluster string) (client kubernetes.Interface, err error) {
-	var ok bool
-	client, ok = findClientset(cluster)
-	if !ok {
-		client, err = newClientset(cluster)
+
+	pm := settings.NewSettingManager()
+	resp, err := pm.GetIntegrateSettingByName(cluster, settings.KubernetesType)
+	if err != nil {
+		return nil, err
 	}
-	return client, err
+	return buildK8sClient(resp.IntegrateSettingReq.Config.(*models.IntegrateSetting))
 }
 
-func UpdateClientset(cluster string) (client kubernetes.Interface, err error) {
-	clusterClientsetMapMutex.Lock()
-	defer clusterClientsetMapMutex.Unlock()
-	client, err = clientsetProvider(cluster)
+func buildK8sClient(setting *models.IntegrateSetting) (client kubernetes.Interface, err error) {
+	kube := &settings.KubeConfig{}
+	err = json.Unmarshal([]byte(setting.Config), kube)
 	if err != nil {
-		return
+		return nil, err
 	}
-	clusterClientsetMap[cluster] = client
-	return
+
+	var k8sConfig *rest.Config
+	switch kube.Type {
+	case settings.KubernetesConfig:
+		k8sConfig, err = clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
+		if err != nil {
+			return nil, err
+		}
+	case settings.KubernetesToken:
+		k8sConfig = &rest.Config{
+			BearerToken:     kube.Conf,
+			TLSClientConfig: rest.TLSClientConfig{Insecure: true},
+			Host:            kube.URL,
+		}
+	}
+
+	clientSet, err := kubernetes.NewForConfig(k8sConfig)
+	return clientSet, err
 }

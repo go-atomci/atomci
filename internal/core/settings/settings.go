@@ -174,6 +174,16 @@ func (pm *SettingManager) GetIntegrateSettingByID(id int64) (*IntegrateSettingRe
 	return formatSignalIntegrateSetting(integrateSetting, config), err
 }
 
+func (pm *SettingManager) GetIntegrateSettingByName(name string, integrateType string) (*IntegrateSettingResponse, error) {
+	integrateSetting, err := pm.model.GetIntegrateSettingByName(name, integrateType)
+	if err != nil {
+		log.Log.Error("when GetIntegrateSettingByName, get GetIntegrateSettingByName occur error: %s", err.Error())
+		return nil, err
+	}
+	config := &Config{}
+	return formatSignalIntegrateSetting(integrateSetting, config), err
+}
+
 // GetIntegrateSettingsByPagination ..
 func (pm *SettingManager) GetIntegrateSettingsByPagination(filter *query.FilterQuery, intergrateTypes []string) (*query.QueryResult, error) {
 	queryResult, settingsList, err := pm.model.GetIntegrateSettingsByPagination(filter, intergrateTypes)
@@ -275,7 +285,7 @@ func (pm *SettingManager) VerifyIntegrateSetting(request *IntegrateSettingReq) V
 			k8sconf = &rest.Config{
 				BearerToken:     kube.Conf,
 				TLSClientConfig: rest.TLSClientConfig{Insecure: true},
-				Host:            "https://81.68.216.88:6443",
+				Host:            kube.URL,
 			}
 		}
 
