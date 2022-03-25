@@ -7,9 +7,9 @@
 <template>
   <el-dialog top='25vh' :title="title" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog"  width='50%' :before-close="doCancelCreate">
     <el-form :model="form" ref="ruleForm" :rules="rules">
-      <el-form-item label="应用名" prop="name">
+      <el-form-item label="应用名" prop="scm_id">
         <el-select  allow-create filterable default-first-option v-model="form.namespace" placeholder="请选择应用名">
-          <el-option v-for="(item, index) in scmAppList" :key="index" :label="item.full_name" :value="item.id">
+          <el-option v-for="(item, index) in scmAppList" :key="index" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
@@ -44,8 +44,8 @@ export default {
       form: JSON.parse(JSON.stringify(formData)),
       title: '新增',
       rules: {
-        name: [
-          { required: true, message: '请输入名称', trigger: 'blur' },
+        id: [
+          { required: true, message: '请选择应用', trigger: 'blur' },
         ],
       },
       rowId: '',
@@ -74,24 +74,21 @@ export default {
   created() {},
   methods: {
     doCreate(flag, item) {
-      this.isEdit = flag;
       if (flag) {
-        this.title = '编辑';
-        this.form = {
-          name: item.name || '',
-          app_id: 0,
-        };
-        this.rowId = item.id;
-      } else {
         this.title = '新增';
         this.form = {
           name: '',
-          app_id: 0,
+          scm_id: 0,
         };
-        this.rowId = '';
+      } else {
+        this.title = '编辑';
+        this.form = {
+          name: '',
+          scm_id: item.scm_id,
+        };
       }
+      this.rowId = '';
       this.dialogFormVisible = true;
-      this.isEdit = flag;
     },
     doSubmit() {
       this.$refs.ruleForm.validate((valid) => {
@@ -103,7 +100,7 @@ export default {
           };
           const cl = {
             name: this.form.name,
-            app_id: this.form.app_id,
+            scm_id: this.form.scm_id,
           };
           if (this.isEdit) {
             backend.updateProjectApp(this.projectID, this.rowId, cl, () => {

@@ -51,17 +51,13 @@
       <div class="table-toolbar">
         <el-row class="mt16">
           <el-col :span="16">
-            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate(false)">+{{$t('bm.deployCenter.addRepository')}}</el-button>
+            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate()">+{{$t('bm.deployCenter.addRepository')}}</el-button>
           </el-col>
         </el-row>
       </div>
       <template>
         <el-table border :data="listCol" class="mt16">
-          <el-table-column prop="name" :label="$t('bm.deployCenter.repositoryName')" min-width="12%" :show-overflow-tooltip=true>
-            <template slot-scope="scope">
-              <el-button @click="appDetail(scope.row.id, 1)" type="text">{{scope.row.name}}</el-button>
-            </template>
-          </el-table-column>
+          <el-table-column prop="name" :label="$t('bm.deployCenter.repositoryName')" min-width="12%" :show-overflow-tooltip=true></el-table-column>
           <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="12%" :show-overflow-tooltip=true />
           <el-table-column prop="language" :label="$t('bm.deployCenter.buildLang')" sortable min-width="8%" :show-overflow-tooltip=true />
           <el-table-column prop="branch_name" :label="$t('bm.deployCenter.currentBranch')" min-width="8%" :show-overflow-tooltip=true />
@@ -73,11 +69,17 @@
           </el-table-column>
           <el-table-column :label="$t('bm.deployCenter.operation')" min-width="15%">
             <template slot-scope="scope">
-                <el-button type="text" size="small" @click="$refs.appArrange.doSetup(scope.row)">
-                  {{$t('bm.deployCenter.appOrchestration')}}
-                </el-button>
-              <el-button type="text" size="small" @click="appDetail(scope.row.id, 1)">
-                {{$t('bm.deployCenter.branchManage')}}
+              <el-button type="text" size="small" @click="$refs.appArrange.doSetup(scope.row)">
+                {{$t('bm.deployCenter.appOrchestration')}}
+              </el-button>
+              <el-button type="text" size="small" @click="$refs.appRegister.doCreate(false, scope.row)">
+                {{$t('bm.deployCenter.edit')}}
+              </el-button> 
+              <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
+                {{$t('bm.deployCenter.delete')}}
+              </el-button>           
+              <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
+                {{$t('bm.deployCenter.details')}}
               </el-button>
             </template>
           </el-table-column>
@@ -104,11 +106,6 @@ export default {
   mixins: [listTemplate],
   data() {
     return {
-      searchList: [
-        { key: 'name', txt: this.$t('bm.deployCenter.repositoryName')},
-        { key: 'branch_name', txt: this.$t('bm.deployCenter.currentBranch') },
-        { key: 'path', txt: this.$t('bm.deployCenter.path') },
-      ],
       listCol: [],
       envStageList: [],
       projectAppList: [],
@@ -212,11 +209,9 @@ export default {
     // 代码仓库详情
     appDetail(scmAppId, tabs) {
       this.$router.push({
-        name: 'projectAppDetail',
+        name: 'scmAppDetail',
         params: {
-          projectID: this.projectID,
           appId: scmAppId,
-          tabs: tabs
         },
       });
     },

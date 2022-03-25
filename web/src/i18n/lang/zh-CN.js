@@ -53,7 +53,7 @@ export default {
       projectDetails: '项目详情',
       basicInfo: '基础信息',
       appModules: '代码仓库',
-      branchManage: '分支信息',
+      details: '详情',
       releaseBran: '构建分支',
       buildCompile: '构建命令',
       branchName: '分支名称',
