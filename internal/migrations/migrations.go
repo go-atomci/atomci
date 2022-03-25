@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"github.com/astaxie/beego/orm"
+	"os"
 	"sort"
 	"time"
 )
@@ -29,11 +30,12 @@ func (t MigrationTypes) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
-// InitMigration db migration register
-func InitMigration() {
+// initMigration db migration register
+func initMigration() {
 	migrationTypes := MigrationTypes{
 		new(Migration20220101),
 		new(Migration20220309),
+		new(Migration20220324),
 	}
 
 	migrateInTx(migrationTypes)
@@ -94,4 +96,11 @@ func sureCreateTable(ormer orm.Ormer) {
 	  last_migration_date datetime DEFAULT CURRENT_TIMESTAMP
 	)`
 	ormer.Raw(ddl).Exec()
+}
+
+func init() {
+	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
+		return
+	}
+	initMigration()
 }
