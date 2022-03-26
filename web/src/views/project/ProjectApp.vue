@@ -51,17 +51,16 @@
       <div class="table-toolbar">
         <el-row class="mt16">
           <el-col :span="16">
-            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate()">+{{$t('bm.deployCenter.addRepository')}}</el-button>
+            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate(true)">+{{$t('bm.deployCenter.addRepository')}}</el-button>
           </el-col>
         </el-row>
       </div>
       <template>
         <el-table border :data="listCol" class="mt16">
           <el-table-column prop="name" :label="$t('bm.deployCenter.repositoryName')" min-width="12%" :show-overflow-tooltip=true></el-table-column>
-          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="12%" :show-overflow-tooltip=true />
+          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="14%" :show-overflow-tooltip=true />
           <el-table-column prop="language" :label="$t('bm.deployCenter.buildLang')" sortable min-width="8%" :show-overflow-tooltip=true />
-          <el-table-column prop="branch_name" :label="$t('bm.deployCenter.currentBranch')" min-width="8%" :show-overflow-tooltip=true />
-          <el-table-column prop="build_path" :label="$t('bm.deployCenter.buildPath')" min-width="8%" :show-overflow-tooltip=true />
+          <el-table-column prop="build_path" :label="$t('bm.deployCenter.buildPath')" min-width="6%" :show-overflow-tooltip=true />
           <el-table-column prop="path" :label="$t('bm.infrast.repositoryAdr')" min-width="25%" :show-overflow-tooltip=true>
             <template slot-scope="scope">
               <a class="font-blue" :href='scope.row.path' target="_blank">{{scope.row.path}}</a>

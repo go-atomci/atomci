@@ -492,7 +492,7 @@ const backendAPI = {
   },
   // 添加项目应用模块
   addProjectApp(id, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${id}/apps`, cb, body);
+    Package.httpMethods('post', `/atomci/api/v1/projects/${id}/apps/create`, cb, body);
   },
   // 删除项目应用模块
   delProjectApp(id, projectAppId, cb) {

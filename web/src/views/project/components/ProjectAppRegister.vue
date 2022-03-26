@@ -8,7 +8,7 @@
   <el-dialog top='25vh' :title="title" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog"  width='50%' :before-close="doCancelCreate">
     <el-form :model="form" ref="ruleForm" :rules="rules">
       <el-form-item label="应用名" prop="scm_id">
-        <el-select  allow-create filterable default-first-option v-model="form.namespace" placeholder="请选择应用名">
+        <el-select  allow-create filterable default-first-option v-model="form.scm_id" placeholder="请选择应用名">
           <el-option v-for="(item, index) in scmAppList" :key="index" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
@@ -75,19 +75,19 @@ export default {
   methods: {
     doCreate(flag, item) {
       if (flag) {
+        this.rowId = '';
         this.title = '新增';
         this.form = {
-          name: '',
-          scm_id: 0,
+          scm_id: undefined,
         };
       } else {
         this.title = '编辑';
+        this.rowId = item.id;
         this.form = {
-          name: '',
           scm_id: item.scm_id,
         };
+        this.isEdit  = true
       }
-      this.rowId = '';
       this.dialogFormVisible = true;
     },
     doSubmit() {
@@ -99,7 +99,6 @@ export default {
             this.dialogFormVisible = false;
           };
           const cl = {
-            name: this.form.name,
             scm_id: this.form.scm_id,
           };
           if (this.isEdit) {
