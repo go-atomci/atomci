@@ -19,9 +19,7 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"k8s.io/client-go/rest"
-	"os"
 	"strings"
 	"time"
 
@@ -31,7 +29,6 @@ import (
 	"github.com/go-atomci/atomci/utils/query"
 	"github.com/go-atomci/atomci/utils/validate"
 
-	"github.com/astaxie/beego"
 	"github.com/go-atomci/workflow/jenkins"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -227,28 +224,6 @@ func (pm *SettingManager) UpdateIntegrateSetting(request *IntegrateSettingReq, s
 	stageModel.CryptoConfig(config)
 
 	return pm.model.UpdateIntegrateSetting(stageModel)
-}
-
-func (pm *SettingManager) createOrupateKubernetesConfig(clusterName, config string) error {
-	configPath := beego.AppConfig.String("k8s::configPath")
-
-	log.Log.Debug("configPath: %v", configPath)
-	err := os.MkdirAll(configPath, 0766)
-	if err != nil {
-		log.Log.Error(fmt.Sprintf("Failed to make the k8sconfig dir: %v", err.Error()))
-		return err
-	}
-	fileObj, err := os.OpenFile(configPath+"/"+clusterName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		log.Log.Error(fmt.Sprintf("Failed to open the file: %v", err.Error()))
-		return err
-	}
-	if _, err := io.WriteString(fileObj, config); err != nil {
-		log.Log.Error(fmt.Sprintf("init K8S cluster %v configure failed: %v", clusterName, err.Error()))
-		return err
-	}
-	log.Log.Debug(fmt.Sprintf("update K8S cluster %v configure successfully", clusterName))
-	return nil
 }
 
 // VerifyIntegrateSetting ..
