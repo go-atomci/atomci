@@ -49,7 +49,7 @@ func (model *SysSettingModel) GetIntegrateSettingByID(integrateSettingID int64) 
 	return &integrateSetting, nil
 }
 
-func (model *SysSettingModel) GetIntegrateSettingByName(name string, integrateType string) (*models.IntegrateSetting, error) {
+func (model *SysSettingModel) GetIntegrateSettingByName(name, integrateType string) (*models.IntegrateSetting, error) {
 	integrateSetting := models.IntegrateSetting{}
 	qs := model.ormer.QueryTable(model.IntegrateSettingTableName).Filter("deleted", false)
 	if err := qs.Filter("name", name).Filter("type", integrateType).One(&integrateSetting); err != nil {

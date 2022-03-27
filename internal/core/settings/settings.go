@@ -19,9 +19,10 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"k8s.io/client-go/rest"
 	"strings"
 	"time"
+
+	"k8s.io/client-go/rest"
 
 	"github.com/go-atomci/atomci/constant"
 	"github.com/go-atomci/atomci/internal/dao"
@@ -179,7 +180,6 @@ func (pm *SettingManager) GetIntegrateSettingByID(id int64) (*IntegrateSettingRe
 	return formatSignalIntegrateSetting(integrateSetting, config), err
 }
 
-
 func (pm *SettingManager) GetSCMIntegrateSettinByID(id int64) (*ScmIntegrateSetting, error) {
 	resp, err := pm.GetIntegrateSettingByID(id)
 	if err != nil {
@@ -214,8 +214,9 @@ func getScmConf(scmType string, config interface{}) ScmAuthConf {
 		}
 	}
 	return scmCONF
+}
 
-func (pm *SettingManager) GetIntegrateSettingByName(name string, integrateType string) (*IntegrateSettingResponse, error) {
+func (pm *SettingManager) GetIntegrateSettingByName(name, integrateType string) (*IntegrateSettingResponse, error) {
 	integrateSetting, err := pm.model.GetIntegrateSettingByName(name, integrateType)
 	if err != nil {
 		log.Log.Error("when GetIntegrateSettingByName, get GetIntegrateSettingByName occur error: %s", err.Error())
