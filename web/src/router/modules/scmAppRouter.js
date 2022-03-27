@@ -17,16 +17,9 @@ const scmAppRouter = {
       meta: { title: '我的应用', noCache: true }
     },
     {
-      path: '/scmapp/register',
-      name: 'addScmApp',
-      meta: { title: '新增应用', noCache: true },
-      component: () => import('@/views/scmapp/detail/ScmAppAdd.vue'),
-      hidden: true
-    },
-    {
       path: '/scmapp/:appId',
       name: 'scmAppDetail',
-      meta: { title: '代码仓库详情', noCache: true },
+      meta: { title: '应用详情', noCache: true },
       component: () => import('@/views/scmapp/detail/AppDetail.vue'),
       hidden: true
     },

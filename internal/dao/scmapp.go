@@ -18,7 +18,6 @@ package dao
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
@@ -28,19 +27,17 @@ import (
 
 // ScmAppModel ...
 type ScmAppModel struct {
-	ormer               orm.Ormer
-	scmAppTableName     string
-	repoServerTableName string
-	AppBranchTableName  string
+	ormer              orm.Ormer
+	scmAppTableName    string
+	AppBranchTableName string
 }
 
 // NewGitAppModel ...
 func NewScmAppModel() (model *ScmAppModel) {
 	return &ScmAppModel{
-		ormer:               GetOrmer(),
-		scmAppTableName:     (&models.ScmApp{}).TableName(),
-		repoServerTableName: (&models.RepoServer{}).TableName(),
-		AppBranchTableName:  (&models.AppBranch{}).TableName(),
+		ormer:              GetOrmer(),
+		scmAppTableName:    (&models.ScmApp{}).TableName(),
+		AppBranchTableName: (&models.AppBranch{}).TableName(),
 	}
 }
 
@@ -61,6 +58,31 @@ func (model *ScmAppModel) GetScmApps() ([]*models.ScmApp, error) {
 	// TODO: add scm app tags
 	_, err := qs.All(&app)
 	return app, err
+}
+
+func (model *ScmAppModel) GetScmAppByID(appID int64) (*models.ScmApp, error) {
+	app := models.ScmApp{}
+	err := model.ormer.QueryTable(model.scmAppTableName).
+		Filter("deleted", false).
+		Filter("id", appID).One(&app)
+	return &app, err
+}
+
+// UpdateProjectApp ...
+func (model *ScmAppModel) UpdateSCMApp(scmApp *models.ScmApp) error {
+	_, err := model.ormer.Update(scmApp)
+	return err
+}
+
+// DeleteProjectApp ...
+func (model *ScmAppModel) DeleteSCMApp(scmAppID int64) error {
+	app, err := model.GetScmAppByID(scmAppID)
+	if err != nil {
+		return err
+	}
+	app.MarkDeleted()
+	_, err = model.ormer.Delete(app)
+	return err
 }
 
 // GetCompileEnvsByPagination ..
@@ -88,78 +110,6 @@ func (model *ScmAppModel) GetScmAppsByPagination(filter *query.FilterQuery) (*qu
 	rst.Item = scmApplist
 
 	return rst, nil
-}
-
-// GetGitRepoByID ...
-func (model *ScmAppModel) GetGitRepoByID(repoID int64) (*models.RepoServer, error) {
-	app := models.RepoServer{}
-	err := model.ormer.QueryTable(model.repoServerTableName).
-		Filter("deleted", false).
-		Filter("id", repoID).One(&app)
-	return &app, err
-}
-
-// GetReposByprojectID ..
-func (model *ScmAppModel) GetReposByprojectID(cID int64) ([]*models.RepoServer, error) {
-	repos := []*models.RepoServer{}
-	_, err := model.ormer.QueryTable(model.repoServerTableName).
-		Filter("deleted", false).
-		Filter("cid", cID).All(&repos)
-	return repos, err
-}
-
-// GetRepoBycIDAndType ..
-func (model *ScmAppModel) GetRepoBycIDAndType(cID int64, repoType string) (*models.RepoServer, error) {
-	repo := models.RepoServer{}
-	err := model.ormer.QueryTable(model.repoServerTableName).
-		Filter("deleted", false).
-		Filter("cid", cID).
-		Filter("type", strings.ToLower(repoType)).One(&repo)
-	return &repo, err
-}
-
-// GetRepoByID ..
-func (model *ScmAppModel) GetRepoByID(repoID int64) (*models.RepoServer, error) {
-	repo := models.RepoServer{}
-	err := model.ormer.QueryTable(model.repoServerTableName).
-		Filter("deleted", false).
-		Filter("id", repoID).One(&repo)
-	return &repo, err
-}
-
-// CreateDefaultRepo ..
-func (model *ScmAppModel) CreateDefaultRepo(cID int64, repoType string) error {
-	rs := &models.RepoServer{
-		CID:  cID,
-		Type: strings.ToLower(repoType),
-	}
-	if _, err := model.createRepo(rs); err != nil {
-		return err
-	}
-	return nil
-}
-
-// UpdateRepo ...
-func (model *ScmAppModel) UpdateRepo(repo *models.RepoServer) error {
-	_, err := model.ormer.Update(repo)
-	return err
-}
-
-func (model *ScmAppModel) createRepo(rs *models.RepoServer) (int64, error) {
-	_, id, err := model.ormer.ReadOrCreate(rs, "type", "deleted", "cid")
-	return id, err
-}
-
-// GetGitApps ...
-func (model *ScmAppModel) GetGitApps(appIDs []int64) ([]*models.ScmApp, error) {
-	apps := []*models.ScmApp{}
-	qs := model.ormer.QueryTable(model.scmAppTableName).Filter("deleted", false)
-	if appIDs != nil {
-		qs = qs.Filter("id__in", appIDs)
-	}
-
-	_, err := qs.All(&apps)
-	return apps, err
 }
 
 // CreateAppBranchIfNotExist ...

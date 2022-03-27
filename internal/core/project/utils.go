@@ -121,43 +121,11 @@ func (pm *ProjectManager) deleteProjectUser(users []string, role string, project
 	return nil
 }
 
-func (pm *ProjectManager) formatProjectAppResp(modelApp *models.ProjectApp) (*ProjectAppRsp, error) {
-	// Get App Branches
-	branches, err := pm.scmAppModel.GetAppBranches(modelApp.ID)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: branchList get need commbined
-	branchList := []string{}
-	for _, branch := range branches {
-		branchList = append(branchList, branch.BranchName)
-	}
-	if len(branchList) == 0 {
-		branchList = []string{"master"}
-	}
-	compileEnvName := ""
-	if modelApp.CompileEnvID != 0 {
-		compileEnv, err := pm.settingModel.GetCompileEnvByID(modelApp.CompileEnvID)
-		if err != nil {
-			log.Log.Error("get compile env by id: %v error: %s", modelApp.CompileEnvID, err.Error())
-		} else {
-			compileEnvName = compileEnv.Name
-		}
-	}
-
-	return &ProjectAppRsp{
-		ProjectApp:        modelApp,
-		CompileEnv:        compileEnvName,
-		BranchHistoryList: branchList,
-	}, nil
-
-}
-
 func (pm *ProjectManager) formatProjectAppsResp(modelApps []*models.ProjectApp) ([]*ProjectAppRsp, error) {
 	projectAppsRsp := []*ProjectAppRsp{}
 	for _, app := range modelApps {
 		// Get App Branches
-		branches, err := pm.scmAppModel.GetAppBranches(app.ID)
+		branches, err := pm.scmAppModel.GetAppBranches(app.ScmID)
 		if err != nil {
 			return nil, err
 		}
@@ -177,8 +145,20 @@ func (pm *ProjectManager) formatProjectAppsResp(modelApps []*models.ProjectApp) 
 		// } else {
 		// 	compileEnvName = compileEnv.Name
 		// }
+
+		scmapp, err := pm.scmAppModel.GetScmAppByID(app.ScmID)
+		if err != nil {
+			return nil, err
+		}
+
 		projectAppRsp := &ProjectAppRsp{
 			ProjectApp: app,
+			Name:       scmapp.Name,
+			FullName:   scmapp.FullName,
+			Language:   scmapp.Language,
+			Path:       scmapp.Path,
+			Dockerfile: scmapp.Dockerfile,
+			BuildPath:  scmapp.BuildPath,
 			// CompileEnv:        compileEnvName,
 			BranchHistoryList: branchList,
 		}

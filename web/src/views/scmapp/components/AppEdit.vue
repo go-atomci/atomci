@@ -109,7 +109,6 @@ export default {
       this.isEdit = flag;
       this.form = {
         name: item.name || '',
-        // TODO: comment app type tmp
         language: item.language || '',
         path: item.path || '',
         compile_env_id: item.compile_env_id || 0,

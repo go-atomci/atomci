@@ -74,7 +74,7 @@
               <el-button type="text" size="small" @click="$refs.appRegister.doCreate(false, scope.row)">
                 {{$t('bm.deployCenter.edit')}}
               </el-button> 
-              <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
+              <el-button type="text" size="small" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectID, scope.row.id)">
                 {{$t('bm.deployCenter.delete')}}
               </el-button>           
               <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
@@ -85,16 +85,19 @@
         </el-table>
       </template>
       <page-nav ref="pages" :list="listCol" v-on:getlist="getList"></page-nav>
+      <common-delete ref="commonDelete" v-on:getlist="getList"></common-delete>
       <app-arrange ref="appArrange" :envList="envStageList" :appList="projectAppList"></app-arrange>
-      <project-app-register ref="appRegister" :scmAppList="scmAppList"></project-app-register>
+      <project-app-register ref="appRegister" :scmAppList="scmAppList" v-on:getlist="getList"></project-app-register>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+  import { MessageBox } from 'element-ui';
 import backend from '@/api/backend';
 import ListSearch from '@/components/utils/ListSearch';
+import CommonDelete from '@/components/utils/Delete';
 import PageNav from '@/components/utils/PageList';
 import Refresh from '@/components/utils/Refresh';
 import listTemplate from '@/common/listTemplate';
@@ -142,6 +145,7 @@ export default {
   components: {
     ListSearch,
     PageNav,
+    CommonDelete,
     Refresh,
     AppArrange,
     ProjectAppRegister,
@@ -205,14 +209,17 @@ export default {
         }
       });
     },
-    // 代码仓库详情
-    appDetail(scmAppId, tabs) {
-      this.$router.push({
-        name: 'scmAppDetail',
-        params: {
-          appId: scmAppId,
-        },
-      });
+    // 我的应用-应用详情
+    appDetail(scmAppId) {
+      MessageBox.confirm('确定要进入“我的应用 / 应用详情” 页面 ？', '提示', { type: 'warning' }).then(() => {
+        this.$router.push({
+          name: 'scmAppDetail',
+          params: {
+            appId: scmAppId,
+          },
+        });
+      }).catch(() => { });
+      
     },
     changeFilterTxt(val, type) {
       this.searchVal = val;

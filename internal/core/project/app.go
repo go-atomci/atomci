@@ -25,15 +25,14 @@ import (
 )
 
 // CreateProjectApp ...
-func (pm *ProjectManager) CreateProjectApp(projectID int64, item *ProjectAppReq, creator, cName string) error {
+func (pm *ProjectManager) CreateProjectApp(projectID int64, item *ProjectAppReq, creator string) error {
 	log.Log.Debug("request params: %+v", item)
 
 	projectAppModel := models.ProjectApp{
 		Addons:    models.NewAddons(),
 		Creator:   creator,
 		ProjectID: projectID,
-		// TODO: need added
-		ScmID: 0,
+		ScmID:     item.SCMID,
 	}
 
 	_, err := pm.model.CreateProjectAppIfNotExist(&projectAppModel)
@@ -54,15 +53,6 @@ func (pm *ProjectManager) GetProjectApps(projectID int64) ([]*ProjectAppRsp, err
 	return pm.formatProjectAppsResp(modelProjectApps)
 }
 
-// GetProjectApp ..
-func (pm *ProjectManager) GetProjectApp(projectAppID int64) (*ProjectAppRsp, error) {
-	app, err := pm.model.GetProjectApp(projectAppID)
-	if err != nil {
-		return nil, err
-	}
-	return pm.formatProjectAppResp(app)
-}
-
 // GetProjectAppsByPagination ..
 func (pm *ProjectManager) GetProjectAppsByPagination(projectID int64, filter *models.ProejctAppFilterQuery) (*query.QueryResult, error) {
 	apps, modelDatas, err := pm.model.GetProjectAppsList(projectID, filter)
@@ -80,7 +70,7 @@ func (pm *ProjectManager) GetProjectAppsByPagination(projectID int64, filter *mo
 }
 
 // DeleteProjectApp ...
-func (pm *ProjectManager) DeleteProjectApp(projectAppID int64, cName string) error {
+func (pm *ProjectManager) DeleteProjectApp(projectAppID int64) error {
 	log.Log.Debug("delete project app, projectAppID: %v", projectAppID)
 
 	_, err := pm.model.GetProjectApp(projectAppID)
@@ -100,51 +90,14 @@ func (pm *ProjectManager) DeleteProjectApp(projectAppID int64, cName string) err
 
 // UpdateProjectApp ..
 func (pm *ProjectManager) UpdateProjectApp(projectID, projectAppID int64, req *ProjectAppUpdateReq) error {
-	log.Log.Debug("update app projectAppID: %v, params: %+v", projectAppID, req)
-	if req.Name == "" {
-		return fmt.Errorf("请输入有效的『仓库名』")
-	}
-
-	if req.Path == "" {
-		return fmt.Errorf("请输入有效的『路径』")
+	_, err := pm.model.GetProjectAppByScmID(projectID, req.ScmID)
+	if err == nil {
+		return fmt.Errorf("already exist scmid: %v register", req.ScmID)
 	}
 	projectApp, err := pm.model.GetProjectApp(projectAppID)
 	if err != nil {
 		return err
 	}
-
-	if req.BuildPath == "" {
-		projectApp.BuildPath = "/"
-	} else {
-		projectApp.BuildPath = req.BuildPath
-	}
-
-	if req.Dockerfile == "" {
-		projectApp.Dockerfile = "Dockerfile"
-	} else {
-		projectApp.Dockerfile = req.Dockerfile
-	}
-
-	projectApp.BranchName = req.BranchName
-	projectApp.CompileEnvID = req.CompileEnvID
-	projectApp.Language = req.Language
-	projectApp.Name = req.Name
-	projectApp.Path = req.Path
-	return pm.model.UpdateProjectApp(projectApp)
-}
-
-// SwitchAppBranch ..
-func (pm *ProjectManager) SwitchAppBranch(projectID, projectAppID int64, req *ProjectAppBranchUpdateReq) error {
-	log.Log.Debug("switch app branch projectAppID: %v, params: %+v", projectAppID, req)
-	branch, err := pm.scmAppModel.GetAppBranchByName(req.AppID, req.BranchName)
-	if err != nil {
-		return fmt.Errorf("when get app branch, occur error: %s", err.Error())
-	}
-	projectApp, err := pm.model.GetProjectApp(projectAppID)
-	if err != nil {
-		return err
-	}
-	projectApp.BranchName = req.BranchName
-	projectApp.Path = branch.Path
+	projectApp.ScmID = req.ScmID
 	return pm.model.UpdateProjectApp(projectApp)
 }

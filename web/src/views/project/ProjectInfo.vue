@@ -305,7 +305,6 @@ export default {
   },
   created() {
     //角色、成员下拉框初始化
-    // TODO: group name use default 
     const groupName = 'system';
     if(this.isSysAdmin === 1) {
       backend.getGroupViewList(groupName, (data) => {
@@ -329,10 +328,7 @@ export default {
             return;
           }
         });
-        // const groupName = this.userInfo.groups[0].group;
-        // TODO: group name use default 
-        const groupName = "system";
-        backend.getProjectUser(groupName, checkRole, (data) => {
+        backend.getProjectUser("system", checkRole, (data) => {
           this.memberList = data.users;
         });
       } else {

@@ -209,7 +209,7 @@ export default {
       }
     },
     getIntegrateRepos() {
-      backend.getRepos((data) => {
+      backend.getIntegrateRepos((data) => {
         if (data) {
           this.integrateRepos = data;
         }

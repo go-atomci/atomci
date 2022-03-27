@@ -106,19 +106,9 @@ func (t *ProjectUser) TableName() string {
 // ProjectApp ...
 type ProjectApp struct {
 	Addons
-	Creator   string `orm:"column(creator);size(64);null" json:"creator"`
-	ProjectID int64  `orm:"column(project_id)" json:"project_id"`
-	ScmID     int64  `orm:"column(scm_id)" json:"scm_id"`
-	// TODO: clean
-	Name              string   `orm:"column(name);size(64)" json:"name"`
-	FullName          string   `orm:"column(full_name);size(64)" json:"full_name"`
-	Language          string   `orm:"column(language);size(64)" json:"language"`
-	BranchName        string   `orm:"column(branch_name);size(64)" json:"branch_name"`
-	Path              string   `orm:"column(path);size(255)" json:"path"`
-	RepoID            int64    `orm:"column(repo_id)" json:"repo_id"`
-	CompileEnvID      int64    `orm:"column(compile_env_id);size(64)" json:"compile_env_id"`
-	BuildPath         string   `orm:"column(build_path);size(64)" json:"build_path"`
-	Dockerfile        string   `orm:"column(dockerfile);size(256)" json:"dockerfile"`
+	Creator           string   `orm:"column(creator);size(64);null" json:"creator"`
+	ProjectID         int64    `orm:"column(project_id)" json:"project_id"`
+	ScmID             int64    `orm:"column(scm_id)" json:"scm_id"`
 	BranchHistoryList []string `orm:"-" json:"branch_history_list"`
 }
 

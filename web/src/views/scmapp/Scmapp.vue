@@ -4,7 +4,7 @@
       <notice-bar v-if="releaseSetingMsg" :msg="releaseSetingMsg" />
       <div class="portlet-body mt0">
         <el-row style="display: flex">
-           <el-col class="w320 mt10 mr16">
+          <el-col class="w320 mt10 mr16">
             <el-input v-model="searchName" @keyup.enter.native="getList" auto-complete="off" maxlength="20" placeholder="应用名称/创建者"></el-input>
           </el-col>
           <el-col class="w320 mt10 mr16">
@@ -35,7 +35,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="tags" label="应用标签" sortable　min-width="12%" :show-overflow-tooltip=true />
-          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="8%" :show-overflow-tooltip=true />
+          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="10%" :show-overflow-tooltip=true />
           <el-table-column prop="language" :label="$t('bm.deployCenter.buildLang')" sortable min-width="8%" :show-overflow-tooltip=true />
           <el-table-column prop="build_path" :label="$t('bm.deployCenter.buildPath')" min-width="8%" :show-overflow-tooltip=true />
           <el-table-column prop="path" :label="$t('bm.infrast.repositoryAdr')" min-width="25%" :show-overflow-tooltip=true>
@@ -190,14 +190,7 @@ export default {
       
     };
   },
-  watch: {
-    // 如果是从项目详情删除过来的话则必须重新刷新列表数据
-    $route(to, from) {
-      if (this.$route.query.isRefresh && from.name === 'projectDetail') {
-        this.getList();
-      }
-    },
-  },
+  watch: {},
   components: {
     PageNav,
     ListSearch,
@@ -227,7 +220,7 @@ export default {
         name: 'addScmApp',
       });
     },
-    // 代码仓库详情
+    // 应用详情
     appDetail(scmAppId) {
       this.$router.push({
         name: 'scmAppDetail',

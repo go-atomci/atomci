@@ -36,7 +36,7 @@ type PipelineManager struct {
 	modelPublishJob *dao.PublishJobModel
 	modelK8s        *dao.K8sClusterModel
 	appHandler      *appmgr.AppManager
-	// TODO: model app, model app arrnage  change to appHandler
+	// TODO: modelApp, modelAppArrnage change to appHandler
 	modelApp        *dao.ScmAppModel
 	modelAppArrange *dao.AppArrangeModel
 	settingsHandler *settings.SettingManager

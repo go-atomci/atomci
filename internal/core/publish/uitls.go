@@ -175,11 +175,16 @@ func (pm *PublishManager) getPublishInfoApps(publishID int64) ([]*PublishInfoApp
 			logs.Warn("publish app is not found, by project app id: %v, error: %s", app.ProjectAppID, err.Error())
 			continue
 		}
+		scpApp, err := pm.gitAppModel.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			logs.Warn("get scm by id %v error: %s", projectApp.ScmID, err.Error())
+			continue
+		}
 		infoApp := &PublishInfoApp{
 			PublishApp: app,
-			Language:   projectApp.Language,
-			Name:       projectApp.Name,
-			// TODO: use hard code defined app type
+			Language:   scpApp.Language,
+			Name:       scpApp.Name,
+			// use hard code defined app type
 			Type: "app",
 		}
 		infoApps = append(infoApps, infoApp)

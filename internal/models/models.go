@@ -171,7 +171,6 @@ func initOrm() {
 		new(Project),
 		new(ProjectUser),
 		new(ProjectApp),
-		new(RepoServer),
 		new(FlowComponent),
 		new(TaskTmpl),
 

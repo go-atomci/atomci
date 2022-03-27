@@ -23,10 +23,8 @@ import (
 	"github.com/go-atomci/atomci/internal/core/settings"
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
-	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
 
-	"github.com/astaxie/beego/orm"
 	"github.com/drone/go-scm/scm"
 )
 
@@ -51,50 +49,6 @@ func NewAppManager() *AppManager {
 // AppBranches ...
 func (manager *AppManager) AppBranches(appID int64, filter *query.FilterQuery) (*query.QueryResult, error) {
 	return manager.scmAppModel.GetAppBranchesByPagination(appID, filter)
-}
-
-// GetRepos ..
-// TODO: clean
-func (manager *AppManager) GetRepos(projectID int64) ([]*RepoServerRsp, error) {
-	repos := []*models.RepoServer{}
-	// TODO: support code repository defined,
-	defaultRepos := []string{"gitlab", "github", "gitee", "gitea"}
-	// defaultRepos := []string{"gitlab"}
-	for _, item := range defaultRepos {
-		_, err := manager.scmAppModel.GetRepoBycIDAndType(projectID, item)
-		if err != nil {
-			if err == orm.ErrNoRows {
-				if err := manager.scmAppModel.CreateDefaultRepo(projectID, item); err != nil {
-					log.Log.Error("create default repos failed: %v", err.Error())
-					return nil, fmt.Errorf("网络异常，请重试")
-				}
-				_, err = manager.scmAppModel.GetRepoBycIDAndType(projectID, item)
-				if err != nil {
-					log.Log.Error("after create, get repos occur error: %v", err.Error())
-					return nil, fmt.Errorf("网络异常，请重试")
-				}
-			} else {
-				return nil, err
-			}
-		}
-	}
-	repos, err := manager.scmAppModel.GetReposByprojectID(projectID)
-	if err != nil {
-		return nil, fmt.Errorf("网络异常，请重试")
-	}
-	rsp := []*RepoServerRsp{}
-	for _, repoItem := range repos {
-		itemRsp := &RepoServerRsp{
-			SetupRepo: SetupRepo{
-				User:    repoItem.User,
-				BaseURL: repoItem.BaseURL,
-			},
-			Type:   repoItem.Type,
-			RepoID: repoItem.ID,
-		}
-		rsp = append(rsp, itemRsp)
-	}
-	return rsp, nil
 }
 
 // GetScmProjectsByRepoID ..

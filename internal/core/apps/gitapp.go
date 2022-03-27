@@ -98,19 +98,22 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 
 // SyncAppBranches ...
 func (manager *AppManager) SyncAppBranches(appID int64) error {
-	projectApp, _ := manager.projectModel.GetProjectApp(appID)
-	repoModel, err := manager.scmAppModel.GetRepoByID(projectApp.RepoID)
+	scmApp, _ := manager.scmAppModel.GetScmAppByID(appID)
+	scmIntegrateResp, err := manager.settingsHandler.GetSCMIntegrateSettinByID(scmApp.RepoID)
 	if err != nil {
-		log.Log.Error("GetRepoByID occur error: %v", err.Error())
+		return err
+	}
+	if err != nil {
+		log.Log.Error("getCompileEnvByID occur error: %v", err.Error())
 		return fmt.Errorf("网络错误，请重试")
 	}
-	client, err := NewScmProvider(repoModel.Type, projectApp.Path, repoModel.Token)
+	client, err := NewScmProvider(scmIntegrateResp.Type, scmApp.Path, scmIntegrateResp.Token)
 	branchList := []*scm.Reference{}
 	listOptions := scm.ListOptions{
 		Page: 1,
 		Size: 100,
 	}
-	got, res, err := client.Git.ListBranches(context.Background(), projectApp.FullName, listOptions)
+	got, res, err := client.Git.ListBranches(context.Background(), scmApp.FullName, listOptions)
 	if err != nil {
 		return fmt.Errorf("when get branches list from gitlab occur error: %s", err.Error())
 	}
@@ -118,7 +121,7 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 
 	for i := 1; i < res.Page.Last; {
 		listOptions.Page++
-		got, _, err := client.Git.ListBranches(context.Background(), projectApp.FullName, listOptions)
+		got, _, err := client.Git.ListBranches(context.Background(), scmApp.FullName, listOptions)
 		if err != nil {
 			return fmt.Errorf("when get branches list from gitlab occur error: %s", err.Error())
 		}
@@ -140,14 +143,14 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 		if originBranch.BranchName == "" {
 			appBranch := &models.AppBranch{
 				BranchName: branch.Name,
-				Path:       projectApp.Path,
+				Path:       scmApp.Path,
 				AppID:      appID,
 			}
 			if _, err := manager.scmAppModel.CreateAppBranchIfNotExist(appBranch); err != nil {
 				return err
 			}
 		} else {
-			originBranch.Path = projectApp.Path
+			originBranch.Path = scmApp.Path
 			if err := manager.scmAppModel.UpdateAppBranch(originBranch); err != nil {
 				return err
 			}
@@ -206,6 +209,90 @@ func (manager *AppManager) CreateSCMApp(item *ScmAppReq, creator string) error {
 }
 
 // GetProjectAppsByPagination ..
+func (manager *AppManager) GetScmApps() ([]*models.ScmApp, error) {
+	return manager.scmAppModel.GetScmApps()
+}
+
+// GetProjectAppsByPagination ..
 func (manager *AppManager) GetScmAppsByPagination(filter *query.FilterQuery) (*query.QueryResult, error) {
 	return manager.scmAppModel.GetScmAppsByPagination(filter)
+}
+
+func (manager *AppManager) GetScmApp(appID int64) (*SCMAppRsp, error) {
+	app, err := manager.scmAppModel.GetScmAppByID(appID)
+	if err != nil {
+		return nil, err
+	}
+	return manager.formatscmAppResp(app)
+}
+
+// UpdateProjectApp ..
+func (manager *AppManager) UpdateProjectApp(scmAppID int64, req *ScmAppUpdateReq) error {
+	log.Log.Debug("update app projectAppID: %v, params: %+v", scmAppID, req)
+	if req.Name == "" {
+		return fmt.Errorf("请输入有效的『仓库名』")
+	}
+
+	if req.Path == "" {
+		return fmt.Errorf("请输入有效的『路径』")
+	}
+	scmApp, err := manager.scmAppModel.GetScmAppByID(scmAppID)
+	if err != nil {
+		return err
+	}
+
+	if req.BuildPath == "" {
+		scmApp.BuildPath = "/"
+	} else {
+		scmApp.BuildPath = req.BuildPath
+	}
+
+	if req.Dockerfile == "" {
+		scmApp.Dockerfile = "Dockerfile"
+	} else {
+		scmApp.Dockerfile = req.Dockerfile
+	}
+
+	scmApp.BranchName = req.BranchName
+	scmApp.CompileEnvID = req.CompileEnvID
+	scmApp.Language = req.Language
+	scmApp.Name = req.Name
+	scmApp.Path = req.Path
+	return manager.scmAppModel.UpdateSCMApp(scmApp)
+}
+
+func (manager *AppManager) DeleteSCMApp(scmAppID int64) error {
+	log.Log.Debug("delete project app, scmAppID: %v", scmAppID)
+
+	_, err := manager.scmAppModel.GetScmAppByID(scmAppID)
+	if err != nil {
+		log.Log.Error("when delete scm app, get scm app occur error: %s", err.Error())
+		return fmt.Errorf("当前代码库可能已经删除，请你刷新页面后重试")
+	}
+
+	// TODO: add publish order verify
+	err = manager.scmAppModel.DeleteSCMApp(scmAppID)
+	if err != nil {
+		return err
+	}
+	// TODO: delete app service constraint
+	return nil
+}
+
+func (manager *AppManager) formatscmAppResp(modelApp *models.ScmApp) (*SCMAppRsp, error) {
+	compileEnvName := ""
+	if modelApp.CompileEnvID != 0 {
+		compileEnv, err := manager.settingsHandler.GetCompileEnvByID(modelApp.CompileEnvID)
+		if err != nil {
+			log.Log.Error("get compile env by id: %v error: %s", modelApp.CompileEnvID, err.Error())
+		} else {
+			compileEnvName = compileEnv.Name
+		}
+	}
+
+	return &SCMAppRsp{
+		ScmApp:     modelApp,
+		CompileEnv: compileEnvName,
+	}, nil
+
 }

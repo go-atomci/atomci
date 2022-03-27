@@ -208,10 +208,8 @@ router.beforeEach((to, from, next) => {
                         if (data && data.user) {
                             store.dispatch('user/setUserInfo', data);
 
-                            // TODO: dynamically add accessible routes
                             // generate accessible routes map based on roles
                             const accessRoutes = generateRoutes(data.admin)
-                            
                             
                             // dynamically add accessible routes
                             router.addRoutes(accessRoutes)

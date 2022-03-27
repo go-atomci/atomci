@@ -26,7 +26,6 @@ import (
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
-	"github.com/go-atomci/atomci/utils"
 	"github.com/go-atomci/atomci/utils/errors"
 	"github.com/go-atomci/atomci/utils/query"
 
@@ -183,7 +182,7 @@ func (pm *ProjectManager) UpdateProject(user string, projectID int64, p *Project
 	modelProject.Description = p.Description
 	// if p.Owner changed, update project constraint
 	if UpdateConstraint {
-		// TODO: add project constraint for owner, group use taimei
+		// TODO: add project constraint for owner
 		if err := dao.AddGroupUserConstraintValues("system", p.Owner, "projectID", []string{strconv.Itoa(int(projectID))}); err != nil {
 			return err
 		}
@@ -230,21 +229,6 @@ func (pm *ProjectManager) GetProjectInfo(projectID int64) (*models.ProjectDetail
 	}
 
 	return rsp, nil
-}
-
-// CheckProjectUser ..
-func (pm *ProjectManager) CheckProjectUser(projectID int64, user string, groupsAdminList []string) (bool, error) {
-	project, err := pm.model.GetProjectByID(projectID)
-	if err != nil {
-		err = fmt.Errorf("when check project user, get project occur error: %s", err)
-		log.Log.Error("%v", err)
-		return false, err
-	}
-	if project.Owner == user {
-		return true, nil
-	}
-	// TODO: deprecated delete project Department
-	return utils.Contains(groupsAdminList, "taimei"), nil
 }
 
 // DeleteProject ...

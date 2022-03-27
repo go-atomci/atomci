@@ -476,10 +476,10 @@ func (model *ProjectModel) GetProjectAppsList(projectID int64, filter *models.Pr
 
 // CreateProjectAppIfNotExist ...
 func (model *ProjectModel) CreateProjectAppIfNotExist(app *models.ProjectApp) (int64, error) {
-	created, id, err := model.ormer.ReadOrCreate(app, "project_id", "name", "repo_id", "deleted")
+	created, id, err := model.ormer.ReadOrCreate(app, "project_id", "scm_id", "deleted")
 	if err == nil {
 		if !created {
-			err = fmt.Errorf(fmt.Sprintf("app: %v existed in project", app.FullName))
+			err = fmt.Errorf(fmt.Sprintf("app: %v existed in project", app.ScmID))
 		}
 	}
 	return id, err
@@ -522,6 +522,15 @@ func (model *ProjectModel) GetProjectApp(projectAppID int64) (*models.ProjectApp
 	if projectAppID != 0 {
 		qs = qs.Filter("id", projectAppID)
 	}
+	err := qs.One(&app)
+	return &app, err
+}
+
+// GetProjectApp ...
+func (model *ProjectModel) GetProjectAppByScmID(projectID, scmID int64) (*models.ProjectApp, error) {
+	app := models.ProjectApp{}
+	qs := model.ormer.QueryTable(model.projectAppTableName).Filter("deleted", false)
+	qs = qs.Filter("scm_id", scmID).Filter("project_id", projectID)
 	err := qs.One(&app)
 	return &app, err
 }
