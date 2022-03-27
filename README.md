@@ -180,7 +180,5 @@ __AtomCI__ 因你而变。
 |`ldap::baseDN`| OU=Xxx,DC=xx,DC=com | |
 | JWT 配置 <br/>|
 |`jwt::secret`| changemeforsecurity |　jwt的加密使用的字段，建议修改 |
-| K8s配置　<br/> |
-|`k8s::configPath`| ./conf/k8sconfig | k8s 配置文件存放路径，不建议修改|
 |<br/>|
 |`atomci::url`| http://localhost:8080 | AtomCI 回调地址　|
