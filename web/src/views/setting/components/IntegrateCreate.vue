@@ -22,17 +22,26 @@
         <el-input v-model.trim="form.name" auto-complete="off" maxlength="60" placeholder="请输入名称" :disabled="isKubernetes"></el-input>
       </el-form-item>
       <el-form-item label="配置类型" prop="type" class="form-item">
-        <el-select v-model="form.type" placeholder="请选择" filterable :disabled="isEdit">
+        <el-select v-model="form.type" placeholder="请选择" filterable :disabled="isEdit" @change="selectChange">
           <el-option v-for="(item, index) in settingTypeList" :key="index" :label="item.name" :value="item.name">
           </el-option>
         </el-select>
       </el-form-item>
       <div v-if="form.type ==='kubernetes'">
-        <el-form-item label="Kubernetes URL" prop="config.url" class="form-item">
+        <el-form-item label="认证类型" prop="config.type" class="form-item">
+          <el-radio-group v-model="form.config.type">
+            <el-radio label="kubernetesConfig">Kubernetes Config</el-radio>
+            <el-radio label="kubernetesToken">Service Account Token</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="form.config.type==='kubernetesToken'" label="Kubernetes URL" prop="config.url" class="form-item">
           <el-input v-model.trim="form.config.url" auto-complete="off" placeholder="请输入Kubernetes地址"></el-input>
         </el-form-item>
-        <el-form-item label="Kubernetes Config" prop="config.conf" class="form-item">
+        <el-form-item v-if="form.config.type==='kubernetesConfig'" label="Kubernetes Config" prop="config.conf" class="form-item">
           <el-input type="textarea" :rows="8" v-model="form.config.conf" placeholder="请输入Kubernetes Config"></el-input>
+        </el-form-item>
+        <el-form-item v-else-if="form.config.type==='kubernetesToken'" label="Kubernetes Token" prop="config.conf" class="form-item">
+          <el-input type="textarea" :rows="8" v-model="form.config.conf" placeholder="请输入Kubernetes Token"></el-input>
         </el-form-item>
       </div>
       <div v-else-if="form.type ==='jenkins'">
@@ -141,6 +150,9 @@ export default {
         'config.token': [
           { required: true, message: '请输入token信息', trigger: 'blur' },
         ],
+        'config.type': [
+          { required: true, message: '请选择类型', trigger: 'blur' },
+        ],
         description: [
           { required: false, message: '描述信息不能为空', trigger: 'blur' },
         ],
@@ -155,7 +167,15 @@ export default {
   },
   created() {
   },
+
   methods: {
+    selectChange(newVal){
+      console.log("下拉改变",newVal)
+      if (this.form.type === 'kubernetes'){
+        if (this.form.config.type == null)
+          this.$set(this.form.config,"type","kubernetesConfig")
+      }
+    },
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {

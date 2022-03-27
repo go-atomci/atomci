@@ -17,53 +17,38 @@ limitations under the License.
 package kube
 
 import (
-	"sync"
-
+	"github.com/go-atomci/atomci/internal/core/settings"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
-var (
-	clusterClientsetMapMutex sync.RWMutex
-	clusterClientsetMap      = make(map[string]kubernetes.Interface)
-)
+func GetClientset(cluster string) (client kubernetes.Interface, cfg *rest.Config, err error) {
 
-func findClientset(cluster string) (client kubernetes.Interface, ok bool) {
-	clusterClientsetMapMutex.RLock()
-	defer clusterClientsetMapMutex.RUnlock()
-	client, ok = clusterClientsetMap[cluster]
-	return client, ok
+	pm := settings.NewSettingManager()
+	resp, err := pm.GetIntegrateSettingByName(cluster, settings.KubernetesType)
+	if err != nil {
+		return nil, nil, err
+	}
+	return buildK8sClient(resp.IntegrateSettingReq.Config.(*settings.KubeConfig))
 }
 
-func newClientset(cluster string) (client kubernetes.Interface, err error) {
-	var ok bool
-	clusterClientsetMapMutex.Lock()
-	defer clusterClientsetMapMutex.Unlock()
-	client, ok = clusterClientsetMap[cluster]
-	if !ok {
-		client, err = clientsetProvider(cluster)
-		if err == nil {
-			clusterClientsetMap[cluster] = client
+func buildK8sClient(kube *settings.KubeConfig) (client kubernetes.Interface, cfg *rest.Config, err error) {
+	var k8sConfig *rest.Config
+	switch kube.Type {
+	case settings.KubernetesConfig:
+		k8sConfig, err = clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
+		if err != nil {
+			return nil, nil, err
+		}
+	case settings.KubernetesToken:
+		k8sConfig = &rest.Config{
+			BearerToken:     kube.Conf,
+			TLSClientConfig: rest.TLSClientConfig{Insecure: true},
+			Host:            kube.URL,
 		}
 	}
-	return client, err
-}
 
-func GetClientset(cluster string) (client kubernetes.Interface, err error) {
-	var ok bool
-	client, ok = findClientset(cluster)
-	if !ok {
-		client, err = newClientset(cluster)
-	}
-	return client, err
-}
-
-func UpdateClientset(cluster string) (client kubernetes.Interface, err error) {
-	clusterClientsetMapMutex.Lock()
-	defer clusterClientsetMapMutex.Unlock()
-	client, err = clientsetProvider(cluster)
-	if err != nil {
-		return
-	}
-	clusterClientsetMap[cluster] = client
-	return
+	clientSet, err := kubernetes.NewForConfig(k8sConfig)
+	return clientSet, k8sConfig, err
 }

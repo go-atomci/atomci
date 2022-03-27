@@ -24,14 +24,10 @@ import (
 
 	"github.com/go-atomci/atomci/internal/cronjob"
 	_ "github.com/go-atomci/atomci/internal/initialize"
+	_ "github.com/go-atomci/atomci/internal/migrations"
 	_ "github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/pkg/kube"
 )
-
-func init() {
-	kube.Init()
-}
 
 func main() {
 	cronjob.RunPublishJobServer()

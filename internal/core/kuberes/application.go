@@ -144,7 +144,7 @@ func NewAppRes(cluster string, envID, projectID int64) (*AppRes, error) {
 			ProjectID: projectID,
 		}, nil
 	}
-	client, err := kube.GetClientset(cluster)
+	client, _, err := kube.GetClientset(cluster)
 	if err != nil {
 		if cluster != "" {
 			return nil, errors.NewInternalServerError().SetCause(err)
@@ -486,7 +486,7 @@ func (ar *AppRes) SetLabels(namespace, name string, labels map[string]string) er
 }
 
 func CreateK8sNamespace(cluster, namespace string) error {
-	client, err := kube.GetClientset(cluster)
+	client, _, err := kube.GetClientset(cluster)
 	if err != nil {
 		return err
 	}
@@ -505,7 +505,7 @@ func CreateK8sNamespace(cluster, namespace string) error {
 }
 
 func CreateRegistrySecret(cluster, namespace string, envID int64) error {
-	client, err := kube.GetClientset(cluster)
+	client, _, err := kube.GetClientset(cluster)
 	if err != nil {
 		log.Log.Warning(fmt.Sprintf("create registry secret failed: %v", err.Error()))
 		return err

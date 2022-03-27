@@ -18,7 +18,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/go-atomci/atomci/internal/migrations"
 	"os"
 	"time"
 
@@ -156,6 +155,5 @@ func init() {
 		return
 	}
 	initOrm()
-	migrations.InitMigration()
 	// orm.RunSyncdb("default", false, true)
 }

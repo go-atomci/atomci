@@ -40,10 +40,6 @@ baseDN = OU=Xxx,DC=xx,DC=com
 [jwt]
 secret = changemeforsecurity
 
-[k8s]
-# k8s相关配置文件默认保存地址，一般请不要修改
-configPath = ./conf/k8sconfig
-
 [atomci]
 # atomci后端服务地址，用于k8s/jenkins进行回调，因此请确保地址是可以被k8s集群(jenkins agent)访问到
 url = http://localhost:8080
