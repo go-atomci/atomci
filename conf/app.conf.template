@@ -1,5 +1,7 @@
+## 模板配置，承载完整最新的配置内容
 [default]
 appname = atomci
+# 默认监听端口
 httpport = 8080
 runmode = dev
 copyrequestbody = true
@@ -19,13 +21,15 @@ level = 7
 separate = ["error"]
 
 [DB]
-url = root:root@tcp(127.0.0.1:3306)/atomci_01?charset=utf8mb4&loc=Local
+# 数据库相关配置，目前仅支持mysql5.7+
+url = root:root@tcp(127.0.0.1:3306)/atomci?charset=utf8mb4&loc=Local
 debug = false
 rowsLimit = 5000
 maxIdelConns = 100
 maxOpenConns = 200
 
 [ldap]
+# 支持配置LDAP
 host = ldap.xxx.com
 port = 389
 bindDN = ldap@xx.com
@@ -36,15 +40,16 @@ baseDN = OU=Xxx,DC=xx,DC=com
 [jwt]
 secret = changemeforsecurity
 
-# build/deploy callback 
 [atomci]
+# atomci后端服务地址，用于k8s/jenkins进行回调，因此请确保地址是可以被k8s集群(jenkins agent)访问到
 url = http://localhost:8080
 
-# notification config
+# 通知配置
 [notification]
+# 钉钉通知
 dingEnable = 1
 ding = "https://oapi.dingtalk.com/robot/send?access_token=faketoken"
-
+# 邮件通知
 mailEnable = 1
 smtpHost = "smtp.host"
 smtpPort = 465
