@@ -242,17 +242,6 @@
     <to-build v-on:getprojectReleaseList="getVersionInfo" ref="goToBuild"></to-build>
     <version-add v-on:getlist="getVersionInfo" ref="versionAdd"></version-add>
     <publish-edit v-on:getPublishBaseInfo="getVersionBaseInfo" ref="publishEdit"></publish-edit>
-    <!-- <el-dialog title="详细日志" :visible.sync="viewLog.visiable" width="90%">
-      <div slot="title">
-        <div class="centers"><span>详细日志</span></div>
-        <div class="icons">
-       <i class="iconfont icon-minus" style="font-size: 24px"></i>
-       <i class="iconfont icon-full-screen" style="font-size: 24px"></i>
-       <i class="iconfont icon-close" style="font-size: 24px"></i>
-     </div>
-      </div>
-      <iframe :src="viewLog.url" frameborder="0" width="100%" scrolling="auto" class="viewlog" />
-    </el-dialog> -->
     <el-dialog
       v-dialogDrag
       ref="atomciDialog"
@@ -270,7 +259,7 @@
         <div class="selftitle">
           <span>详细日志</span>
           <div class="icons">
-            <i :class="viewLog.fullscreen ? 'el-icon-crop' : 'el-icon-full-screen'" @click="viewLog.fullscreen=!viewLog.fullscreen"></i>
+            <i :class="viewLog.fullscreen ? 'el-icon-bottom-left' : 'el-icon-full-screen'" @click="viewLog.fullscreen=!viewLog.fullscreen"></i>
             <i class="el-icon-close"  @click="viewLog.visiable=false"></i>
           </div>
         </div>
