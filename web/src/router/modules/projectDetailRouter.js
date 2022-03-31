@@ -63,13 +63,6 @@ export function projectDetailRouter() {
           component: () => import('@/views/project/detail/ProjectCIDetail.vue'),
           hidden: true
         },
-        {
-          path: '/project/projectPubDetail/:projectID/:jobName/:runId/:stageId',
-          name: 'projectPubDetail',
-          meta: { title: '日志详情', noCache: true },
-          component: () => import('@/views/project/detail/ProjectPubDetail.vue'),
-          hidden: true
-        },
       ]
     },
     {
