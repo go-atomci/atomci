@@ -144,34 +144,7 @@
       <to-build v-on:getprojectReleaseList="getVersionInfo" ref="goToBuild"></to-build>
       <version-add v-on:getlist="getVersionInfo" ref="versionAdd"></version-add>
       <publish-edit v-on:getPublishBaseInfo="getVersionBaseInfo" ref="publishEdit"></publish-edit>
-      <el-dialog
-      v-dialogDrag
-      ref="atomciDialog"
-      class="atomciDialog"
-      title="详细日志"
-      :fullscreen="viewLog.fullscreen"
-      :visible.sync="viewLog.visiable"
-      :append-to-body="true"
-      :close-on-click-modal="false"
-      :show-close="false"
-      width="90%"
-      center
-    >
-      <div slot="title" class="medium">
-        <div class="selftitle">
-          <span>详细日志</span>
-          <div class="icons">
-            <i :class="viewLog.fullscreen ? 'el-icon-bottom-left' : 'el-icon-full-screen'" @click="viewLog.fullscreen=!viewLog.fullscreen"></i>
-            <i class="el-icon-close"  @click="viewLog.visiable=false"></i>
-          </div>
-        </div>
-      </div>
-      <div class="dialogBody">
-        <slot>
-          <iframe :src="viewLog.url" frameborder="0" width="100%" scrolling="auto" class="viewlog" />
-        </slot>
-      </div>
-    </el-dialog>
+      <jenkins-log ref="jenkinsLog"></jenkins-log>
     </div>
 </template>
 
@@ -297,16 +270,6 @@
   .env-run {
     background-image: url(../../../assets/env_run.png);
   }
-  .viewlog {
-    width: 100%;
-    height: 100%;
-    min-height: 600px;
-  }
-  .selftitle>.icons{
-    display: flex;
-    float: right;
-    font-size:24px
-  }
 
 </style>
 <script>
@@ -322,6 +285,7 @@
   import ProjectDeploy from '../dialogCI/ProjectDeploy'; // 部署
   import versionAdd from '../dialogCI/ProjectVersionAdd'; //添加应用
   import PublishEdit from '../dialogCI/PublishEdit'; // 编辑版本
+  import JenkinsLog from "../components/JenkinsLog"; //查看Jenkins运行日志
 
 
 
@@ -337,14 +301,10 @@ export default {
       ],
       iconClass: ['env-error', 'env-done', 'env-run', 'env-next', 'env-done', 'env-done', 'env-next', 'env-done', 'env-error', 'env-error', 'env-error'],
       statusCheck: false,
-      viewLog: {
-        visiable: false,
-        fullscreen: false,
-        url: null,
-      },
     };
   },
   components: {
+    JenkinsLog,
     BackTo,
     NextStage,
     ToBuild,
@@ -446,15 +406,8 @@ export default {
         this.$refs.pages.total = data.total;
       });
     },
-    viewFile(item) {
-      backend.getJenkinsServer((data) => {
-        let jenkinsURL = data.jenkins;
-        if (jenkinsURL.endsWith('/')) {
-          jenkinsURL = jenkinsURL.slice(0, -1);
-        }
-        this.viewLog.url = `${jenkinsURL}/blue/organizations/jenkins/${item.job_name}/detail/${item.job_name}/${item.run_id}/pipeline/`;
-        this.viewLog.visiable = true;
-      }, item.stage_id);
+    viewFile(item){
+      this.$refs.jenkinsLog.doCreate(item.job_name,item.run_id,item.stage_id)
     },
     // 移除应用
     removeApp(id) {
