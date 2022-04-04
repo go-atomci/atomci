@@ -184,7 +184,6 @@ export default {
         .catch(_ => {});
     },
     doCreate(flag, item) {
-      console.log("test",item)
       this.isEdit = flag;
       this.isKubernetes = false
       if (flag) {

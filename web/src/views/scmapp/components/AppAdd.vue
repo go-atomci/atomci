@@ -255,10 +255,10 @@ export default {
   
           backend.addScmAppPro(cl, (data) => {
             Message.success('添加成功！');
-              this.dialogFormVisible = false
-              // TODO: fresh app list
-            });
-          }
+            this.$emit('getlist');
+            this.dialogFormVisible = false
+          });
+        }
       });
     },
     editPath(index) {

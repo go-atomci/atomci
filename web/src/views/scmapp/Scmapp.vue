@@ -229,13 +229,6 @@ export default {
         },
       });
     },
-    doEdit(id) {
-      backend.getProjectDetail(id, (data) => {
-        if(data) {
-          this.$refs.create.doCreate(true, data);
-        }
-      });
-    },
     getList(isRefresh) {
       if (isRefresh) {
         this.$refs.pages.currentPage = 1;
