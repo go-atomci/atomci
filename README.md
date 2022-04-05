@@ -1,5 +1,9 @@
 # atomci
 
+<a href="https://goreportcard.com/report/github.com/go-atomci/atomci"><img src="https://goreportcard.com/badge/github.com/go-atomci/atomci" alt="A+"></a>
+[![codecov](https://codecov.io/gh/go-atomci/atomci/branch/master/graph/badge.svg?token=VPJGT3405P)](https://codecov.io/gh/go-atomci/atomci)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/go-atomci/atomci/blob/master/LICENSE)
+
 AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
 
 * github: https://github.com/go-atomci/atomci
