@@ -374,6 +374,11 @@ const backendAPI = {
   getUserList(cb) {
     Package.httpMethods('get', '/atomci/api/v1/users', cb);
   },
+  // 获得项目成员列表数据
+  projectMemberByConstraint(id,cb) {
+    Package.httpMethods('get', `/atomci/api/v1/users/${id}/projectMemberByConstraint`, cb);
+  },
+
   // 创建用户
   addUser(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/users', cb, body);
