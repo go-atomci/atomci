@@ -238,3 +238,19 @@ func GetUserResourceConstraintValues(resourceType, user string) (UserResourceCon
 	conValues.Values = append(conValues.Values, values)
 	return conValues, nil
 }
+
+// GetProjectMemberByConstraint ..
+func GetProjectMemberByConstraint(projectId int64) ([]models.GroupUserConstraint, error) {
+	var user []models.GroupUserConstraint
+	query := GetOrmer().QueryTable("sys_group_user_constraint").Filter("deleted", false)
+	if projectId != 0 {
+		query = query.
+			Filter("constraint", "project_id").Filter("value", projectId)
+	}
+	_, err := query.All(&user)
+	if err != nil {
+		logs.Error("get project user by constraint error: %s", err.Error())
+		return user, err
+	}
+	return user, nil
+}

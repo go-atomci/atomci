@@ -51,6 +51,7 @@ func RegisterRoutes() {
 
 				beego.NSRouter("/users", &api.UserController{}, "get:UserList;post:CreateUser"),
 				beego.NSRouter("/users/:user", &api.UserController{}, "get:GetUser;put:UpdateUser;delete:DeleteUser"),
+				beego.NSRouter("/users/:project_id/projectMemberByConstraint", &api.UserController{}, "get:GetProjectMemberByConstraint"),
 				beego.NSRouter("/users/:user/resources/:resourceType/constraints/values", &api.UserController{}, "get:GetUserResourceConstraintValues"),
 
 				beego.NSRouter("/groups", &api.GroupController{}, "get:GroupList"),
