@@ -17,11 +17,12 @@ limitations under the License.
 package mycasbin
 
 import (
-	"github.com/astaxie/beego"
-	"github.com/go-atomci/atomci/internal/middleware/log"
 	glog "log"
 
-	beegoormadapter "github.com/casbin/beego-orm-adapter/v3"
+	"github.com/astaxie/beego"
+	"github.com/go-atomci/atomci/internal/middleware/log"
+
+	beegoormadapter "github.com/casbin/beego-orm-adapter/v2"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	_ "github.com/go-sql-driver/mysql"
