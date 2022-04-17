@@ -33,7 +33,7 @@ func (a *AppController) CreateSCMApp() {
 	req := &apps.ScmAppReq{}
 	a.DecodeJSONReq(&req)
 	mgr := apps.NewAppManager()
-	result := mgr.CreateSCMApp(req, a.User)
+	_, result := mgr.CreateSCMApp(req, a.User)
 	if result != nil {
 		a.HandleInternalServerError(result.Error())
 		log.Log.Error("add project app error: %s", result.Error())

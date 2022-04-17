@@ -1,10 +1,12 @@
 package migrations
 
 import (
-	"github.com/astaxie/beego/orm"
 	"os"
 	"sort"
 	"time"
+
+	"github.com/astaxie/beego/orm"
+	"github.com/go-atomci/atomci/internal/middleware/log"
 )
 
 type MigrationTypes []Migration
@@ -36,6 +38,7 @@ func initMigration() {
 		new(Migration20220101),
 		new(Migration20220309),
 		new(Migration20220324),
+		new(Migration20220414),
 	}
 
 	migrateInTx(migrationTypes)
@@ -54,6 +57,7 @@ func migrateInTx(migrationTypes MigrationTypes) {
 		if m.GetCreateAt().After(last) {
 			errRet = m.Upgrade(ormClient)
 			if errRet != nil {
+				log.Log.Error("migrate: %v, upgrade error: %v", m.GetCreateAt(), errRet.Error())
 				break
 			}
 		}

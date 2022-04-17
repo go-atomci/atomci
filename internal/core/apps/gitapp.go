@@ -174,7 +174,7 @@ func (manager *AppManager) SyncAppBranches(appID int64) error {
 }
 
 // CreateSCMApp ...
-func (manager *AppManager) CreateSCMApp(item *ScmAppReq, creator string) error {
+func (manager *AppManager) CreateSCMApp(item *ScmAppReq, creator string) (int64, error) {
 	log.Log.Debug("request params: %+v", item)
 
 	if item.BranchName == "" {
@@ -199,13 +199,13 @@ func (manager *AppManager) CreateSCMApp(item *ScmAppReq, creator string) error {
 		Dockerfile:   item.Dockerfile,
 	}
 
-	_, err := manager.scmAppModel.CreateScmAppIfNotExist(&scmAppModel)
+	id, err := manager.scmAppModel.CreateScmAppIfNotExist(&scmAppModel)
 	if err != nil {
 		log.Log.Error("create scm app error: %s", err)
-		return err
+		return 0, err
 	}
 
-	return nil
+	return id, nil
 }
 
 // GetProjectAppsByPagination ..
