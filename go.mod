@@ -32,7 +32,7 @@ replace (
 
 require (
 	github.com/astaxie/beego v1.12.1
-	github.com/casbin/beego-orm-adapter/v3 v3.0.2
+	github.com/casbin/beego-orm-adapter/v2 v2.0.2
 	github.com/casbin/casbin/v2 v2.37.4
 	github.com/colynn/go-ldap-client/v3 v3.0.0-20201016034829-4c1455a490de
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -48,7 +48,9 @@ require (
 	github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175
 	github.com/jarcoal/httpmock v1.1.0
 	github.com/kr/text v0.2.0 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pborman/uuid v1.2.0
+	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
