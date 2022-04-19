@@ -111,7 +111,7 @@ func (a *Adapter) close() {
 }
 
 func (a *Adapter) createTable() error {
-	return orm.RunSyncdb(a.dataSourceAlias, false, true)
+	return orm.RunSyncdb(a.dataSourceAlias, false, false)
 }
 
 func (a *Adapter) dropTable() error {
