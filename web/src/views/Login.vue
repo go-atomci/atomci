@@ -141,7 +141,6 @@ export default {
           //     console.log('go catch ...')
           //   })
           backend.login(this.loginForm, (response) => {
-              // TODO: set token
               setToken(response.token)
               // backend.setCookie("Authorization", response.token, 1800)
               console.log(this.redirect)

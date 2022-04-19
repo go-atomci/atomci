@@ -67,6 +67,22 @@ func (p *IntegrateController) GetIntegrateSettingsByPagination() {
 	p.ServeJSON()
 }
 
+func (p *IntegrateController) GetSCMIntegrateSettings() {
+	pm := settings.NewSettingManager()
+	rsp, err := pm.GetIntegrateSettings(constant.ScmIntegratetypes)
+	if err != nil {
+		p.HandleInternalServerError(err.Error())
+		log.Log.Error("Get integrate settings occur error: %s", err.Error())
+		return
+	}
+	// for security hidden config content
+	for _, item := range rsp {
+		item.IntegrateSettingReq.Config = nil
+	}
+	p.Data["json"] = NewResult(true, rsp, "")
+	p.ServeJSON()
+}
+
 // GetSCMIntegrateSettingsByPagination ..
 func (p *IntegrateController) GetSCMIntegrateSettingsByPagination() {
 	filterQuery := p.GetFilterQuery()

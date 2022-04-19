@@ -121,10 +121,10 @@ func initOrm() {
 		new(Audit),
 		new(GatewayRouter),
 
+		new(ScmApp),
 		new(Project),
 		new(ProjectUser),
 		new(ProjectApp),
-		new(RepoServer),
 		new(FlowComponent),
 		new(TaskTmpl),
 
@@ -150,7 +150,7 @@ func initOrm() {
 }
 
 // Init ...
-func init() {
+func InitDB() {
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		return
 	}

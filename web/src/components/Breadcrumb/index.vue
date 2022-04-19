@@ -36,8 +36,6 @@ export default {
       let matched = this.$route.matched.filter(item => item.meta && item.meta.title)
       const first = matched[0]
 
-      // console.log('xxxx breadcrumb:  ')
-      // console.log(first, first.name)
       const routerName  = first.name
       if (routerName.startsWith('project') && routerName !== 'projects') {
         matched = [{ path: '/project', meta: { title: '我的项目' }}].concat(matched)

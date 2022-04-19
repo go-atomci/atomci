@@ -115,21 +115,26 @@ func (pm *PipelineManager) generateCompileEnvParams(apps []*RunBuildAppReq) []co
 			logs.Warn("project app error: %s", err.Error())
 			continue
 		}
-
-		if projectApp.CompileEnvID == 0 {
-			log.Log.Debug("app: %v didnot setup complie env, use default docker runtime", projectApp.Name)
+		scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			logs.Warn("get scm app error: %s", err.Error())
 			continue
 		}
-		compileItem, err := pm.settingsHandler.GetCompileEnvByID(projectApp.CompileEnvID)
+
+		if scmApp.CompileEnvID == 0 {
+			log.Log.Debug("app: %v didnot setup complie env, use default docker runtime", scmApp.Name)
+			continue
+		}
+		compileItem, err := pm.settingsHandler.GetCompileEnvByID(scmApp.CompileEnvID)
 		if err != nil {
-			logs.Warn("get compile env by id:%v error: %s", projectApp.CompileEnvID, err.Error())
+			logs.Warn("get compile env by id:%v error: %s", scmApp.CompileEnvID, err.Error())
 		}
 		compileEnvItem := compileEnv{
 			Image:      compileItem.Image,
 			Args:       compileItem.Args,
 			Command:    compileItem.Command,
 			WorkingDir: "/home/jenkins/agent",
-			Name:       strings.ToLower(projectApp.Name),
+			Name:       strings.ToLower(scmApp.Name),
 		}
 		compileParams = append(compileParams, compileEnvItem)
 	}
@@ -344,18 +349,24 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		log.Log.Error("when crate build job, get project app error: %s", err.Error())
 		return 0, "", err
 	}
-	repoModel, err := pm.modelApp.GetGitRepoByID(projectApp.RepoID)
+	scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
 	if err != nil {
-		log.Log.Error("get GetGitRepoByID occur error: %v", err.Error())
-		return 0, "", fmt.Errorf("网络错误，请重试")
+		log.Log.Error("when crate build job, get scm app error: %s", err.Error())
+		return 0, "", err
 	}
 
-	baseURL := strings.Replace(repoModel.BaseURL, "http://", "", -1)
+	scmIntegrateResp, err := pm.settingsHandler.GetSCMIntegrateSettinByID(scmApp.RepoID)
+	if err != nil {
+		log.Log.Error("when crate build job, get scm integrate setting error: %s", err.Error())
+		return 0, "", err
+	}
+
+	baseURL := strings.Replace(scmIntegrateResp.URL, "http://", "", -1)
 	baseURL = strings.Replace(baseURL, "https://", "", -1)
 	if strings.HasSuffix(baseURL, "/") {
 		baseURL = strings.Replace(baseURL, "/", "", -1)
 	}
-	repoConfStr := fmt.Sprintf("{\"%s\":[\"%s\",\"%s\"]}", baseURL, repoModel.User, repoModel.Token)
+	repoConfStr := fmt.Sprintf("{\"%s\":[\"%s\",\"%s\"]}", baseURL, scmIntegrateResp.User, scmIntegrateResp.Token)
 
 	adminToken, err := pm.getUserToken("admin")
 	if err != nil {
@@ -627,12 +638,17 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 		return "", err
 	}
 
-	repoModel, err := pm.modelApp.GetRepoByID(projectApp.RepoID)
+	scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
 	if err != nil {
+		log.Log.Error("when get app code commit, get scm ap by id: %v error:%s", appID, err.Error())
 		return "", err
 	}
 
-	client, err := apps.NewScmProvider(repoModel.Type, repoModel.BaseURL, repoModel.Token)
+	scmIntegrateResp, err := pm.settingsHandler.GetSCMIntegrateSettinByID(scmApp.RepoID)
+	if err != nil {
+		return "", err
+	}
+	client, err := apps.NewScmProvider(scmIntegrateResp.Type, scmIntegrateResp.URL, scmIntegrateResp.Token)
 	if err != nil {
 		return "", err
 	}
@@ -642,7 +658,7 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 		Size: 10,
 	}
 
-	got, _, err := client.Git.ListCommits(context.Background(), projectApp.FullName, opt)
+	got, _, err := client.Git.ListCommits(context.Background(), scmApp.FullName, opt)
 	if err != nil {
 		return "", err
 	}
@@ -663,6 +679,11 @@ func (pm *PipelineManager) getPublishStepPreBranchList(projectID, publishID, sta
 	publishStepResp := []*PublishStepResp{}
 	for _, app := range publishApps {
 		projectApp, _ := pm.modelProject.GetProjectApp(app.ProjectAppID)
+		scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			log.Log.Error("get scm app by id %v error: %s", projectApp.ScmID, err.Error())
+			continue
+		}
 		branchHistoryList, _ := pm.modelApp.GetAppBranches(app.ProjectAppID)
 		branchItems := []string{}
 		for _, branch := range branchHistoryList {
@@ -673,10 +694,10 @@ func (pm *PipelineManager) getPublishStepPreBranchList(projectID, publishID, sta
 		}
 		appInfo := &PublishStepResp{
 			BranchName:        app.BranchName,
-			AppName:           projectApp.Name,
-			Language:          projectApp.Language,
+			AppName:           scmApp.Name,
+			Language:          scmApp.Language,
 			ProjectAppID:      app.ProjectAppID,
-			BuildPath:         projectApp.BuildPath,
+			BuildPath:         scmApp.BuildPath,
 			Type:              "app",
 			TargetBranch:      targetBranch,
 			CompileCommand:    app.CompileCommand,
@@ -754,9 +775,14 @@ func (pm *PipelineManager) getDeployStepAppImages(publishID int64) ([]*DeploySte
 			logs.Warn("project app id: %v not exist, err: %s", app.ProjectAppID, err.Error())
 			continue
 		}
+		scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			logs.Warn("scm app id: %v not exist, err: %s", projectApp.ScmID, err.Error())
+			continue
+		}
 		item := &DeployStepAppRsp{
 			ProjectAppID: projectApp.ID,
-			Name:         projectApp.Name,
+			Name:         scmApp.Name,
 			Type:         "app",
 		}
 		rsp = append(rsp, item)
@@ -845,7 +871,12 @@ func (pm *PipelineManager) checkApparrange(projectID int64, apps []int64, stage 
 		_, err := pm.appHandler.GetRealArrange(modelApp.ID, arrangeEnvID)
 		if err != nil {
 			log.Log.Error("get project app id: %v arrnage occur error: %s", modelApp.ID, err)
-			nilArranged = append(nilArranged, modelApp.Name)
+			scmApp, err := pm.modelApp.GetScmAppByID(modelApp.ScmID)
+			if err != nil {
+				log.Log.Warn("get scm app error: %s", err.Error())
+				continue
+			}
+			nilArranged = append(nilArranged, scmApp.Name)
 		}
 	}
 	if len(nilArranged) > 0 {
@@ -874,10 +905,15 @@ func (pm *PipelineManager) aggregateAppsParamsForBuild(apps []*RunBuildAppReq, s
 		if err != nil {
 			log.Log.Error("get proejct modelapp occur error: %s", err)
 		}
-
+		scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			logs.Warn("get scm app error: %s", err.Error())
+			continue
+		}
 		releaseBranch := "None"
 		allParm := &RunBuildAllParms{
-			ProjectApp:     projectApp,
+			ProjectID:      projectApp.ProjectID,
+			ScmApp:         scmApp,
 			RunBuildAppReq: app,
 			Release:        releaseBranch,
 		}
@@ -894,6 +930,11 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 		projectApp, err := pm.modelProject.GetProjectApp(app.ProjectAppID)
 		if err != nil {
 			log.Log.Error("get gitmodelapp occur error: %s", err)
+		}
+
+		scmApp, err := pm.modelApp.GetScmAppByID(projectApp.ScmID)
+		if err != nil {
+			log.Log.Error("get scmapp error: %s", err.Error())
 		}
 
 		arrange, err := pm.appHandler.GetRealArrange(app.ProjectAppID, stageID)
@@ -941,7 +982,8 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 
 		log.Log.Debug("imageAddr: %s", newImageAddr)
 		allParm := &RunDeployAllParms{
-			ProjectApp:      projectApp,
+			ProjectID:       projectApp.ProjectID,
+			ScmApp:          scmApp,
 			RunDeployAppReq: app,
 			ImageAddr:       newImageAddr,
 		}

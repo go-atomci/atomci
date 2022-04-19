@@ -78,12 +78,10 @@ var resourceReq = ResourceReq{
 				[]string{"GetAppsByPagination", "获取项目应用分页列表"},
 				[]string{"GetArrange", "获取应用编排"},
 				[]string{"SetArrange", "设置应用编排"},
+				[]string{"DeleteProjectApp", "删除项目应用"},
+				[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
 				[]string{"GetAppBranches", "获取应用分支"},
 				[]string{"SyncAppBranches", "同步远程分支"},
-				[]string{"SwitchProjectBranch", "切换项目应用的默认分支"},
-				[]string{"DeleteProjectApp", "删除项目应用"},
-				[]string{"GetRepos", "获取代码仓库列表"},
-				[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
 				[]string{"ParserAppArrange", "应用编排解析"},
 				[]string{"GetJenkinsConfig", "获取Jenkins配置"},
 
@@ -185,8 +183,12 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/groups/:group/users/:user", "DELETE", "atomci", "group", "RemoveGroupUser"},
 
 		// app repo
-		[]string{"atomci/api/v1/repos", "GET", "atomci", "repository", "GetRepos"},
 		[]string{"atomci/api/v1/repos/:repo_id/projects", "POST", "atomci", "repository", "GetGitProjectsByRepoID"},
+		[]string{"atomci/api/v1/apps/:app_id/branches", "POST", "atomci", "repository", "GetAppBranches"},
+		[]string{"atomci/api/v1/apps/:app_id/syncBranches", "POST", "atomci", "repository", "SyncAppBranches"},
+		[]string{"atomci/api/v1/apps/:app_id", "GET", "atomci", "repository", "GetScmApp"},
+		[]string{"atomci/api/v1/apps/:app_id", "PUT", "atomci", "repository", "UpdateScmApp"},
+		[]string{"atomci/api/v1/apps/:app_id", "DELETE", "atomci", "repository", "DeleteScmApp"},
 
 		// project
 		[]string{"atomci/api/v1/projects", "POST", "atomci", "project", "ProjectList"},
@@ -210,10 +212,7 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/arrange/yaml/parser", "POST", "atomci", "project", "ParserAppArrange"},
 		[]string{"atomci/api/v1/pipelines/stages/:stage_id/jenkins-config", "GET", "atomci", "project", "GetJenkinsConfig"},
 
-		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/branches", "POST", "atomci", "project", "GetAppBranches"},
-		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/syncBranches", "POST", "atomci", "project", "SyncAppBranches"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "PUT", "atomci", "project", "UpdateProjectApp"},
-		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "PATCH", "atomci", "project", "SwitchProjectBranch"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "DELETE", "atomci", "project", "DeleteProjectApp"},
 		[]string{"atomci/api/v1/projects/:project_id/clusters/:cluster/apps", "POST", "atomci", "project", "GetProjectAppServices"},
 		[]string{"atomci/api/v1/clusters/:cluster/namespaces/:namespace/apps/:app", "GET", "atomci", "project", "GetAppServiceInspect"},

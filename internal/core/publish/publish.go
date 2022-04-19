@@ -34,7 +34,7 @@ import (
 type PublishManager struct {
 	model           *dao.PublishModel
 	pipelineModel   *dao.PipelineStageModel
-	gitAppModel     *dao.GitAppModel
+	gitAppModel     *dao.ScmAppModel
 	projectModel    *dao.ProjectModel
 	k8sModel        *dao.K8sClusterModel
 	pipelineHandler *pipelinemgr.PipelineManager
@@ -47,7 +47,7 @@ func NewPublishManager() *PublishManager {
 		model:           dao.NewPublishModel(),
 		pipelineModel:   dao.NewPipelineStageModel(),
 		projectModel:    dao.NewProjectModel(),
-		gitAppModel:     dao.NewGitAppModel(),
+		gitAppModel:     dao.NewScmAppModel(),
 		k8sModel:        dao.NewK8sClusterModel(),
 		pipelineHandler: pipelinemgr.NewPipelineManager(),
 		projectHandler:  project.NewProjectManager(),

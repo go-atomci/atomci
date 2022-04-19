@@ -4,6 +4,7 @@ import backend from '../api/backend';
 import store from '@/store';
 import Layout from '@/layout'
 import projectRouter from './modules/projectRouter'
+import scmAppRouter from './modules/scmAppRouter'
 import { projectDetailRouter } from './modules/projectDetailRouter'
 
 import { getToken } from '@/utils/auth' // get token from cookie
@@ -33,6 +34,7 @@ let constantRoutes = [
         component: () => import('../views/Logout.vue')
     },
     projectRouter,
+    scmAppRouter
 ];
 
 constantRoutes = constantRoutes.concat(projectDetailRouter())
@@ -206,10 +208,8 @@ router.beforeEach((to, from, next) => {
                         if (data && data.user) {
                             store.dispatch('user/setUserInfo', data);
 
-                            // TODO: dynamically add accessible routes
                             // generate accessible routes map based on roles
                             const accessRoutes = generateRoutes(data.admin)
-                            
                             
                             // dynamically add accessible routes
                             router.addRoutes(accessRoutes)
@@ -266,6 +266,8 @@ export function getUserSibeBarRoutes(routerPath) {
         routers = projectDetailRouter()
     } else if (routerPath === '/' || routerPath === '/project') {
         routers = [projectRouter]
+    } else if (routerPath === '/scmapp') {
+        routers = [scmAppRouter]
     } else {
         console.log(routerPath)
     }

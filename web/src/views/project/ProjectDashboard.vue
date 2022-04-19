@@ -299,7 +299,6 @@
         });
       },
       getProjectInfo() {
-        // TODO: project id refacotr to router params
         if (this.$route.query.id !== undefined) {
           this.projectID = this.$route.query.id
           this.$store.dispatch('project/setProjectID', this.$route.query.id);

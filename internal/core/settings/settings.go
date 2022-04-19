@@ -19,10 +19,12 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"k8s.io/client-go/rest"
 	"strings"
 	"time"
 
+	"k8s.io/client-go/rest"
+
+	"github.com/go-atomci/atomci/constant"
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
@@ -46,6 +48,13 @@ type IntegrateSettingResponse struct {
 	CreateAt *time.Time `json:"create_at,omitempty"`
 	UpdateAt *time.Time `json:"update_at,omitempty"`
 	ID       int64      `json:"id,omitempty"`
+}
+
+type ScmIntegrateSetting struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	ScmAuthConf
+	Type string `json:"type,omitempty"`
 }
 
 // VerifyResponse   integrate verify
@@ -96,7 +105,7 @@ type ScmBaseConfig struct {
 	Token string `json:"token,omitempty"`
 }
 
-type ScmGitlabConfig struct {
+type ScmAuthConf struct {
 	ScmBaseConfig
 	User string `json:"user,omitempty"`
 }
@@ -129,7 +138,7 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		err := json.Unmarshal([]byte(sc), registry)
 		return registry, err
 	case "gitlab":
-		scmConf := &ScmGitlabConfig{}
+		scmConf := &ScmAuthConf{}
 		err := json.Unmarshal([]byte(sc), scmConf)
 		return scmConf, err
 	case "gitea", "gitee", "github":
@@ -171,7 +180,43 @@ func (pm *SettingManager) GetIntegrateSettingByID(id int64) (*IntegrateSettingRe
 	return formatSignalIntegrateSetting(integrateSetting, config), err
 }
 
-func (pm *SettingManager) GetIntegrateSettingByName(name string, integrateType string) (*IntegrateSettingResponse, error) {
+func (pm *SettingManager) GetSCMIntegrateSettinByID(id int64) (*ScmIntegrateSetting, error) {
+	resp, err := pm.GetIntegrateSettingByID(id)
+	if err != nil {
+		return nil, err
+	}
+	scmResp := &ScmIntegrateSetting{
+		Name: resp.Name,
+		Type: resp.Type,
+	}
+	scmCONF := getScmConf(resp.Type, resp.Config)
+	scmResp.ScmAuthConf = scmCONF
+	return scmResp, nil
+}
+
+func getScmConf(scmType string, config interface{}) ScmAuthConf {
+	scmCONF := ScmAuthConf{}
+	switch strings.ToLower(scmType) {
+	case constant.SCMGitlab:
+		if conf, ok := config.(*ScmAuthConf); ok {
+			scmCONF.URL = conf.URL
+			scmCONF.User = conf.User
+			scmCONF.Token = conf.Token
+		} else {
+			log.Log.Error("parse type: %s conf error", constant.SCMGitlab)
+		}
+	case constant.SCMGitea, constant.SCMGitee, constant.SCMGithub:
+		if conf, ok := config.(*ScmBaseConfig); ok {
+			scmCONF.URL = conf.URL
+			scmCONF.Token = conf.Token
+		} else {
+			log.Log.Error("parse type: %s conf error", "scmbase conf")
+		}
+	}
+	return scmCONF
+}
+
+func (pm *SettingManager) GetIntegrateSettingByName(name, integrateType string) (*IntegrateSettingResponse, error) {
 	integrateSetting, err := pm.model.GetIntegrateSettingByName(name, integrateType)
 	if err != nil {
 		log.Log.Error("when GetIntegrateSettingByName, get GetIntegrateSettingByName occur error: %s", err.Error())

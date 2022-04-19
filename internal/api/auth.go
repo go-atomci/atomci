@@ -93,7 +93,6 @@ func (a *AuthController) Authenticate() {
 		http.Error(a.Ctx.ResponseWriter, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	e, err := mycasbin.NewCasbin()
 	if err != nil {
 		log.Log.Error("add user role, new casbin instance error: %s", err.Error())

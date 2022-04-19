@@ -287,7 +287,6 @@ func (p *ProjectController) Delete() {
 	if groupAdminFlag == 1 {
 		flag = true
 	}
-	// flag, err := pm.CheckProjectUser(projectID, user, groupsAdminList)
 	if !flag {
 		log.Log.Error("when check project user flag is %v", flag)
 		p.HandleInternalServerError("仅允许项目owner及管理员更新基础信息")
@@ -539,11 +538,7 @@ func (p *ProjectController) CreateApp() {
 	req := &project.ProjectAppReq{}
 	p.DecodeJSONReq(&req)
 	pm := project.NewProjectManager()
-	groupName := p.UserGroup()
-	if groupName == "" {
-		groupName = "system"
-	}
-	result := pm.CreateProjectApp(projectID, req, p.User, groupName)
+	result := pm.CreateProjectApp(projectID, req, p.User)
 	if result != nil {
 		p.HandleInternalServerError(result.Error())
 		log.Log.Error("add project app error: %s", result.Error())
@@ -561,20 +556,6 @@ func (p *ProjectController) GetApps() {
 	if err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("get project app list error: %s", err.Error())
-		return
-	}
-	p.Data["json"] = NewResult(true, result, "")
-	p.ServeJSON()
-}
-
-// ProjectAppInfo ..
-func (p *ProjectController) ProjectAppInfo() {
-	projectAppID, _ := p.GetInt64FromPath(":project_app_id")
-	pm := project.NewProjectManager()
-	result, err := pm.GetProjectApp(projectAppID)
-	if err != nil {
-		p.HandleInternalServerError(err.Error())
-		log.Log.Error("get project app error: %s", err.Error())
 		return
 	}
 	p.Data["json"] = NewResult(true, result, "")
@@ -600,12 +581,8 @@ func (p *ProjectController) GetAppsByPagination() {
 // DeleteProjectApp for project
 func (p *ProjectController) DeleteProjectApp() {
 	projectAppID, _ := p.GetInt64FromPath(":project_app_id")
-	defaultGroupName := p.UserGroup()
-	if defaultGroupName == "" {
-		defaultGroupName = "system"
-	}
 	pm := project.NewProjectManager()
-	result := pm.DeleteProjectApp(projectAppID, defaultGroupName)
+	result := pm.DeleteProjectApp(projectAppID)
 	if result != nil {
 		p.HandleInternalServerError(result.Error())
 		log.Log.Error("delete project app error: %s", result.Error())
@@ -625,22 +602,6 @@ func (p *ProjectController) UpdateProjectApp() {
 	if err := pm.UpdateProjectApp(projectID, projectAppID, req); err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("update project app error: %s", err.Error())
-		return
-	}
-	p.Data["json"] = NewResult(true, nil, "")
-	p.ServeJSON()
-}
-
-// SwitchProjectBranch ..
-func (p *ProjectController) SwitchProjectBranch() {
-	projectID, _ := p.GetInt64FromPath(":project_id")
-	projectAppID, _ := p.GetInt64FromPath(":project_app_id")
-	req := &project.ProjectAppBranchUpdateReq{}
-	p.DecodeJSONReq(req)
-	pm := project.NewProjectManager()
-	if err := pm.SwitchAppBranch(projectID, projectAppID, req); err != nil {
-		p.HandleInternalServerError(err.Error())
-		log.Log.Error("switch project app branch error: %s", err.Error())
 		return
 	}
 	p.Data["json"] = NewResult(true, nil, "")

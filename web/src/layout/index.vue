@@ -9,8 +9,8 @@
         <navbar />
       </div>
     <div>
-        <sidebar class="sidebar-container" v-if="this.$route.path != '/project' "/>
-        <div class="main-container" :class="{ projectList: this.$route.path == '/project' }">
+        <sidebar class="sidebar-container" v-if="!hideSidebar()"/>
+        <div class="main-container" :class="{ projectList: hideSidebar() }">
           <div class="tag-container">
             <div :class="{ hasTagsView: needTagsView }">
               <tags-view v-if="needTagsView" />
@@ -60,6 +60,12 @@ export default {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false });
     },
+    hideSidebar() {
+      if (this.$route.path === '/project' || this.$route.path.startsWith('/scmapp') ) {
+        return true
+      }
+      return false
+    }
   },
 };
 </script>
