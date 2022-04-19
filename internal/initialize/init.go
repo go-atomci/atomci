@@ -23,7 +23,7 @@ import (
 	"github.com/go-atomci/atomci/utils/errors"
 )
 
-func init() {
+func Init() {
 
 	// 注册/更新资源
 	initResource()

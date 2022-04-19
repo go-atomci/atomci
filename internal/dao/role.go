@@ -18,6 +18,7 @@ package dao
 
 import (
 	"fmt"
+
 	mycasbin "github.com/go-atomci/atomci/internal/middleware/casbin"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"

@@ -102,7 +102,7 @@ func sureCreateTable(ormer orm.Ormer) {
 	ormer.Raw(ddl).Exec()
 }
 
-func init() {
+func Migrate() {
 	if len(os.Args) > 1 && os.Args[1][:5] == "-test" {
 		return
 	}
