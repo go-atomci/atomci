@@ -19,6 +19,7 @@ package apps
 import (
 	"context"
 	"fmt"
+	"github.com/drone/go-scm/scm/driver/gogs"
 	"net/http"
 	"strings"
 
@@ -42,7 +43,7 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 	var err error
 	var client *scm.Client
 	switch strings.ToLower(vcsType) {
-	case "gitea", "gitlab":
+	case "gitea", "gitlab", "gogs":
 		if strings.HasSuffix(vcsPath, ".git") {
 			vcsPath = strings.TrimSuffix(vcsPath, ".git")
 		}
@@ -63,9 +64,16 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 					Token: token,
 				},
 			}
-		} else {
+		} else if "gitlab" == gitRepo {
 			client, err = gitlab.New(schema + "://" + projectPathSplit[0])
 
+			client.Client = &http.Client{
+				Transport: &transport.PrivateToken{
+					Token: token,
+				},
+			}
+		} else {
+			client, err = gogs.New(schema + "://" + projectPathSplit[0])
 			client.Client = &http.Client{
 				Transport: &transport.PrivateToken{
 					Token: token,
