@@ -37,7 +37,7 @@
           <el-input v-model.trim="form.config.user" auto-complete="off" placeholder="请输入gitlab用户名"></el-input>
         </el-form-item>
       </div>
-      <div>  
+      <div>
         <el-form-item label="Token" prop="config.token" class="form-item">
           <el-input v-model.trim="form.config.token" auto-complete="off" maxlength="120" placeholder="请输入代码源Token"></el-input>
         </el-form-item>
@@ -83,6 +83,7 @@ export default {
         {"name": "github"},
         {"name": "gitee"},
         {"name": "gitea"},
+        {"name": "gogs"},
       ],
       direction: 'rtl',
       // 是否属于编辑状态
