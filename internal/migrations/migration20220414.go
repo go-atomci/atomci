@@ -58,7 +58,10 @@ func (m Migration20220414) Upgrade(ormer orm.Ormer) error {
 	var repoServerItems []repoServer
 	_, err := ormer.Raw("SELECT id,type,base_url,user,token,password,cid FROM pub_repo_server WHERE deleted=0;").QueryRows(&repoServerItems)
 	if err != nil {
-		return fmt.Errorf("select pub_repo_server : %s", err.Error())
+		if strings.Contains(err.Error(), " doesn't exist") {
+			return nil
+		}
+		return fmt.Errorf("select pub_repo_server: %s", err.Error())
 	}
 	log.Log.Debug("reposerver len: %v", len(repoServerItems))
 	repoItemsMapping, err := m.migrateRepoServerIntoIntegrateSetting(repoServerItems)
