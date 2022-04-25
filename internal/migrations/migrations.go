@@ -77,7 +77,7 @@ func getNewestData(ormer orm.Ormer) time.Time {
 	var lastMigrationDate time.Time
 	ormer.Raw(sql).QueryRow(&lastMigrationDate)
 	if lastMigrationDate.IsZero() {
-		lastMigrationDate = time.UnixMicro(0)
+		lastMigrationDate = time.Unix(0, 0)
 	}
 	return lastMigrationDate
 }
