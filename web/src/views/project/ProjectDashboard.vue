@@ -269,7 +269,9 @@
         projectInfo: {},
         versionList: [],
         optionData: [],
-        projectMember :[],
+        projectMember:{
+          count :0,
+        },
         logList: [],
       };
     },
@@ -304,12 +306,12 @@
         //获取成员列表
         backend.projectMemberByConstraint(this.projectID, (data) => {
           if (data) {
-            this.projectMember['count'] = data.length;
+            this.projectMember.count = data.length;
             let members = '';
             for (let i = 0; i < data.length; i++) {
               members += data[i].user + ',';
             }
-            this.projectMember['user'] = members.substr(0, members.length - 1);
+            this.projectMember.user = members.substr(0, members.length - 1);
           }
         });
       },
