@@ -85,7 +85,6 @@ export default {
     },
     getList() {
       if (this.$props.isUser) {
-        // TODO: group's name use system , tmp
         backend.getGroupUserRole("system", this.$route.params.user, (data) => {
           if (data) {
             this.curList = data.map((item) => {

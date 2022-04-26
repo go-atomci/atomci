@@ -350,10 +350,6 @@ const backendAPI = {
   getProjectApp(id, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${id}/apps`, cb);
   },
-  // 获得应用仓库列表
-  getWarehouse(body, cb) {
-    Package.httpMethods('post', '/atomci/api/v1/apps', cb, body);
-  },
   // 关联应用
   postWarehouse(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/apps/create', cb, body);
@@ -501,7 +497,7 @@ const backendAPI = {
   },
   // 添加项目应用模块
   addProjectApp(id, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${id}/apps`, cb, body);
+    Package.httpMethods('post', `/atomci/api/v1/projects/${id}/apps/create`, cb, body);
   },
   // 删除项目应用模块
   delProjectApp(id, projectAppId, cb) {
@@ -510,10 +506,6 @@ const backendAPI = {
   // 更新应用模块
   updateProjectApp(id, projectAppId, body, cb) {
     Package.httpMethods('put', `/atomci/api/v1/projects/${id}/apps/${projectAppId}`, cb, body);
-  },
-  // 同步远程分支
-  synBranch(appID, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/apps/${appID}/syncBranches`, cb);
   },
 
   // 获得部门列表
@@ -718,8 +710,8 @@ const backendAPI = {
   getIntegrateSettings(body, cb) {
     Package.httpMethods('post', '/atomci/api/v1/integrate/settings', cb, body);
   },
-  getStagesAll(cb) {
-    Package.httpMethods('get', '/atomci/api/v1/integrate/settings', cb);
+  getSCMIntegrateSettings(body, cb) {
+    Package.httpMethods('post', '/atomci/api/v1/integrate/settings/scms', cb, body);
   },
   AddIntegrateSetting(body,cb) {
     Package.httpMethods('post', '/atomci/api/v1/integrate/settings/create', cb, body);
@@ -867,18 +859,33 @@ const backendAPI = {
     Package.httpMethods('delete', `/atomci/api/v1/projects/${projectId}/pipelines/${stepId}`, cb);
   },
   // 应用列表
+  getScmApps(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps`, cb, body);
+  },
+  getAllScmApps(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/apps`, cb);
+  },
+  // 获取单个应用详情
+  getScmAppDetail(appID, cb) {
+    Package.httpMethods('get', `/atomci/api/v1/apps/${appID}`, cb);
+  },
+  updateScmAppInfo(appId, body, cb) {
+    Package.httpMethods('put', `/atomci/api/v1/apps/${appId}`, cb, body);
+  },
+  delScmApp(scmAppID, cb) {
+    Package.httpMethods('delete', `/atomci/api/v1/apps/${scmAppID}`, cb);
+  },
+  asyncBranch(app_id, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/${app_id}/syncBranches`, cb);
+  },
+  getScmBranch(app_id, body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/${app_id}/branches`, cb, body);
+  },
   getApp(projectId, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${projectId}/apps`, cb, body);
   },
   getAppAll(projectId, cb) {
     Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/apps`, cb);
-  },
-  appDialogBranch(repo_id, code_id, cb, body, errCb) {
-    Package.httpMethods('get', `/atomci/api/v1/repos/${repo_id}/projects/${code_id}/branches`, cb, body, errCb);
-  },
-  // 获取单个代码仓库详情
-  getAppDetail(projectId, appID, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/projects/${projectId}/apps/${appID}`, cb);
   },
   updateAppInfo(projectId, appId, body, cb) {
     Package.httpMethods('put', `/atomci/api/v1/projects/${projectId}/apps/${appId}`, cb, body);
@@ -887,25 +894,19 @@ const backendAPI = {
   changeBranch(id, projectAppId, body, cb) {
     Package.httpMethods('patch', `/atomci/api/v1/projects/${id}/apps/${projectAppId}`, cb, body);
   },
-  getProjectBranch(project_id, app_id, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/branches`, cb, body);
-  },
   createBranch(project_id, body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/branches`, cb, body);
   },
-  asyncBranch(project_id, app_id, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/${app_id}/syncBranches`, cb);
+  //获取集成的代码源
+  getIntegrateRepos(cb) {
+    Package.httpMethods('get', `/atomci/api/v1/integrate/settings/scms`, cb);
   },
-  //新增应用模块
-  getRepos(project_id, cb) {
-    Package.httpMethods('get', `/atomci/api/v1/repos?project_id=${project_id}`, cb);
-  },
-  getReposList(repo_id, project_id, body, cb, errcb) {
-    Package.httpMethods('post', `/atomci/api/v1/repos/${repo_id}/projects?project_id=${project_id}`, cb, body, errcb);
+  getReposList(repo_id, cb, errcb) {
+    Package.httpMethods('post', `/atomci/api/v1/repos/${repo_id}/projects`, cb, errcb);
   },
   //新增
-  addAppPro(project_id, body, cb) {
-    Package.httpMethods('post', `/atomci/api/v1/projects/${project_id}/apps/create`, cb, body);
+  addScmAppPro(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/create`, cb, body);
   },
   //应用编排
   getProjectArrange(project_id, app_id, arrange_env, cb) {

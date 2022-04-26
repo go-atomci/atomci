@@ -125,8 +125,6 @@ export default {
           case 'registry':
             this.registryList.push(element)
             break;
-          default:
-            console.log("this type not support", element.type)
           }
         });
       }

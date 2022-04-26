@@ -37,7 +37,6 @@ func (t *IntegrateSetting) TableName() string {
 }
 
 func (t *IntegrateSetting) CryptoConfig(raw string) {
-	t.crypto(raw)
 	t.Config = t.crypto(raw)
 }
 

@@ -82,6 +82,7 @@ func RegisterRoutes() {
 				// Integrate Settings
 				beego.NSRouter("/integrate/settings", &api.IntegrateController{}, "get:GetIntegrateSettings;post:GetIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/create", &api.IntegrateController{}, "post:CreateIntegrateSetting"),
+				beego.NSRouter("/integrate/settings/scms", &api.IntegrateController{}, "get:GetSCMIntegrateSettings;post:GetSCMIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/:id", &api.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &api.IntegrateController{}, "post:VerifyIntegrateSetting"),
 				beego.NSRouter("/integrate/clusters", &api.IntegrateController{}, "get:GetClusterIntegrateSettings"),
@@ -90,14 +91,26 @@ func RegisterRoutes() {
 				beego.NSRouter("/integrate/compile_envs/create", &api.IntegrateController{}, "post:CreateCompileEnv"),
 				beego.NSRouter("/integrate/compile_envs/:id", &api.IntegrateController{}, "put:UpdateCompileEnv;delete:DeleteCompileEnv"),
 
-				// Git Repository
-				beego.NSRouter("/repos", &api.AppController{}, "get:GetRepos"),
+				// scm apps
 				beego.NSRouter("/repos/:repo_id/projects", &api.AppController{}, "post:GetGitProjectsByRepoID"),
+				beego.NSRouter("/apps/create", &api.AppController{}, "post:CreateSCMApp"),
+				beego.NSRouter("/apps", &api.AppController{}, "get:GetAllApps;post:GetAppsByPagination"),
+				beego.NSRouter("/apps/:app_id", &api.AppController{}, "get:ScmAppInfo;put:UpdateScmApp;delete:DeleteScmApp"),
+				beego.NSRouter("/apps/:app_id/syncBranches", &api.AppController{}, "post:SyncAppBranches"),
+				beego.NSRouter("/apps/:app_id/branches", &api.AppController{}, "post:GetAppBranches"),
 
 				// Project
 				beego.NSRouter("/projects", &api.ProjectController{}, "post:ProjectList"),
 				beego.NSRouter("/projects/create", &api.ProjectController{}, "post:Create"),
 				beego.NSRouter("/projects/:project_id", &api.ProjectController{}, "put:Update;delete:Delete;get:GetProject"),
+
+				// Project App
+				beego.NSRouter("/projects/:project_id/apps/create", &api.ProjectController{}, "post:CreateApp"),
+				beego.NSRouter("/projects/:project_id/apps", &api.ProjectController{}, "get:GetApps;post:GetAppsByPagination"),
+				beego.NSRouter("/projects/:project_id/apps/:app_id/:env_id/arrange", &api.AppController{}, "get:GetArrange;post:SetArrange"),
+				beego.NSRouter("/arrange/yaml/parser", &api.AppController{}, "post:ParseArrangeYaml"),
+				beego.NSRouter("/projects/:project_id/apps/:project_app_id", &api.ProjectController{}, "put:UpdateProjectApp;delete:DeleteProjectApp"),
+
 				beego.NSRouter("/projects/:project_id/checkProjectOwner", &api.ProjectController{}, "post:CheckProjetCreator"),
 				beego.NSRouter("/projects/:project_id/clusters/:cluster/apps", &api.ProjectController{}, "post:GetAppserviceList"),
 				beego.NSRouter("/clusters/:cluster/namespaces/:namespace/apps/:app", &api.ProjectController{}, "get:AppInspect;delete:AppDelete"),
@@ -120,16 +133,6 @@ func RegisterRoutes() {
 				beego.NSRouter("/projects/:project_id/pipelines", &api.ProjectController{}, "get:GetProjectPipelines;post:GetPipelinesByPagination"),
 				beego.NSRouter("/projects/:project_id/pipelines/create", &api.ProjectController{}, "post:CreatePipeline"),
 				beego.NSRouter("/projects/:project_id/pipelines/:id", &api.ProjectController{}, "get:GetProjectPipeline;put:UpdatePipelineConfig;delete:DeleteProjectPipeline"),
-
-				// Project App
-				beego.NSRouter("/projects/:project_id/apps/create", &api.ProjectController{}, "post:CreateApp"),
-				beego.NSRouter("/projects/:project_id/apps", &api.ProjectController{}, "get:GetApps;post:GetAppsByPagination"),
-				beego.NSRouter("/projects/:project_id/apps/:app_id/:env_id/arrange", &api.AppController{}, "get:GetArrange;post:SetArrange"),
-				beego.NSRouter("/arrange/yaml/parser", &api.AppController{}, "post:ParseArrangeYaml"),
-				beego.NSRouter("/projects/:project_id/apps/:app_id/branches", &api.AppController{}, "post:GetAppBranches"),
-				beego.NSRouter("/projects/:project_id/apps/:app_id/syncBranches", &api.AppController{}, "post:SyncAppBranches"),
-				beego.NSRouter("/projects/:project_id/apps/:project_app_id", &api.ProjectController{}, "get:ProjectAppInfo;patch:SwitchProjectBranch;put:UpdateProjectApp;delete:DeleteProjectApp"),
-
 				// Project stats
 				beego.NSRouter("/projects/:project_id/publish/stats", &api.PipelineController{}, "post:GetPublishStats"),
 
