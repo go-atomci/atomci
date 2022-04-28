@@ -8,7 +8,7 @@
               <div class="setTitle">
                 <div class="f-r">
                   <div class="summaryUser">
-                    {{projectInfo.members}}<span class="fontSmall"> 人</span>
+                    {{projectMember.count}}<span class="fontSmall"> 人</span>
                     <p class="fontSmall">项目人员</p>
                   </div>
                   <div class="summaryUser">
@@ -35,7 +35,7 @@
             <el-col class="setText">结束时间：{{projectInfo.end_at}}</el-col>
           </el-row>
           <el-row>
-            <el-col class="setText">项目成员：{{projectInfo.membersName}}</el-col>
+            <el-col class="setText">项目成员：{{projectMember.user}}</el-col>
           </el-row>
         </div>
       </template>
@@ -269,6 +269,9 @@
         projectInfo: {},
         versionList: [],
         optionData: [],
+        projectMember:{
+          count :0,
+        },
         logList: [],
       };
     },
@@ -280,6 +283,7 @@
     components: {},
     created() {
       this.getProjectInfo();
+      this.projectMemberByConstraint()
       // this.getChartData();
     },
     mounted() {
@@ -296,6 +300,19 @@
           this.$nextTick(() => {
             this.getData();
           });
+        });
+      },
+      projectMemberByConstraint() {
+        //获取成员列表
+        backend.projectMemberByConstraint(this.projectID, (data) => {
+          if (data) {
+            this.projectMember.count = data.length;
+            let members = '';
+            for (let i = 0; i < data.length; i++) {
+              members += data[i].user + ',';
+            }
+            this.projectMember.user = members.substr(0, members.length - 1);
+          }
         });
       },
       getProjectInfo() {
