@@ -47,19 +47,4 @@ func Init() {
 			os.Exit(2)
 		}
 	}
-
-	/*
-		TODO: Below resources just run once
-	*/
-	if err := Component(); err != nil {
-		os.Exit(2)
-	}
-
-	// init compile envs
-	initCompileEnvs()
-
-	// init task tmpls
-	if err := initTaskTemplates(); err != nil {
-		os.Exit(2)
-	}
 }

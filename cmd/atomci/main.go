@@ -32,8 +32,9 @@ import (
 
 func main() {
 	models.InitDB()
-	initialize.Init()
 	migrations.Migrate()
+	// TODO: resource items migrate later
+	initialize.Init()
 
 	cronjob.RunPublishJobServer()
 	beego.Info("Beego version:", beego.VERSION)

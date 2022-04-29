@@ -79,7 +79,6 @@ func CreateGroupRole(req *models.GroupRoleReq) (*models.GroupRole, error) {
 		return nil, err
 	}
 
-	log.Log.Debug("req operations length: %v", len(req.Operations))
 	err := GenerateCasbinrules(req.Role, req.Operations)
 	if err != nil {
 		log.Log.Error("generate casbin rules error: %s", err.Error())
@@ -159,10 +158,6 @@ func AddRoleOperation(req *models.GroupRoleOperationReq) error {
 		// TODO: add casbin items;
 		sql := `insert ignore into sys_group_role_operation(` + "`group`" + `,role, operation_id) values` + values
 		if _, err := GetOrmer().Raw(sql).Exec(); err != nil {
-			return err
-		}
-
-		if err := GenerateCasbinrules(req.Role, req.Operations); err != nil {
 			return err
 		}
 	}
