@@ -1,4 +1,4 @@
-package main
+package notification
 
 import (
 	"github.com/astaxie/beego"
@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	beego.LoadAppConfig("ini", "./app.unittest.conf")
+	_ = beego.LoadAppConfig("ini", "./app.unittest.conf")
 }
 
 func Test_SEND_SHOULD_NO_ERROR(t *testing.T) {
@@ -27,6 +27,7 @@ func Test_SEND_SHOULD_NO_ERROR(t *testing.T) {
 			return resp, nil
 		},
 	)
+
 	var temp notification.INotify
 
 	mockResult := new(messages.StepCallbackResult)
