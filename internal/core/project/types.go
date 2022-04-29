@@ -35,13 +35,7 @@ type ProjectUpdateReq struct {
 
 // ProjectAppUpdateReq ..
 type ProjectAppUpdateReq struct {
-	BranchName   string `json:"branch_name"`
-	Language     string `json:"language"`
-	Name         string `json:"name"`
-	Path         string `json:"path"`
-	CompileEnvID int64  `json:"compile_env_id"`
-	BuildPath    string `json:"build_path"`
-	Dockerfile   string `json:"dockerfile"`
+	ScmID int64 `json:"scm_id"`
 }
 
 // ProjectAppBranchUpdateReq ..
@@ -75,22 +69,20 @@ type ProjectNumberReq struct {
 
 // ProjectAppReq add app into project request body.
 type ProjectAppReq struct {
-	Name         string `json:"name"`
-	CompileEnvID int64  `json:"compile_env_id"`
-	Language     string `json:"language"`
-	Path         string `json:"path"`
-	RepoID       int64  `json:"repo_id"`
-	FullName     string `json:"full_name"`
-	BranchName   string `json:"branch_name"`
-	BuildPath    string `json:"build_path"`
-	Dockerfile   string `json:"dockerfile"`
+	SCMID int64 `json:"scm_id"`
 }
 
 // ProjectAppRsp ..
 type ProjectAppRsp struct {
 	*models.ProjectApp
 	BranchHistoryList []string `json:"branch_history_list,omitempty"`
-	CompileEnv        string   `json:"compile_env"`
+	CompileEnv        string   `json:"compile_env,omitempty"`
+	Name              string   `json:"name,omitempty"`
+	FullName          string   `json:"full_name,omitempty"`
+	Language          string   `json:"language,omitempty"`
+	Path              string   `json:"path,omitempty"`
+	BuildPath         string   `json:"build_path,omitempty"`
+	Dockerfile        string   `json:"dockerfile,omitempty"`
 }
 
 // ProjectPipelineRsp ..

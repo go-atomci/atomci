@@ -8,7 +8,7 @@ import (
 )
 
 func TestAesCrypto(t *testing.T) {
-	crypted := base64.StdEncoding.EncodeToString(AesEny([]byte("Hello")))
-	log.Printf("%s", crypted)
-	assert.NotEmpty(t, crypted)
+	encrypted := base64.StdEncoding.EncodeToString(AesEny([]byte("Hello")))
+	log.Printf("%s", encrypted)
+	assert.NotEmpty(t, encrypted)
 }

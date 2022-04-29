@@ -39,7 +39,7 @@ func NewProvider() auth.Provider {
 func (p *Provider) Authenticate(loginUser, password string) (*auth.ExternalAccount, error) {
 	userModel, err := dao.GetUser(loginUser)
 	if err != nil {
-		log.Log.Error("get user error: %v")
+		log.Log.Error("get user error: %v", err.Error())
 		return nil, fmt.Errorf("用户不存在或密码错误")
 	}
 

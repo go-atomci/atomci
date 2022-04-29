@@ -180,6 +180,19 @@ func (u *UserController) GetUserResourceConstraintValues() {
 	u.ServeJSON()
 }
 
+// GetProjectMemberByConstraint ..
+func (u *UserController) GetProjectMemberByConstraint() {
+	projectId, _ := u.GetInt64FromPath(":project_id")
+	rsp, err := dao.GetProjectMemberByConstraint(projectId)
+	if err != nil {
+		u.HandleInternalServerError(err.Error())
+		log.Log.Error("Get project member error: %s", err.Error())
+		return
+	}
+	u.Data["json"] = NewResult(true, rsp, "")
+	u.ServeJSON()
+}
+
 func generatePassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }

@@ -19,18 +19,18 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 	"time"
 
+	"k8s.io/client-go/rest"
+
+	"github.com/go-atomci/atomci/constant"
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
 	"github.com/go-atomci/atomci/utils/validate"
 
-	"github.com/astaxie/beego"
 	"github.com/go-atomci/workflow/jenkins"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -48,6 +48,13 @@ type IntegrateSettingResponse struct {
 	CreateAt *time.Time `json:"create_at,omitempty"`
 	UpdateAt *time.Time `json:"update_at,omitempty"`
 	ID       int64      `json:"id,omitempty"`
+}
+
+type ScmIntegrateSetting struct {
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
+	ScmAuthConf
+	Type string `json:"type,omitempty"`
 }
 
 // VerifyResponse   integrate verify
@@ -69,6 +76,9 @@ const (
 	KubernetesType = "kubernetes"
 	RegistryType   = "registry"
 	JenkinsType    = "jenkins"
+
+	KubernetesConfig = "kubernetesConfig"
+	KubernetesToken  = "kubernetesToken"
 )
 
 type Config struct{}
@@ -81,12 +91,23 @@ type BaseConfig struct {
 type KubeConfig struct {
 	URL  string `json:"url,omitempty"`
 	Conf string `json:"conf,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 type RegistryConfig struct {
 	BaseConfig
 	Name     string `json:"name,omitempty"`
 	Password string `json:"password,omitempty"`
 	IsHttps  bool   `json:"isHttps,omitempty"`
+}
+
+type ScmBaseConfig struct {
+	URL   string `json:"url,omitempty"`
+	Token string `json:"token,omitempty"`
+}
+
+type ScmAuthConf struct {
+	ScmBaseConfig
+	User string `json:"user,omitempty"`
 }
 
 type JenkinsConfig struct {
@@ -116,6 +137,14 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		registry := &RegistryConfig{}
 		err := json.Unmarshal([]byte(sc), registry)
 		return registry, err
+	case "gitlab":
+		scmConf := &ScmAuthConf{}
+		err := json.Unmarshal([]byte(sc), scmConf)
+		return scmConf, err
+	case "gitea", "gitee", "github":
+		scmConf := &ScmBaseConfig{}
+		err := json.Unmarshal([]byte(sc), scmConf)
+		return scmConf, err
 	default:
 		log.Log.Warn("this settings type %s is not support, return origin string", settingType)
 		return sc, nil
@@ -130,8 +159,8 @@ func NewSettingManager() *SettingManager {
 }
 
 // GetIntegrateSettings ..
-func (pm *SettingManager) GetIntegrateSettings(integrateType string) ([]*IntegrateSettingResponse, error) {
-	items, err := pm.model.GetIntegrateSettings(integrateType)
+func (pm *SettingManager) GetIntegrateSettings(integrateTypes []string) ([]*IntegrateSettingResponse, error) {
+	items, err := pm.model.GetIntegrateSettings(integrateTypes)
 	if err != nil {
 		log.Log.Error("get interate settings error: %s", err.Error())
 		return nil, err
@@ -151,9 +180,55 @@ func (pm *SettingManager) GetIntegrateSettingByID(id int64) (*IntegrateSettingRe
 	return formatSignalIntegrateSetting(integrateSetting, config), err
 }
 
+func (pm *SettingManager) GetSCMIntegrateSettinByID(id int64) (*ScmIntegrateSetting, error) {
+	resp, err := pm.GetIntegrateSettingByID(id)
+	if err != nil {
+		return nil, err
+	}
+	scmResp := &ScmIntegrateSetting{
+		Name: resp.Name,
+		Type: resp.Type,
+	}
+	scmCONF := getScmConf(resp.Type, resp.Config)
+	scmResp.ScmAuthConf = scmCONF
+	return scmResp, nil
+}
+
+func getScmConf(scmType string, config interface{}) ScmAuthConf {
+	scmCONF := ScmAuthConf{}
+	switch strings.ToLower(scmType) {
+	case constant.SCMGitlab:
+		if conf, ok := config.(*ScmAuthConf); ok {
+			scmCONF.URL = conf.URL
+			scmCONF.User = conf.User
+			scmCONF.Token = conf.Token
+		} else {
+			log.Log.Error("parse type: %s conf error", constant.SCMGitlab)
+		}
+	case constant.SCMGitea, constant.SCMGitee, constant.SCMGithub:
+		if conf, ok := config.(*ScmBaseConfig); ok {
+			scmCONF.URL = conf.URL
+			scmCONF.Token = conf.Token
+		} else {
+			log.Log.Error("parse type: %s conf error", "scmbase conf")
+		}
+	}
+	return scmCONF
+}
+
+func (pm *SettingManager) GetIntegrateSettingByName(name, integrateType string) (*IntegrateSettingResponse, error) {
+	integrateSetting, err := pm.model.GetIntegrateSettingByName(name, integrateType)
+	if err != nil {
+		log.Log.Error("when GetIntegrateSettingByName, get GetIntegrateSettingByName occur error: %s", err.Error())
+		return nil, err
+	}
+	config := &Config{}
+	return formatSignalIntegrateSetting(integrateSetting, config), err
+}
+
 // GetIntegrateSettingsByPagination ..
-func (pm *SettingManager) GetIntegrateSettingsByPagination(filter *query.FilterQuery) (*query.QueryResult, error) {
-	queryResult, settingsList, err := pm.model.GetIntegrateSettingsByPagination(filter)
+func (pm *SettingManager) GetIntegrateSettingsByPagination(filter *query.FilterQuery, intergrateTypes []string) (*query.QueryResult, error) {
+	queryResult, settingsList, err := pm.model.GetIntegrateSettingsByPagination(filter, intergrateTypes)
 	if err != nil {
 		return nil, err
 	}
@@ -190,40 +265,10 @@ func (pm *SettingManager) UpdateIntegrateSetting(request *IntegrateSettingReq, s
 		log.Log.Error("json marshal error: %s", err.Error())
 		return err
 	}
-	//stageModel.Config = config
+
 	stageModel.CryptoConfig(config)
-	if request.Type == KubernetesType {
-		kube := &KubeConfig{}
-		err := json.Unmarshal([]byte(config), kube)
-		if err == nil {
-			pm.createOrupateKubernetesConfig(request.Name, kube.Conf)
-		} else {
-			log.Log.Error("kuber conf format error:  %v", err.Error())
-		}
-	}
+
 	return pm.model.UpdateIntegrateSetting(stageModel)
-}
-
-func (pm *SettingManager) createOrupateKubernetesConfig(clusterName, config string) error {
-	configPath := beego.AppConfig.String("k8s::configPath")
-
-	log.Log.Debug("configPath: %v", configPath)
-	err := os.MkdirAll(configPath, 0766)
-	if err != nil {
-		log.Log.Error(fmt.Sprintf("Failed to make the k8sconfig dir: %v", err.Error()))
-		return err
-	}
-	fileObj, err := os.OpenFile(configPath+"/"+clusterName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
-		log.Log.Error(fmt.Sprintf("Failed to open the file: %v", err.Error()))
-		return err
-	}
-	if _, err := io.WriteString(fileObj, config); err != nil {
-		log.Log.Error(fmt.Sprintf("init K8S cluster %v configure failed: %v", clusterName, err.Error()))
-		return err
-	}
-	log.Log.Debug(fmt.Sprintf("update K8S cluster %v configure successfully", clusterName))
-	return nil
 }
 
 // VerifyIntegrateSetting ..
@@ -240,16 +285,30 @@ func (pm *SettingManager) VerifyIntegrateSetting(request *IntegrateSettingReq) V
 	case KubernetesType:
 		kube := &KubeConfig{}
 		err := json.Unmarshal([]byte(config), kube)
+		if kube.Type == "" {
+			kube.Type = KubernetesConfig
+		}
 		if err != nil {
 			log.Log.Error("kuber conf format error:  %v", err.Error())
 			resp.Error = err
 			return resp
 		}
-		k8sconf, err := clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
-		if err != nil {
-			resp.Error = err
-			return resp
+		var k8sconf *rest.Config
+		switch kube.Type {
+		case KubernetesConfig:
+			k8sconf, err = clientcmd.RESTConfigFromKubeConfig([]byte(kube.Conf))
+			if err != nil {
+				resp.Error = err
+				return resp
+			}
+		case KubernetesToken:
+			k8sconf = &rest.Config{
+				BearerToken:     kube.Conf,
+				TLSClientConfig: rest.TLSClientConfig{Insecure: true},
+				Host:            kube.URL,
+			}
 		}
+
 		clientset, err := kubernetes.NewForConfig(k8sconf)
 		if err != nil {
 			resp.Error = err
@@ -334,21 +393,6 @@ func (pm *SettingManager) CreateIntegrateSetting(request *IntegrateSettingReq, c
 
 	newIntegrateSetting.CryptoConfig(config)
 
-	if request.Type == KubernetesType {
-		kube := &KubeConfig{}
-		err := json.Unmarshal([]byte(config), kube)
-		if err != nil {
-			msg := fmt.Sprintf("kuber conf format error:  %v", err.Error())
-			log.Log.Error(msg)
-			return fmt.Errorf(msg)
-		}
-
-		if err := pm.createOrupateKubernetesConfig(request.Name, kube.Conf); err != nil {
-			log.Log.Error("create or update k8s config file error: %s", err.Error())
-		} else {
-			log.Log.Debug("create or update k8s config file success.")
-		}
-	}
 	return pm.model.CreateIntegrateSetting(newIntegrateSetting)
 }
 

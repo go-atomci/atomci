@@ -310,13 +310,6 @@
           });
         }).catch(() => { });
       },
-      goPubDetail(type, id) {
-        window.open(
-          `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectID}/${
-          this.$props.pubItem.id
-          }/${id}/${type}`
-        );
-      },
       // 终止发布
       termination(id, stargid, name) {
         MessageBox.confirm(this.$t('bm.add.sureStopPublishCodeModule'), this.$t('bm.add.hint'), { type: 'warning' }).then(() => {

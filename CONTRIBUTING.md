@@ -32,10 +32,40 @@
    # use the pull.rebase config option to change the behavior for every git pull (instead of only newly-created branches)
    git config pull.rebase true
    ```
+3. 如果您提交的代码涉及到数据迁移，请在`internal/migrations`目录下添加迁移脚本，并在`migration.go`中注册该脚本
+   ```go
+   type MigrationXXXXX struct {
+   }
 
-3. Create a pull request to the main repository on GitHub.
-4. When the reviewer makes some comments, address any feedback that comes and update the pull request.
-5. When your contribution is accepted, your pull request will be approved and merged to the main branch.
+   func (m MigrationXXXXX) GetCreateAt() time.Time{
+      //时间请设定为提交代码的当前时间，以便于系统自动记录迁移历史
+      return time.Date(2022, 1, 1, 0, 0, 0, 0, time.Local)
+   }
+   func (m Migration20220101) Upgrade(ormer orm.Ormer) error{ 
+      //样例代码如下，err不为nil时，会自动回滚所有操作
+      /*
+      err := ormer.Raw(xxxx).Exec()
+      return err
+      */
+      
+   }
+
+   ```
+
+   ```go
+   //在migrations.go中
+   func InitMigration() {
+      migrationTypes := MigrationTypes{
+         //注册
+         new(MigrationXXXXX),
+         //...
+      }
+
+   }
+   ```
+4. Create a pull request to the main repository on GitHub.
+5. When the reviewer makes some comments, address any feedback that comes and update the pull request.
+6. When your contribution is accepted, your pull request will be approved and merged to the main branch.
 
 ### 2. 文档贡献
 

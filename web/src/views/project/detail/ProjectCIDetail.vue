@@ -144,6 +144,7 @@
       <to-build v-on:getprojectReleaseList="getVersionInfo" ref="goToBuild"></to-build>
       <version-add v-on:getlist="getVersionInfo" ref="versionAdd"></version-add>
       <publish-edit v-on:getPublishBaseInfo="getVersionBaseInfo" ref="publishEdit"></publish-edit>
+      <jenkins-log ref="jenkinsLog"></jenkins-log>
     </div>
 </template>
 
@@ -269,6 +270,7 @@
   .env-run {
     background-image: url(../../../assets/env_run.png);
   }
+
 </style>
 <script>
   import { Message, MessageBox } from 'element-ui';
@@ -283,6 +285,7 @@
   import ProjectDeploy from '../dialogCI/ProjectDeploy'; // 部署
   import versionAdd from '../dialogCI/ProjectVersionAdd'; //添加应用
   import PublishEdit from '../dialogCI/PublishEdit'; // 编辑版本
+  import JenkinsLog from "../components/JenkinsLog"; //查看Jenkins运行日志
 
 
 
@@ -301,6 +304,7 @@ export default {
     };
   },
   components: {
+    JenkinsLog,
     BackTo,
     NextStage,
     ToBuild,
@@ -402,10 +406,8 @@ export default {
         this.$refs.pages.total = data.total;
       });
     },
-    viewFile(item) {
-      window.open(
-        `//${window.location.host}/project/projectPubDetail/${this.$route.params.projectID}/${item.job_name}/${item.run_id}/${item.stage_id}`
-      );
+    viewFile(item){
+      this.$refs.jenkinsLog.doCreate(item.job_name,item.run_id,item.stage_id)
     },
     // 移除应用
     removeApp(id) {

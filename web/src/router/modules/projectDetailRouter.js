@@ -28,20 +28,6 @@ export function projectDetailRouter() {
           meta: { title: '应用代码', noCache: true},
           component: () => import('@/views/project/ProjectApp.vue'),
         },
-        {
-          path: '/project/addApp/:projectID',
-          name: 'addApp',
-          meta: { title: '新增应用', noCache: true },
-          component: () => import('@/views/project/detail/ProjectAppAdd.vue'),
-          hidden: true
-        },
-        {
-          path: '/project/projectAppDetail/:projectID/:appId/:tabs',
-          name: 'projectAppDetail',
-          meta: { title: '代码仓库详情', noCache: true },
-          component: () => import('@/views/project/detail/ProjectAppDetail.vue'),
-          hidden: true
-        },
       ]
     },
     {
@@ -61,13 +47,6 @@ export function projectDetailRouter() {
           meta: { title: '构建部署详情', noCache: true },
           name: 'projectCIDetail',
           component: () => import('@/views/project/detail/ProjectCIDetail.vue'),
-          hidden: true
-        },
-        {
-          path: '/project/projectPubDetail/:projectID/:jobName/:runId/:stageId',
-          name: 'projectPubDetail',
-          meta: { title: '日志详情', noCache: true },
-          component: () => import('@/views/project/detail/ProjectPubDetail.vue'),
           hidden: true
         },
       ]

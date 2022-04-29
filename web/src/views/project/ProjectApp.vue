@@ -51,21 +51,16 @@
       <div class="table-toolbar">
         <el-row class="mt16">
           <el-col :span="16">
-            <el-button :plain="false" type="primary" @click="addApp()">+{{$t('bm.deployCenter.addRepository')}}</el-button>
+            <el-button :plain="false" type="primary" @click="$refs.appRegister.doCreate(true)">+{{$t('bm.deployCenter.addRepository')}}</el-button>
           </el-col>
         </el-row>
       </div>
       <template>
         <el-table border :data="listCol" class="mt16">
-          <el-table-column prop="name" :label="$t('bm.deployCenter.repositoryName')" min-width="12%" :show-overflow-tooltip=true>
-            <template slot-scope="scope">
-              <el-button @click="appDetail(scope.row.id, 1)" type="text">{{scope.row.name}}</el-button>
-            </template>
-          </el-table-column>
-          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="12%" :show-overflow-tooltip=true />
+          <el-table-column prop="name" :label="$t('bm.deployCenter.repositoryName')" min-width="12%" :show-overflow-tooltip=true></el-table-column>
+          <el-table-column prop="full_name" :label="$t('bm.deployCenter.repositoryFullName')" min-width="14%" :show-overflow-tooltip=true />
           <el-table-column prop="language" :label="$t('bm.deployCenter.buildLang')" sortable min-width="8%" :show-overflow-tooltip=true />
-          <el-table-column prop="branch_name" :label="$t('bm.deployCenter.currentBranch')" min-width="8%" :show-overflow-tooltip=true />
-          <el-table-column prop="build_path" :label="$t('bm.deployCenter.buildPath')" min-width="8%" :show-overflow-tooltip=true />
+          <el-table-column prop="build_path" :label="$t('bm.deployCenter.buildPath')" min-width="6%" :show-overflow-tooltip=true />
           <el-table-column prop="path" :label="$t('bm.infrast.repositoryAdr')" min-width="25%" :show-overflow-tooltip=true>
             <template slot-scope="scope">
               <a class="font-blue" :href='scope.row.path' target="_blank">{{scope.row.path}}</a>
@@ -73,43 +68,50 @@
           </el-table-column>
           <el-table-column :label="$t('bm.deployCenter.operation')" min-width="15%">
             <template slot-scope="scope">
-                <el-button type="text" size="small" @click="$refs.appArrange.doSetup(scope.row)">
-                  {{$t('bm.deployCenter.appOrchestration')}}
-                </el-button>
-              <el-button type="text" size="small" @click="appDetail(scope.row.id, 1)">
-                {{$t('bm.deployCenter.branchManage')}}
+              <el-button type="text" size="small" @click="$refs.appArrange.doSetup(scope.row)">
+                {{$t('bm.deployCenter.appOrchestration')}}
+              </el-button>
+              <el-button type="text" size="small" @click="$refs.appRegister.doCreate(false, scope.row)">
+                {{$t('bm.deployCenter.edit')}}
+              </el-button> 
+              <el-button type="text" size="small" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectID, scope.row.id)">
+                {{$t('bm.deployCenter.delete')}}
+              </el-button>           
+              <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
+                {{$t('bm.deployCenter.details')}}
               </el-button>
             </template>
           </el-table-column>
         </el-table>
       </template>
       <page-nav ref="pages" :list="listCol" v-on:getlist="getList"></page-nav>
+      <common-delete ref="commonDelete" v-on:getlist="getList"></common-delete>
       <app-arrange ref="appArrange" :envList="envStageList" :appList="projectAppList"></app-arrange>
+      <project-app-register ref="appRegister" :scmAppList="scmAppList" v-on:getlist="getList"></project-app-register>
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+  import { MessageBox } from 'element-ui';
 import backend from '@/api/backend';
 import ListSearch from '@/components/utils/ListSearch';
+import CommonDelete from '@/components/utils/Delete';
 import PageNav from '@/components/utils/PageList';
 import Refresh from '@/components/utils/Refresh';
 import listTemplate from '@/common/listTemplate';
 import AppArrange from './components/AppArrange';
+import ProjectAppRegister from './components/ProjectAppRegister';
 
 export default {
   mixins: [listTemplate],
   data() {
     return {
-      searchList: [
-        { key: 'name', txt: this.$t('bm.deployCenter.repositoryName')},
-        { key: 'branch_name', txt: this.$t('bm.deployCenter.currentBranch') },
-        { key: 'path', txt: this.$t('bm.deployCenter.path') },
-      ],
       listCol: [],
       envStageList: [],
       projectAppList: [],
+      scmAppList: [],
       filterTxt: '',
       searchVal: '',
       searchType: '',
@@ -143,8 +145,10 @@ export default {
   components: {
     ListSearch,
     PageNav,
+    CommonDelete,
     Refresh,
     AppArrange,
+    ProjectAppRegister,
   },
   computed: {
     ...mapGetters({
@@ -162,6 +166,9 @@ export default {
     }),
     backend.getAppAll(this.projectID, (data) => {
       this.projectAppList = data
+    }),
+    backend.getAllScmApps( (data) => {
+      this.scmAppList = data
     }),
     this.getList(true);
   },
@@ -202,16 +209,17 @@ export default {
         }
       });
     },
-    // 代码仓库详情
-    appDetail(scmAppId, tabs) {
-      this.$router.push({
-        name: 'projectAppDetail',
-        params: {
-          projectID: this.projectID,
-          appId: scmAppId,
-          tabs: tabs
-        },
-      });
+    // 我的应用-应用详情
+    appDetail(scmAppId) {
+      MessageBox.confirm('确定要进入“我的应用 / 应用详情” 页面 ？', '提示', { type: 'warning' }).then(() => {
+        this.$router.push({
+          name: 'scmAppDetail',
+          params: {
+            appId: scmAppId,
+          },
+        });
+      }).catch(() => { });
+      
     },
     changeFilterTxt(val, type) {
       this.searchVal = val;
