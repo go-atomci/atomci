@@ -16,18 +16,36 @@ limitations under the License.
 
 package apps
 
-// SetupRepo ..
-type SetupRepo struct {
-	BaseURL string `json:"base_url"`
-	User    string `json:"user"`
-	Token   string `json:"token"`
+import "github.com/go-atomci/atomci/internal/models"
+
+type ScmAppReq struct {
+	// ProjectAppReq add app into project request body.
+	Name         string `json:"name"`
+	CompileEnvID int64  `json:"compile_env_id"`
+	Language     string `json:"language"`
+	Path         string `json:"path"`
+	RepoID       int64  `json:"repo_id"`
+	FullName     string `json:"full_name"`
+	BranchName   string `json:"branch_name"`
+	BuildPath    string `json:"build_path"`
+	Dockerfile   string `json:"dockerfile"`
 }
 
-// RepoServerRsp ..
-type RepoServerRsp struct {
-	RepoID int64  `json:"repo_id"`
-	Type   string `json:"type"`
-	SetupRepo
+type ScmAppUpdateReq struct {
+	BranchName   string `json:"branch_name"`
+	Language     string `json:"language"`
+	Name         string `json:"name"`
+	Path         string `json:"path"`
+	CompileEnvID int64  `json:"compile_env_id"`
+	BuildPath    string `json:"build_path"`
+	Dockerfile   string `json:"dockerfile"`
+}
+
+// SCMAppRsp ..
+type SCMAppRsp struct {
+	*models.ScmApp
+	BranchHistoryList []string `json:"branch_history_list,omitempty"`
+	CompileEnv        string   `json:"compile_env"`
 }
 
 // RepoProjectRsp ..

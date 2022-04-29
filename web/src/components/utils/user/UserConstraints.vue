@@ -186,12 +186,10 @@ export default {
             dataValue.push(item.value);
           });
           if (this.isEdit) {
-            // TODO: use default group system 
             backend.putUserConstraintsItem("system", this.$route.params.user, this.form.constraint, dataValue, () => {
               successCallBack();
             });
           } else {
-            // TODO: use default group system 
             backend.postUserConstraints("system", this.$route.params.user, this.form.constraint, dataValue, () => {
               successCallBack();
             });

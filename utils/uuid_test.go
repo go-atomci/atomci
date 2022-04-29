@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestUUID(t *testing.T) {
+func Test_NEWUUID_SHOULD_NOT_EMPTY(t *testing.T) {
 	uuid := NewUUID()
 
 	assert.NotEmpty(t, uuid)

@@ -28,6 +28,91 @@ type AppController struct {
 	BaseController
 }
 
+// CreateSCMApp for project
+func (a *AppController) CreateSCMApp() {
+	req := &apps.ScmAppReq{}
+	a.DecodeJSONReq(&req)
+	mgr := apps.NewAppManager()
+	_, result := mgr.CreateSCMApp(req, a.User)
+	if result != nil {
+		a.HandleInternalServerError(result.Error())
+		log.Log.Error("add project app error: %s", result.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
+func (a *AppController) GetAllApps() {
+	mgr := apps.NewAppManager()
+	// TODO: add app tag filter base on permisson
+	result, err := mgr.GetScmApps()
+	if err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("get scm apps error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
+// GetAppsByPagination ..
+func (a *AppController) GetAppsByPagination() {
+	filterQuery := a.GetFilterQuery()
+	mgr := apps.NewAppManager()
+	result, err := mgr.GetScmAppsByPagination(filterQuery)
+	if err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("get scm app list error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
+// ScmAppInfo ..
+func (a *AppController) ScmAppInfo() {
+	scmAppID, _ := a.GetInt64FromPath(":app_id")
+	mgr := apps.NewAppManager()
+	result, err := mgr.GetScmApp(scmAppID)
+	if err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("get scm app error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
+// UpdateScmApp ..
+func (a *AppController) UpdateScmApp() {
+	scmAppID, _ := a.GetInt64FromPath(":app_id")
+	req := &apps.ScmAppUpdateReq{}
+	a.DecodeJSONReq(req)
+	am := apps.NewAppManager()
+	if err := am.UpdateProjectApp(scmAppID, req); err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("update scm app error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, nil, "")
+	a.ServeJSON()
+}
+
+// DeleteScmApp ...
+func (a *AppController) DeleteScmApp() {
+	scmAppID, _ := a.GetInt64FromPath(":app_id")
+	am := apps.NewAppManager()
+	result := am.DeleteSCMApp(scmAppID)
+	if result != nil {
+		a.HandleInternalServerError(result.Error())
+		log.Log.Error("delete scm app error: %s", result.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, result, "")
+	a.ServeJSON()
+}
+
 // GetArrange ...
 func (a *AppController) GetArrange() {
 	appID, err := a.GetInt64FromPath(":app_id")
@@ -96,43 +181,11 @@ func (a *AppController) ParseArrangeYaml() {
 	a.ServeResult(NewResult(true, rsp, ""))
 }
 
-/* -- repo server start -- */
-
-// GetRepos ..
-func (a *AppController) GetRepos() {
-	projectID, err := a.GetInt64FromQuery("project_id")
-	if err != nil {
-		a.HandleInternalServerError(err.Error())
-		log.Log.Error("parse project id error: %s", err.Error())
-		return
-	}
-	if projectID == 0 {
-		projectID = 1
-	}
-	log.Log.Debug("args projectID: %v", projectID)
-	mgr := apps.NewAppManager()
-	rsp, err := mgr.GetRepos(projectID)
-	if err != nil {
-		a.HandleInternalServerError(err.Error())
-		log.Log.Error("get repos error: %s", err.Error())
-		return
-	}
-	a.ServeResult(NewResult(true, rsp, ""))
-}
-
 // GetGitProjectsByRepoID ..
 func (a *AppController) GetGitProjectsByRepoID() {
-	// TODO: change url query
-	projectID, _ := a.GetInt64FromQuery("project_id")
-	if projectID == 0 {
-		projectID = 1
-	}
-	log.Log.Debug("args projectID: %v", projectID)
 	repoID, _ := a.GetInt64FromPath(":repo_id")
-	request := apps.SetupRepo{}
-	a.DecodeJSONReq(&request)
 	mgr := apps.NewAppManager()
-	rsp, err := mgr.SetRepoAndGetProjects(projectID, repoID, &request)
+	rsp, err := mgr.GetScmProjectsByRepoID(repoID)
 	if err != nil {
 		a.HandleInternalServerError(err.Error())
 		log.Log.Error("get repo's projects error: %s", err.Error())
@@ -140,8 +193,6 @@ func (a *AppController) GetGitProjectsByRepoID() {
 	}
 	a.ServeResult(NewResult(true, rsp, ""))
 }
-
-/* -- repo server end -- */
 
 // GetAppBranches ..
 func (a *AppController) GetAppBranches() {

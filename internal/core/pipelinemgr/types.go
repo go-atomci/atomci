@@ -290,17 +290,19 @@ type MergeBranchStepResp struct {
 
 // RunBuildAllParms there are all apps parms for jenkins pipeline job
 type RunBuildAllParms struct {
-	*models.ProjectApp
 	*RunBuildAppReq
+	*models.ScmApp
 	Release     string `json:"release"`
 	MergeBranch bool   `json:"merge-branch"`
+	ProjectID   int64
 }
 
 // RunDeployAllParms there are all apps parms for jenkins pipeline job
 type RunDeployAllParms struct {
-	*models.ProjectApp
+	*models.ScmApp
 	*RunDeployAppReq
 	ImageAddr string `json:"image_addr"`
+	ProjectID int64
 }
 
 // AppParamsForCreatePublishJob ..

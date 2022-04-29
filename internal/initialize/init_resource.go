@@ -103,7 +103,7 @@ func initRouterItems() error {
 			err := fmt.Errorf("invalid router parameter: %v", route)
 			return err
 		}
-		// TODO: add get verify
+		// TODO: Does validation already exist?
 		if err := dao.CreateGatewayRoute(route[0], route[1], route[2], route[3], route[4]); err != nil {
 			if !errors.OrmError1062(err) {
 				log.Log.Error("Init gateway error: %s", err.Error())

@@ -51,7 +51,7 @@ func (pm *PublishManager) GetCanAddedApps(publishID int64) ([]*models.ProjectApp
 	for _, app := range projectApps {
 		if !utils.IntContains(appIDByAdded, app.ID) {
 			branchList := []string{}
-			branches, err := pm.gitAppModel.GetAppBranches(app.ID)
+			branches, err := pm.gitAppModel.GetAppBranches(app.ScmID)
 			if err == nil {
 				for _, item := range branches {
 					branchList = append(branchList, item.BranchName)

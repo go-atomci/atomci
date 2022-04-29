@@ -49,12 +49,21 @@ func (model *SysSettingModel) GetIntegrateSettingByID(integrateSettingID int64) 
 	return &integrateSetting, nil
 }
 
-// GetIntegrateSettings ...
-func (model *SysSettingModel) GetIntegrateSettings(integrateType string) ([]*models.IntegrateSetting, error) {
-	integrateSettings := []*models.IntegrateSetting{}
+func (model *SysSettingModel) GetIntegrateSettingByName(name, integrateType string) (*models.IntegrateSetting, error) {
+	integrateSetting := models.IntegrateSetting{}
 	qs := model.ormer.QueryTable(model.IntegrateSettingTableName).Filter("deleted", false)
-	if integrateType != "" {
-		qs = qs.Filter("type", integrateType)
+	if err := qs.Filter("name", name).Filter("type", integrateType).One(&integrateSetting); err != nil {
+		return nil, err
+	}
+	return &integrateSetting, nil
+}
+
+// GetIntegrateSettings ...
+func (model *SysSettingModel) GetIntegrateSettings(integrateTypes []string) ([]*models.IntegrateSetting, error) {
+	var integrateSettings []*models.IntegrateSetting
+	qs := model.ormer.QueryTable(model.IntegrateSettingTableName).Filter("deleted", false)
+	if len(integrateTypes) > 0 {
+		qs = qs.Filter("type__in", integrateTypes)
 	}
 	_, err := qs.All(&integrateSettings)
 	if err != nil {
@@ -64,7 +73,7 @@ func (model *SysSettingModel) GetIntegrateSettings(integrateType string) ([]*mod
 }
 
 // GetIntegrateSettingsByPagination ..
-func (model *SysSettingModel) GetIntegrateSettingsByPagination(filter *query.FilterQuery) (*query.QueryResult, []*models.IntegrateSetting, error) {
+func (model *SysSettingModel) GetIntegrateSettingsByPagination(filter *query.FilterQuery, intergrateTypes []string) (*query.QueryResult, []*models.IntegrateSetting, error) {
 	rst := &query.QueryResult{Item: []*models.IntegrateSetting{}}
 	queryCond := orm.NewCondition().AndCond(orm.NewCondition().And("deleted", false))
 
@@ -72,6 +81,9 @@ func (model *SysSettingModel) GetIntegrateSettingsByPagination(filter *query.Fil
 		queryCond = queryCond.AndCond(filterCond)
 	}
 	qs := model.ormer.QueryTable(model.IntegrateSettingTableName).OrderBy("-create_at").SetCond(queryCond)
+	if len(intergrateTypes) > 0 {
+		qs = qs.Filter("type__in", intergrateTypes)
+	}
 	count, err := qs.Count()
 	if err != nil {
 		return nil, nil, err

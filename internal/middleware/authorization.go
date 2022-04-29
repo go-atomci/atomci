@@ -27,7 +27,7 @@ import (
 func Authorization(c *context.Context, username string) (bool, error) {
 	e, err := mycasbin.NewCasbin()
 	if err != nil {
-		log.Log.Error("casbin new occur error: %v", err)
+		log.Log.Error("casbin new occur error: %v", err.Error())
 		return false, err
 	}
 	urlPath := c.Request.URL.Path

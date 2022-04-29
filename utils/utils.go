@@ -55,6 +55,10 @@ func MakeToken() string {
 	return token
 }
 
+func GenerateRandomstring(length int) string {
+	return string(Krand(length, KC_RAND_KIND_ALL))
+}
+
 // Contains ..
 func Contains(s []string, e string) bool {
 	for _, a := range s {

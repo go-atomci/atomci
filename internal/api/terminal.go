@@ -18,14 +18,9 @@ package api
 
 import (
 	"fmt"
-	"path"
-
 	"github.com/go-atomci/atomci/internal/core/podexec"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/pkg/kube"
-
-	"github.com/astaxie/beego"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type TerminalController struct {
@@ -57,7 +52,7 @@ func (t *TerminalController) PodTerminal() {
 		_ = pty.Close()
 	}()
 
-	kubeCli, err := kube.GetClientset(cluster)
+	kubeCli, cfg, err := kube.GetClientset(cluster)
 	if err != nil {
 		msg := fmt.Sprintf("get kubecli err :%v", err)
 		log.Log.Error(msg)
@@ -79,14 +74,6 @@ func (t *TerminalController) PodTerminal() {
 		return
 	}
 
-	configFile := path.Join(beego.AppConfig.String("k8s::configPath"), cluster)
-	cfg, err := clientcmd.BuildConfigFromFlags("", configFile)
-	if err != nil {
-		msg := fmt.Sprintf("build config occur error: %s", err.Error())
-		log.Log.Error(msg)
-		t.HandleInternalServerError(msg)
-		return
-	}
 	err = podexec.ExecPod(kubeCli, cfg, []string{"/bin/sh"}, pty, namespace, podName, containerName)
 	if err != nil {
 		msg := fmt.Sprintf("Exec to pod error! err: %v", err)

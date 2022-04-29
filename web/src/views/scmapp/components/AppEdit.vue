@@ -109,7 +109,6 @@ export default {
       this.isEdit = flag;
       this.form = {
         name: item.name || '',
-        // TODO: comment app type tmp
         language: item.language || '',
         path: item.path || '',
         compile_env_id: item.compile_env_id || 0,
@@ -139,7 +138,7 @@ export default {
             build_path: this.form.build_path,
             dockerfile:  this.form.dockerfile || 'Dockerfile',
           };
-          backend.updateAppInfo(this.$route.params.projectID, this.rowId, cl, (data) => {
+          backend.updateScmAppInfo(this.rowId, cl, (data) => {
             successCallBack();
           });
 

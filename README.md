@@ -3,6 +3,10 @@
 
 # atomci
 
+<a href="https://goreportcard.com/report/github.com/go-atomci/atomci"><img src="https://goreportcard.com/badge/github.com/go-atomci/atomci" alt="A+"></a>
+[![codecov](https://codecov.io/gh/go-atomci/atomci/branch/master/graph/badge.svg?token=VPJGT3405P)](https://codecov.io/gh/go-atomci/atomci)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/go-atomci/atomci/blob/master/LICENSE)
+
 AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
 
 * github: https://github.com/go-atomci/atomci
@@ -183,7 +187,5 @@ __AtomCI__ 因你而变。
 |`ldap::baseDN`| OU=Xxx,DC=xx,DC=com | |
 | JWT 配置 <br/>|
 |`jwt::secret`| changemeforsecurity |　jwt的加密使用的字段，建议修改 |
-| K8s配置　<br/> |
-|`k8s::configPath`| ./conf/k8sconfig | k8s 配置文件存放路径，不建议修改|
 |<br/>|
 |`atomci::url`| http://localhost:8080 | AtomCI 回调地址　|

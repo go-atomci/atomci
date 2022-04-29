@@ -22,18 +22,20 @@ import (
 	"github.com/astaxie/beego"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 
+	"github.com/go-atomci/atomci/internal/initialize"
+	"github.com/go-atomci/atomci/internal/migrations"
+	"github.com/go-atomci/atomci/internal/models"
+
 	"github.com/go-atomci/atomci/internal/cronjob"
-	_ "github.com/go-atomci/atomci/internal/initialize"
-	_ "github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/internal/routers"
-	"github.com/go-atomci/atomci/pkg/kube"
 )
 
-func init() {
-	kube.Init()
-}
-
 func main() {
+	models.InitDB()
+	migrations.Migrate()
+	// TODO: resource items migrate later
+	initialize.Init()
+
 	cronjob.RunPublishJobServer()
 	beego.Info("Beego version:", beego.VERSION)
 

@@ -17,6 +17,8 @@ limitations under the License.
 package api
 
 import (
+	"github.com/go-atomci/atomci/constant"
+
 	"github.com/go-atomci/atomci/internal/core/settings"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 )
@@ -28,7 +30,7 @@ type IntegrateController struct {
 
 func (p *IntegrateController) GetClusterIntegrateSettings() {
 	pm := settings.NewSettingManager()
-	rsp, err := pm.GetIntegrateSettings("kubernetes")
+	rsp, err := pm.GetIntegrateSettings([]string{constant.IntegrateKubernetes})
 	if err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("Get integrate settings occur error: %s", err.Error())
@@ -41,7 +43,7 @@ func (p *IntegrateController) GetClusterIntegrateSettings() {
 // GetIntegrateSettings ..
 func (p *IntegrateController) GetIntegrateSettings() {
 	pm := settings.NewSettingManager()
-	rsp, err := pm.GetIntegrateSettings("")
+	rsp, err := pm.GetIntegrateSettings(constant.Integratetypes)
 	if err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("Get integrate settings occur error: %s", err.Error())
@@ -55,7 +57,37 @@ func (p *IntegrateController) GetIntegrateSettings() {
 func (p *IntegrateController) GetIntegrateSettingsByPagination() {
 	filterQuery := p.GetFilterQuery()
 	pm := settings.NewSettingManager()
-	rsp, err := pm.GetIntegrateSettingsByPagination(filterQuery)
+	rsp, err := pm.GetIntegrateSettingsByPagination(filterQuery, constant.Integratetypes)
+	if err != nil {
+		p.HandleInternalServerError(err.Error())
+		log.Log.Error("Get integrate settings occur error: %s", err.Error())
+		return
+	}
+	p.Data["json"] = NewResult(true, rsp, "")
+	p.ServeJSON()
+}
+
+func (p *IntegrateController) GetSCMIntegrateSettings() {
+	pm := settings.NewSettingManager()
+	rsp, err := pm.GetIntegrateSettings(constant.ScmIntegratetypes)
+	if err != nil {
+		p.HandleInternalServerError(err.Error())
+		log.Log.Error("Get integrate settings occur error: %s", err.Error())
+		return
+	}
+	// for security hidden config content
+	for _, item := range rsp {
+		item.IntegrateSettingReq.Config = nil
+	}
+	p.Data["json"] = NewResult(true, rsp, "")
+	p.ServeJSON()
+}
+
+// GetSCMIntegrateSettingsByPagination ..
+func (p *IntegrateController) GetSCMIntegrateSettingsByPagination() {
+	filterQuery := p.GetFilterQuery()
+	pm := settings.NewSettingManager()
+	rsp, err := pm.GetIntegrateSettingsByPagination(filterQuery, constant.ScmIntegratetypes)
 	if err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("Get integrate settings occur error: %s", err.Error())
