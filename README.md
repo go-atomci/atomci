@@ -1,6 +1,3 @@
-
-[![codecov](https://codecov.io/gh/fanhousanbu/atomci/branch/master/graph/badge.svg?token=RCJWENIENM)](https://codecov.io/gh/fanhousanbu/atomci)
-
 # atomci
 
 <a href="https://goreportcard.com/report/github.com/go-atomci/atomci"><img src="https://goreportcard.com/badge/github.com/go-atomci/atomci" alt="A+"></a>
