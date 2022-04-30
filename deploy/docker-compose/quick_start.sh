@@ -50,5 +50,4 @@ tar zxf atomci-${ATOMCIVERSION}-docker-compose.tgz
 cd atomci-${ATOMCIVERSION}
 
 echo '开始部署'
-docker-compose down && docker-compose up -d
-/bin/bash init.sh
+/bin/bash start.sh
