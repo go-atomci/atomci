@@ -72,6 +72,11 @@ func (pm *SettingManager) GetCompileEnvsByPagination(filter *query.FilterQuery) 
 	return queryResult, err
 }
 
+// resetEnv clear env config
+func resetEnv(env *string) {
+	*env = ""
+}
+
 // UpdateCompileEnv ..
 func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64) error {
 	compileEnv, err := pm.model.GetCompileEnvByID(stepID)
@@ -84,13 +89,20 @@ func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64)
 
 	if request.Args != "" {
 		compileEnv.Args = request.Args
+	} else {
+		resetEnv(&compileEnv.Args)
 	}
 
 	if request.Command != "" {
 		compileEnv.Command = request.Command
+	} else {
+		resetEnv(&compileEnv.Command)
 	}
+
 	if request.Description != "" {
 		compileEnv.Description = request.Description
+	} else {
+		resetEnv(&compileEnv.Description)
 	}
 
 	if request.Image != "" {
