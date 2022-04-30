@@ -130,9 +130,9 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		err := json.Unmarshal([]byte(sc), kube)
 		return kube, err
 	case "jenkins":
-		jenkins := &JenkinsConfig{}
-		err := json.Unmarshal([]byte(sc), jenkins)
-		return jenkins, err
+		jnkCfg := &JenkinsConfig{}
+		err := json.Unmarshal([]byte(sc), jnkCfg)
+		return jnkCfg, err
 	case "registry":
 		registry := &RegistryConfig{}
 		err := json.Unmarshal([]byte(sc), registry)
@@ -254,6 +254,8 @@ func (pm *SettingManager) UpdateIntegrateSetting(request *IntegrateSettingReq, s
 
 	if request.Description != "" {
 		stageModel.Description = request.Description
+	} else {
+		resetEnv(&stageModel.Description)
 	}
 
 	if request.Type != "" {
