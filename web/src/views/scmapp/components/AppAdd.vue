@@ -32,7 +32,7 @@
     >
       <div class="arrange-body">
       <template>
-        <el-form ref="ruleForm" :model="form" :rules="rules">
+        <el-form ref="ruleForm" :model="form" :rules="rules" label-width="100px" >
           <el-form-item label="代码源" prop="repo_id">
             <el-select
               v-model="form.repo_id"
@@ -51,25 +51,25 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item label="仓库地址" prop="path">
-            <el-select
-              v-model="form.path"
-              filterable
-              placeholder="请选择语言类型"
+          <el-form-item label="仓库路径" prop="full_name">
+            <el-autocomplete
+              v-model="form.full_name"
               style="width: 300px"
-              @change="setScmAppName()"
-            >
-              <el-option
-                v-for="(item, index) in scmProjects"
-                :key="index"
-                :label="item.full_name"
-                :value="item.path"
-              >
-              </el-option>
-            </el-select>
+              placeholder="请选择/输入路径"
+              :fetch-suggestions="querySearch"
+              @blur="setScmAppName"
+              @select="setSelectPath">
+              <i
+                class="el-icon-edit el-input__icon"
+                slot="suffix">
+              </i>
+              <template slot-scope="{ item }">
+                <div class="name">{{ item.full_name }}</div>
+              </template>
+            </el-autocomplete>
           </el-form-item>
 
-          <el-form-item label="应用名" prop="build_path">
+          <el-form-item label="应用名" prop="name">
             <el-input
               v-model="form.name"
               placeholder="请输入应用名"
@@ -172,9 +172,11 @@ export default {
       },
       getRepoLoading: true,
       rules: {
+        name: [{ required: true, message: '请输入应用名', trigger: 'blur' }],
         type: [{ required: true, message: '请选择应用类型', trigger: 'change' }],
         repo_id: [{ required: true, message: '请选择代码源', trigger: 'change' }],
         path: [{ required: true, message: '请选择仓库地址', trigger: 'change' }],
+        full_name: [{ required: true, message: '请选择/输入仓库路径', trigger: 'blur' }],
         compile_env_id: [{ required: false, message: '请选择应用编译环境', trigger: 'change' }],
         language: [{ required: true, message: '请选择语言类型', trigger: 'change' }],
       },
@@ -196,17 +198,58 @@ export default {
     this.getIntegrateRepos();
   },
   methods: {
-    setScmAppName() {
-      if (this.form.path == undefined) {
-        return
-      }
+    querySearch(queryString, cb) {
+        var scmProjects = this.scmProjects;
+        var results = queryString ? scmProjects.filter(this.createFilter(queryString)) : scmProjects;
+        // 调用 callback 返回建议列表的数据
+        cb(results);
+      },
+    createFilter(queryString) {
+      return (scmProjects) => {
+        return (scmProjects.full_name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+      };
+    },
+    setSelectPath(item){
+      this.form.full_name=item.full_name;
       for (let i = 0; i < this.scmProjects.length; i++) {
-          if (this.scmProjects[i].path == this.form.path) {
-            this.form.name = this.scmProjects[i].name
-            this.form.full_name = this.scmProjects[i].full_name
+          if (this.scmProjects[i].full_name == this.form.full_name) {
+            this.form.name = this.scmProjects[i].name;
+            this.form.path = this.scmProjects[i].path;
             break
           }
       }
+    },
+    setScmAppName() {
+      this.setFullName();
+      if (this.form.full_name &&  !this.form.name) {
+        let names = this.form.full_name.split('/');
+        this.form.name = names[names.length-1].split('.')[0]
+      }
+      this.form.path = "";
+      for (let i = 0; i < this.scmProjects.length; i++) {
+        if (this.scmProjects[i].full_name == this.form.full_name) {
+          this.form.path = this.scmProjects[i].path;
+          return
+        }
+      }
+    },
+    setFullName(){
+      if (!this.form.full_name){
+        return;
+      }
+      let fullName=this.form.full_name;
+      // 优化路径，路径只需要[域名]和[.git]之间部分就行
+      // 若是完整路径，如 http://reap.com/xx.git,则去除域名
+      if(fullName.toLowerCase().indexOf('http://') > -1 || fullName.toLowerCase().indexOf('https://') > -1){
+          let index = this.form.full_name.indexOf('/',8);
+          fullName = this.form.full_name.substring(index + 1);
+      }
+      // 若路径包含[.git],也要去掉
+      if(fullName.length > 3 && fullName.substring(fullName.length - 4).toLowerCase() == '.git'){
+          this.form.full_name = fullName.substring(0,fullName.length - 4);
+          return
+      }
+      this.form.full_name = fullName;
     },
     getIntegrateRepos() {
       backend.getIntegrateRepos((data) => {
@@ -245,6 +288,19 @@ export default {
     addApp() {
       this.$refs.ruleForm.validate((valid) => {
         if (valid) {
+          // 完整的路径地址不存在的话，则组装一个出来
+          if(this.form.path==""){
+            for (let i = 0; i < this.integrateRepos.length; i++) {
+              if (this.integrateRepos[i].id == this.form.repo_id) {
+                let domain= this.integrateRepos[i].config.url;
+                if(domain && domain.length>0 && domain.substring(domain.length-1)=='/'){
+                  this.form.path = domain + this.form.full_name + '.git';
+                }else {
+                  this.form.path = domain + '/' + this.form.full_name + '.git';
+                }
+              }
+            }
+          }
           const cl = this.form
           cl.type = 'app';
           cl.dockerfile = this.form.dockerfile || 'Dockerfile';

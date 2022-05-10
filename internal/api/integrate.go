@@ -17,6 +17,8 @@ limitations under the License.
 package api
 
 import (
+	"reflect"
+
 	"github.com/go-atomci/atomci/constant"
 
 	"github.com/go-atomci/atomci/internal/core/settings"
@@ -77,10 +79,21 @@ func (p *IntegrateController) GetSCMIntegrateSettings() {
 	}
 	// for security hidden config content
 	for _, item := range rsp {
-		item.IntegrateSettingReq.Config = nil
+		//用于前端生成完成仓库地址
+		item.IntegrateSettingReq.Config = settings.BaseConfig{
+			URL: getBaseConfigUrl(item.IntegrateSettingReq.Config),
+		}
 	}
 	p.Data["json"] = NewResult(true, rsp, "")
 	p.ServeJSON()
+}
+
+// 获取仓库域名
+// TODO现在用反射获取，有更好方法再替换
+func getBaseConfigUrl(config interface{}) string {
+	immutable := reflect.ValueOf(config).Elem()
+	url := immutable.FieldByName("URL").String()
+	return url
 }
 
 // GetSCMIntegrateSettingsByPagination ..
