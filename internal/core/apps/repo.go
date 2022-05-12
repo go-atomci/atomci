@@ -57,6 +57,10 @@ func (manager *AppManager) GetScmProjectsByRepoID(repoID int64) (interface{}, er
 	if err != nil {
 		return nil, err
 	}
+	// 获取仓库项目需要授权，若配置的仓库是公共库，则直接返回
+	if scmIntegrateResp.ScmAuthConf.Token == "" {
+		return []*RepoProjectRsp{}, nil
+	}
 	scmClient, err := NewScmProvider(scmIntegrateResp.Type, scmIntegrateResp.ScmAuthConf.URL, scmIntegrateResp.ScmAuthConf.Token)
 	if err != nil {
 		log.Log.Error("init scm Client occur error: %v", err.Error())

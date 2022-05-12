@@ -19,9 +19,10 @@ package apps
 import (
 	"context"
 	"fmt"
-	"github.com/drone/go-scm/scm/driver/gogs"
 	"net/http"
 	"strings"
+
+	"github.com/drone/go-scm/scm/driver/gogs"
 
 	"github.com/drone/go-scm/scm/driver/gitea"
 
@@ -59,49 +60,44 @@ func NewScmProvider(vcsType, vcsPath, token string) (*scm.Client, error) {
 
 		if "gitea" == gitRepo {
 			client, err = gitea.New(schema + "://" + projectPathSplit[0])
-			client.Client = &http.Client{
-				Transport: &transport.BearerToken{
-					Token: token,
-				},
-			}
 		} else if "gitlab" == gitRepo {
 			client, err = gitlab.New(schema + "://" + projectPathSplit[0])
-
-			client.Client = &http.Client{
-				Transport: &transport.PrivateToken{
-					Token: token,
-				},
-			}
 		} else {
 			client, err = gogs.New(schema + "://" + projectPathSplit[0])
-			client.Client = &http.Client{
-				Transport: &transport.PrivateToken{
-					Token: token,
-				},
-			}
 		}
 	case "github":
 		client = github.NewDefault()
-
-		client.Client = &http.Client{
-			Transport: &transport.BearerToken{
-				Token: token,
-			},
-		}
-
 	case "gitee":
 		client = gitee.NewDefault()
-
-		client.Client = &http.Client{
-			Transport: &transport.BearerToken{
-				Token: token,
-			},
-		}
-
 	default:
 		err = fmt.Errorf("source code management system not configured")
 	}
+	if client != nil {
+		client.Client = getSCMHttpClient(vcsType, token)
+	}
 	return client, err
+}
+
+// 根据不同类型获取客户端，若有token，则配置对应token；无token,表示公共库，不配置鉴权信息
+func getSCMHttpClient(scmType string, token string) *http.Client {
+	if token == "" {
+		return &http.Client{}
+	}
+	switch strings.ToLower(scmType) {
+	case "gitlab", "gogs":
+		return &http.Client{
+			Transport: &transport.PrivateToken{
+				Token: token,
+			}}
+	case "gitea", "gitee", "github":
+		return &http.Client{
+			Transport: &transport.BearerToken{
+				Token: token,
+			},
+		}
+	default:
+		return nil
+	}
 }
 
 // SyncAppBranches ...

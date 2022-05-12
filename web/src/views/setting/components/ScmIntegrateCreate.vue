@@ -28,16 +28,22 @@
         </el-select>
       </el-form-item>
       <div>
+        <el-form-item label="仓库类型" class="form-item" >
+          <el-radio v-model="repoType" label="0">私有</el-radio>
+          <el-radio v-model="repoType" label="1">开源</el-radio>
+        </el-form-item>
+      </div>
+      <div>
         <el-form-item label="地址" prop="config.url" class="form-item" >
           <el-input v-model="form.config.url" auto-complete="off" :disabled="disabledEditURL" placeholder="请输入代码源地址"></el-input>
         </el-form-item>
       </div>
-      <div v-if="form.type ==='gitlab'">
+      <div v-if="repoType === '0' && form.type ==='gitlab'">
         <el-form-item label="用户名" prop="config.user" class="form-item">
           <el-input v-model.trim="form.config.user" auto-complete="off" placeholder="请输入gitlab用户名"></el-input>
         </el-form-item>
       </div>
-      <div>
+      <div v-if="repoType === '0'">
         <el-form-item label="Token" prop="config.token" class="form-item">
           <el-input v-model.trim="form.config.token" auto-complete="off" maxlength="120" placeholder="请输入代码源Token"></el-input>
         </el-form-item>
@@ -76,6 +82,7 @@ export default {
   data() {
     return {
       name: '',
+      repoType:"0",
       disabledEditURL: false,
       groupRoleList: [],
       settingTypeList: [
@@ -149,6 +156,7 @@ export default {
       this.isEdit = flag;
       if (flag) {
         this.title = '编辑配置';
+        this.repoType = item.config.token ? "0" :  "1";
         this.form = {
           name: item.name || '',
           type: item.type || '',
@@ -189,6 +197,11 @@ export default {
             type: this.form.type,
             description: this.form.description,
           };
+          if (this.repoType == '1'){
+            cl.config={
+              url:this.form.config.url
+            }
+          }
           if (this.isEdit) {
             backend.editIntegrateSetting(this.rowId, cl, () => {
               successCallBack();
