@@ -722,6 +722,10 @@ const backendAPI = {
   editIntegrateSetting(idStep, body, cb) {
     Package.httpMethods('put', `/atomci/api/v1/integrate/settings/${idStep}`, cb, body);
   },
+  // 验证仓库源是否联通
+  verifyRepoConnetion(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/integrate/settings/verifyrepo`, cb, body);
+  },
   delIntegrateSetting(idStep, cb) {
     Package.httpMethods('delete', `/atomci/api/v1/integrate/settings/${idStep}`, cb);
   },
@@ -907,6 +911,10 @@ const backendAPI = {
   //新增
   addScmAppPro(body, cb) {
     Package.httpMethods('post', `/atomci/api/v1/apps/create`, cb, body);
+  },
+  // 验证应用地址是否能正常联通
+  verifyAppConnetion(body, cb) {
+    Package.httpMethods('post', `/atomci/api/v1/apps/verifyapp`, cb, body);
   },
   //应用编排
   getProjectArrange(project_id, app_id, arrange_env, cb) {

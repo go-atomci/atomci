@@ -85,6 +85,7 @@ func RegisterRoutes() {
 				beego.NSRouter("/integrate/settings/scms", &api.IntegrateController{}, "get:GetSCMIntegrateSettings;post:GetSCMIntegrateSettingsByPagination"),
 				beego.NSRouter("/integrate/settings/:id", &api.IntegrateController{}, "put:UpdateIntegrateSetting;delete:DeleteIntegrateSetting"),
 				beego.NSRouter("/integrate/settings/verify", &api.IntegrateController{}, "post:VerifyIntegrateSetting"),
+				beego.NSRouter("/integrate/settings/verifyrepo", &api.IntegrateController{}, "post:VerifyRepoConnetion"),
 				beego.NSRouter("/integrate/clusters", &api.IntegrateController{}, "get:GetClusterIntegrateSettings"),
 				// CompileEnv
 				beego.NSRouter("/integrate/compile_envs", &api.IntegrateController{}, "get:GetCompileEnvs;post:GetCompileEnvsByPagination"),
@@ -94,6 +95,7 @@ func RegisterRoutes() {
 				// scm apps
 				beego.NSRouter("/repos/:repo_id/projects", &api.AppController{}, "post:GetGitProjectsByRepoID"),
 				beego.NSRouter("/apps/create", &api.AppController{}, "post:CreateSCMApp"),
+				beego.NSRouter("/apps/verifyapp", &api.AppController{}, "post:VerifySCMAppConnetion"),
 				beego.NSRouter("/apps", &api.AppController{}, "get:GetAllApps;post:GetAppsByPagination"),
 				beego.NSRouter("/apps/:app_id", &api.AppController{}, "get:ScmAppInfo;put:UpdateScmApp;delete:DeleteScmApp"),
 				beego.NSRouter("/apps/:app_id/syncBranches", &api.AppController{}, "post:SyncAppBranches"),

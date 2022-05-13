@@ -129,6 +129,7 @@
         </el-form>
       </template>
         <div class="apparrange-layout">
+          <el-button type="success" @click="doTestConnection" :loading="loading">测试连接</el-button>
           <el-button
             type="primary"
             class="fb-ly-rbtn"
@@ -285,22 +286,44 @@ export default {
         })
         .catch((_) => {});
     },
-    addApp() {
-      this.$refs.ruleForm.validate((valid) => {
-        if (valid) {
-          // 完整的路径地址不存在的话，则组装一个出来
-          if(this.form.path==""){
-            for (let i = 0; i < this.integrateRepos.length; i++) {
-              if (this.integrateRepos[i].id == this.form.repo_id) {
-                let domain= this.integrateRepos[i].config.url;
-                if(domain && domain.length>0 && domain.substring(domain.length-1)=='/'){
-                  this.form.path = domain + this.form.full_name + '.git';
-                }else {
-                  this.form.path = domain + '/' + this.form.full_name + '.git';
-                }
+    doTestConnection() {
+      this.setFormPath();
+      const cl = {
+          full_name: this.form.full_name,
+          path: this.form.path,
+          repo_id: this.form.repo_id,
+        };
+      if ( !cl.repo_id ){
+        Message.error("请先选择一个代码源");
+        return;
+      }
+      if ( !cl.full_name || !cl.path){
+        Message.error("请先选择或输入仓库路径");
+        return;
+      }
+      backend.verifyAppConnetion(cl, () => {
+        Message.success("源码仓库地址连接成功");
+      });
+    },
+    setFormPath(){
+        // 完整的路径地址不存在的话，则组装一个出来
+        if(this.form.path==""){
+          for (let i = 0; i < this.integrateRepos.length; i++) {
+            if (this.integrateRepos[i].id == this.form.repo_id) {
+              let domain= this.integrateRepos[i].config.url;
+              if(domain && domain.length>0 && domain.substring(domain.length-1)=='/'){
+                this.form.path = domain + this.form.full_name + '.git';
+              }else {
+                this.form.path = domain + '/' + this.form.full_name + '.git';
               }
             }
           }
+        }
+    },
+    addApp() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          this.setFormPath();
           const cl = this.form
           cl.type = 'app';
           cl.dockerfile = this.form.dockerfile || 'Dockerfile';

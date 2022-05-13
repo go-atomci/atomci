@@ -17,10 +17,12 @@ limitations under the License.
 package api
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/go-atomci/atomci/constant"
 
+	"github.com/go-atomci/atomci/internal/core/apps"
 	"github.com/go-atomci/atomci/internal/core/settings"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 )
@@ -123,6 +125,33 @@ func (p *IntegrateController) CreateIntegrateSetting() {
 		return
 	}
 	p.Data["json"] = NewResult(true, nil, "")
+	p.ServeJSON()
+}
+
+// VerifyRepoConnetion
+// 验证仓库源是否能连通
+func (p *IntegrateController) VerifyRepoConnetion() {
+	request := settings.IntegrateSettingReq{}
+	p.DecodeJSONReq(&request)
+	url := ""
+	token := ""
+	if m, ok := request.Config.(map[string]interface{}); ok {
+		if v, has := m["url"]; has {
+			url = fmt.Sprintf("%s", v)
+		}
+		if v, has := m["token"]; has {
+			token = fmt.Sprintf("%s", v)
+		}
+	}
+
+	app := apps.NewAppManager()
+	err := app.VerifyRepoConnetion(request.Type, url, token)
+	if err != nil {
+		p.HandleInternalServerError(err.Error())
+		log.Log.Error("verify repo connetion occur error: %s", err.Error())
+		return
+	}
+	p.Data["json"] = NewResult(true, "", "")
 	p.ServeJSON()
 }
 
