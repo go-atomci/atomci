@@ -181,7 +181,13 @@ export default {
       this.isEdit = flag;
     },
     doTestConnection() {
-      Message.info('comming soon');
+      const cl = {
+          config: this.form.config,
+          type: this.form.type,
+        };
+      backend.verifyRepoConnetion(cl, () => {
+        Message.success("源码仓库地址连接成功");
+      });
     },
     doSubmit() {
       this.$refs.ruleForm.validate((valid) => {

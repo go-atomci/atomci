@@ -43,6 +43,22 @@ func (a *AppController) CreateSCMApp() {
 	a.ServeJSON()
 }
 
+// VerifySCMAppConnetion
+// 验证仓库地址是否能连通
+func (a *AppController) VerifySCMAppConnetion() {
+	req := &apps.ScmAppReq{}
+	a.DecodeJSONReq(&req)
+	app := apps.NewAppManager()
+	err := app.VerifyAppConnetion(req.RepoID, req.Path, req.FullName)
+	if err != nil {
+		a.HandleInternalServerError(err.Error())
+		log.Log.Error("verify scm app connetion occur error: %s", err.Error())
+		return
+	}
+	a.Data["json"] = NewResult(true, "", "")
+	a.ServeJSON()
+}
+
 func (a *AppController) GetAllApps() {
 	mgr := apps.NewAppManager()
 	// TODO: add app tag filter base on permisson

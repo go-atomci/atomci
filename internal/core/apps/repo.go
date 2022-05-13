@@ -98,3 +98,64 @@ func (manager *AppManager) GetScmProjectsByRepoID(repoID int64) (interface{}, er
 	}
 	return newRsp, nil
 }
+
+// 验证仓库源是否能正常连通，若无token，只要地址能通就行；若有token，则必须认证通过
+func (manager *AppManager) VerifyRepoConnetion(scmType string, url string, token string) error {
+	scmClient, err := NewScmProvider(scmType, url, token)
+	if err != nil {
+		return err
+	}
+	op := scm.ListOptions{
+		Page: 0,
+		Size: 1,
+	}
+	_, resp, err := scmClient.Organizations.List(context.Background(), op)
+	if resp == nil && err != nil {
+		return fmt.Errorf("连接源码仓库失败,错误信息：%s", err)
+	}
+	if token == "" {
+		if (resp.Status >= 200 && resp.Status <= 299) || resp.Status == 401 {
+			return nil
+		}
+		return fmt.Errorf("连接源码仓库失败,服务器返回：%d", resp.Status)
+	} else {
+		if resp.Status >= 200 && resp.Status <= 299 {
+			return nil
+		} else if resp.Status == 401 {
+			return fmt.Errorf("连接源码仓库成功，但是认证失败,仓库返回：401")
+		} else {
+			return fmt.Errorf("连接源码仓库失败,服务器返回：%d", resp.Status)
+		}
+	}
+}
+
+// 验证仓库地址是否能正常连通,方式通过获取代码分支，若能正常获取，则表示通过
+func (manager *AppManager) VerifyAppConnetion(repoID int64, url string, repo string) error {
+	scmIntegrateResp, err := manager.settingsHandler.GetSCMIntegrateSettinByID(repoID)
+	if err != nil {
+		return err
+	}
+	token := scmIntegrateResp.ScmAuthConf.Token
+	scmClient, err := NewScmProvider(scmIntegrateResp.Type, url, token)
+	if err != nil {
+		return err
+	}
+	listOptions := scm.ListOptions{
+		Page: 0,
+		Size: 1,
+	}
+	_, resp, err := scmClient.Git.ListBranches(context.Background(), repo, listOptions)
+	if resp == nil && err != nil {
+		return fmt.Errorf("连接源码仓库失败,错误信息：%s", err)
+	}
+
+	if resp.Status >= 200 && resp.Status <= 299 {
+		return nil
+	} else if resp.Status == 401 {
+		return fmt.Errorf("连接源码仓库成功,但是认证失败,服务器返回：401")
+	} else if resp.Status == 404 {
+		return fmt.Errorf("连接源码仓库失败,仓库路径错误或当前Token没有权限")
+	} else {
+		return fmt.Errorf("连接源码仓库失败,服务器返回：%d", resp.Status)
+	}
+}
