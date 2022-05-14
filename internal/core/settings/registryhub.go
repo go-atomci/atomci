@@ -14,10 +14,18 @@ func TryLoginRegistry(basicUrl, username, password string, insecure bool) error 
 	} else {
 		schema = "https"
 	}
-	url := fmt.Sprintf("%s://%s/v2/", schema, strings.TrimRight(basicUrl, "/"))
-	resp, err := http.Get(url)
-	if err != nil || resp.StatusCode != 401 {
-		return errors.New("error basicUrl")
+	hostUrl := fmt.Sprintf("%s://%s", schema, strings.TrimRight(basicUrl, "/"))
+	resp, err := http.Get(hostUrl)
+	if err != nil {
+		return errors.New(fmt.Sprintf("%s访问异常:%s", hostUrl, err.Error()))
+	}
+	url := fmt.Sprintf("%s/v2/", hostUrl)
+	resp, err = http.Get(url)
+	if err != nil {
+		return errors.New(fmt.Sprintf("%s访问异常:%s", url, err.Error()))
+	}
+	if resp.StatusCode != 401 {
+		return errors.New(fmt.Sprintf("%s不支持V2版本访问", url))
 	}
 	//get Auth Info
 	auth := resp.Header.Get("Www-Authenticate")
@@ -43,17 +51,17 @@ func TryLoginRegistry(basicUrl, username, password string, insecure bool) error 
 		authFullUrl = authBaseUrl
 	}
 	req, err := http.NewRequest("GET", authFullUrl, nil)
-	req.SetBasicAuth(username, password)
 	if err != nil {
-		return errors.New("incorrect username or password")
+		return errors.New("账号或密码不正确")
 	}
+	req.SetBasicAuth(username, password)
 	client := http.Client{}
 	resp, err = client.Do(req)
 	if err != nil {
 		return err
 	}
 	if resp.StatusCode != 200 {
-		return errors.New("incorrect username or password")
+		return errors.New("账号或密码不正确")
 	}
 	//body, err := ioutil.ReadAll(resp.Body)
 	//fmt.Println(string(body))
