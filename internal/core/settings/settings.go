@@ -336,7 +336,7 @@ func (pm *SettingManager) VerifyIntegrateSetting(request *IntegrateSettingReq) V
 			if err := TryLoginRegistry(registryConf.URL, registryConf.User, registryConf.Password, !registryConf.IsHttps); err != nil {
 				resp.Error = err
 			} else {
-				resp.Msg = "Connected to Registry"
+				resp.Msg = "连接成功"
 			}
 		}
 	case JenkinsType:
