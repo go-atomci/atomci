@@ -60,6 +60,27 @@ var resourceReq = ResourceReq{
 				[]string{"user", "用户账号"},
 			},
 		},
+		BatchResourceTypeSpec{
+			ResourceType: []string{"repository", "我的应用"},
+			ResourceOperation: [][]string{
+				[]string{"*", "我的应用所有操作"},
+				[]string{"GetAppsByPagination", "获取应用分页列表"},
+				[]string{"GetAllApps", "获取应用列表"},
+				[]string{"GetSCMIntegrateSettings", "代码源集成列表"},
+				[]string{"CreateSCMApp", "创建代码应用"},
+				[]string{"VerifySCMAppConnetion", "验证代码应用"},
+				[]string{"GetScmApp", "获取代码应用信息"},
+				[]string{"UpdateScmApp", "更新代码应用信息"},
+				[]string{"DeleteScmApp", "删除代码应用"},
+
+				[]string{"GetAppBranches", "获取应用分支"},
+				[]string{"SyncAppBranches", "同步远程分支"},
+				[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
+			},
+			ResourceConstraint: [][]string{
+				[]string{"project_id", "项目ID"},
+			},
+		},
 
 		BatchResourceTypeSpec{
 			ResourceType: []string{"project", "项目"},
@@ -70,18 +91,16 @@ var resourceReq = ResourceReq{
 				[]string{"UpdateProject", "更新项目信息"},
 				[]string{"DeleteProject", "删除项目"},
 				[]string{"GetProject", "获取项目信息"},
+				[]string{"GetprojectMemberByConstraint", "获取项目成员信息"},
 
 				[]string{"CreateProjectApp", "项目添加应用"},
 				[]string{"UpdateProjectApp", "更新项目应用"},
 				[]string{"GetProjectApps", "获取项目应用列表"},
 				[]string{"GetProjectApp", "获取项目应用详情"},
-				[]string{"GetAppsByPagination", "获取项目应用分页列表"},
+				[]string{"GetProjectAppsByPagination", "获取项目应用分页列表"},
 				[]string{"GetArrange", "获取应用编排"},
 				[]string{"SetArrange", "设置应用编排"},
 				[]string{"DeleteProjectApp", "删除项目应用"},
-				[]string{"GetGitProjectsByRepoID", "获取代码仓库项目列表"},
-				[]string{"GetAppBranches", "获取应用分支"},
-				[]string{"SyncAppBranches", "同步远程分支"},
 				[]string{"ParserAppArrange", "应用编排解析"},
 				[]string{"GetJenkinsConfig", "获取Jenkins配置"},
 
@@ -183,6 +202,11 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/groups/:group/users/:user", "DELETE", "atomci", "group", "RemoveGroupUser"},
 
 		// app repo
+		[]string{"atomci/api/v1/integrate/settings/scms", "GET", "atomci", "repository", "GetSCMIntegrateSettings"},
+		[]string{"atomci/api/v1/apps/create", "POST", "atomci", "repository", "CreateSCMApp"},
+		[]string{"atomci/api/v1/apps/verifyapp", "POST", "atomci", "repository", "VerifySCMAppConnetion"},
+		[]string{"atomci/api/v1/apps", "POST", "atomci", "repository", "GetAppsByPagination"},
+		[]string{"atomci/api/v1/apps", "GET", "atomci", "repository", "GetAllApps"},
 		[]string{"atomci/api/v1/repos/:repo_id/projects", "POST", "atomci", "repository", "GetGitProjectsByRepoID"},
 		[]string{"atomci/api/v1/apps/:app_id/branches", "POST", "atomci", "repository", "GetAppBranches"},
 		[]string{"atomci/api/v1/apps/:app_id/syncBranches", "POST", "atomci", "repository", "SyncAppBranches"},
@@ -192,6 +216,7 @@ var gaetwayReq = RouterReq{
 
 		// project
 		[]string{"atomci/api/v1/projects", "POST", "atomci", "project", "ProjectList"},
+		[]string{"atomci/api/v1/users/:project_id/projectMemberByConstraint", "GET", "atomci", "project", "GetprojectMemberByConstraint"},
 		[]string{"atomci/api/v1/projects/create", "POST", "atomci", "project", "CreateProject"},
 		[]string{"atomci/api/v1/projects/:project_id", "PUT", "atomci", "project", "UpdateProject"},
 		[]string{"atomci/api/v1/projects/:project_id", "DELETE", "atomci", "project", "DeleteProject"},
@@ -206,7 +231,7 @@ var gaetwayReq = RouterReq{
 		[]string{"atomci/api/v1/projects/:project_id/apps/create", "POST", "atomci", "project", "CreateProjectApp"},
 		[]string{"atomci/api/v1/projects/:project_id/apps", "GET", "atomci", "project", "GetProjectApps"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:project_app_id", "GET", "atomci", "project", "GetProjectApp"},
-		[]string{"atomci/api/v1/projects/:project_id/apps", "POST", "atomci", "project", "GetAppsByPagination"},
+		[]string{"atomci/api/v1/projects/:project_id/apps", "POST", "atomci", "project", "GetProjectAppsByPagination"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "GET", "atomci", "project", "GetArrange"},
 		[]string{"atomci/api/v1/projects/:project_id/apps/:app_id/:arrange_env/arrange", "POST", "atomci", "project", "SetArrange"},
 		[]string{"atomci/api/v1/arrange/yaml/parser", "POST", "atomci", "project", "ParserAppArrange"},
