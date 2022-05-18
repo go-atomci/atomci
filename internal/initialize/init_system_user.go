@@ -100,7 +100,7 @@ func initSystemRole() error {
 	memberResourceOperationIDs := []int64{}
 	devAdminResourceOperationIDs := []int64{}
 
-	devAdminResourceOperations, err := dao.GetResourceOperationByResourceTypes([]string{"pipeline", "project", "publish", "auth"})
+	devAdminResourceOperations, err := dao.GetResourceOperationByResourceTypes([]string{"pipeline", "repository", "project", "publish", "auth"})
 	if err != nil {
 		return err
 	}
@@ -114,12 +114,15 @@ func initSystemRole() error {
 		"ProjectList",
 		"CreateProject",
 		"UpdateProject",
+		"GetprojectMemberByConstraint",
 		"GetProject",
 		"CreateProjectApp",
 		"UpdateProjectApp",
 		"GetProjectApps",
 		"GetProjectApp",
 		"GetAppsByPagination",
+		"GetProjectAppsByPagination",
+		"GetAllApps",
 		"GetArrange",
 		"SetArrange",
 		"GetAppBranches",
