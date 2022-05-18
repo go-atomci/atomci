@@ -1,19 +1,37 @@
-# atomci
+<div align="center">
+
+# <a href="https://go-atomci.github.io/atomci-press/" target="_blank" rel="noopener noreferrer">AtomCI</a>
 
 <a href="https://goreportcard.com/report/github.com/go-atomci/atomci"><img src="https://goreportcard.com/badge/github.com/go-atomci/atomci" alt="A+"></a>
+[![Release](https://img.shields.io/github/release/go-atomci/atomci.svg)](https://github.com/go-atomci/atomci/releases/)
 [![codecov](https://codecov.io/gh/go-atomci/atomci/branch/master/graph/badge.svg?token=VPJGT3405P)](https://codecov.io/gh/go-atomci/atomci)
+![docker_pulls]( https://img.shields.io/docker/pulls/colynn/atomci)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/go-atomci/atomci/blob/master/LICENSE)
 
-AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
+[文档](https://go-atomci.github.io/atomci-press) | [在线体验](http://atomci.wolfclan.top/) | [Releases](https://github.com/go-atomci/atomci/releases/)
+</div>
+
+# 介绍
+AtomCI 一款云原生CICD平台，致力于让中小企业快速落地Kubernetes，支持k8s/reigstry/jenkins/代码源的轻松集成，高并发的流水线，云原生yaml支持，多环境灵活管理，权限控制等, 代码均已开源, __您的star__ 是我们开源的动力，非常感谢（：
 
 * github: https://github.com/go-atomci/atomci
 * gitee: https://gitee.com/goatom/atomci
+
+## 为什么选择 atomci
+* 多代码源轻松集成（ gitlab/gihub/gitee/gitea/gogs ）
+* 强大的服务集成（不论是阿里云 /腾讯云，还是自建 k8s ；不管是自建 harbor 还是公有镜像仓库；均可以轻松集成）
+* 流水线灵活自定义
+* 支持原生的 yaml 应用编排
+* 环境灵活新增 /删除
+* 部署方式简单
+* 更多期待你的体验...
+
 ## 架构图
 
 ```sh
 ┌─────────┐
 │         │
-│  Gitlab ├──────┐      ┌───────────────────────┐    ┌──────────┐   ┌───────────────────────┐
+│ Git Scm ├──────┐      ┌───────────────────────┐    ┌──────────┐   ┌───────────────────────┐
 │         │      │      │ AtomCI                │    │          │   │                       │
 └─────────┘      │      │                       │    │          │   │  ┌────────────────┐   │
                  │      │      Frontend (Vue)   │    │          │   │  │ jnlp-agent pod1│   │
@@ -31,16 +49,30 @@ AtomCI 致力于让中小企业快速落地Kubernetes，代码均已开源, __�
 └───────────┘           └───────────────────────┘    └──────────┘   └───────────────────────┘
 ```
 
-## 源起
+## 在线体验
+
+[在线体验](http://atomci.wolfclan.top)
+  
+| 账号 | 密码 |
+| --- | --- |
+| atomci | 123456 |
+
+_注_: 体验帐户为授权用户，不显示“系统管理”的配置页面, 可本地安装完整体验。
 
 ## 视频演示
 1. 概述及如何安装部署 [视频链接](https://www.bilibili.com/video/BV1qq4y1N7mZ/)
 2. 介绍及快速开始 [视频链接](https://www.bilibili.com/video/BV1K3411m78Q/)
 3. 5分钟全流程体验 [视频链接](https://www.bilibili.com/video/BV18F411a7Rk/)
 
-## 功能介绍
-[>请移步](https://go-atomci.github.io/atomci-press/guide/00features.html)
 
+# 快速开始
+
+## 一键部署最新版本
+1. 准备一台可以正常运行的linux服务器（支持MacOS）
+2. 安装Docker 和 Docker Compose
+```sh
+curl -sSL https://raw.githubusercontent.com/go-atomci/atomci/master/deploy/docker-compose/quick_start.sh | bash
+```
 
 ## 如何本地运行
 
@@ -94,18 +126,10 @@ $ yarn install  #仅首次运行时需要执行
 $ yarn run dev
 ```
 
-
 ### 访问
 ```sh
 # 默认用户名/密码 admin/123456
 http://your-ip:8081
-```
-
-## 一键部署最新版本
-1. 准备一台可以正常运行的linux服务器（支持MacOS）
-2. 安装Docker 和 Docker Compose
-```sh
-curl -sSL https://raw.githubusercontent.com/go-atomci/atomci/master/deploy/docker-compose/quick_start.sh | bash
 ```
 
 ## 如何构建镜像
@@ -128,14 +152,22 @@ $ docker build .
 > 如果你使用 [`docker-compsoe`](https://go-atomci.github.io/atomci-press/install/02docker-compose.html)方式部署的话，可以通过替换镜像地址的方式，即可使用`master`分支的最新代码．
 
 
-## 贡献
-AtomCI 欢迎并鼓励社区贡献．
+贡献代码
+===============
+
+可查阅`AtomCI`的[项目计划](https://github.com/go-atomci/atomci/projects/1)，在对应issues中回复认领，或者直接提交PR，感谢你对AtomCI的贡献  
+贡献包括但不限于以下方式：
+- [帮助文档](https://github.com/go-atomci/atomci-press)
+- Bug修复
+- 新功能提交
+- 代码优化
+- 测试用例完善
+
 请参阅[Contribution Guide](https://github.com/go-atomci/atomci/blob/master/CONTRIBUTING.md) 获取更多的信息．
 
-## 互动交流
+# 互动交流
 
-### AtomCI开发者
-![Wechat](https://img.shields.io/badge/-colynnliu-%2307C160?style=flat&logo=Wechat&logoColor=white)
+## AtomCI开发者
 
 <a href="https://github.com/go-atomci/atomci/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=go-atomci/atomci" />
@@ -145,19 +177,18 @@ AtomCI 欢迎并鼓励社区贡献．
 
 ### 已知问题
 
-__AtomCI__ 仍在不断完善中（[问题列表](https://github.com/go-atomci/atomci/issues)）， 如果你发现你想用的一些功能不能正常工作的话，烦请[创建issue](https://github.com/go-atomci/atomci/issues/new)，我们会及时标记、修复。 
+[Issues](https://github.com/go-atomci/atomci/issues)是本项目唯一的沟通渠道，如果在使用过程中遇到问题，请先查阅文档，如果仍无法解决，请查看相关日志，保存截图信息，给我们提交
+[issue](https://github.com/go-atomci/atomci/issues/new)，我们会及时标记、修复。 
 
 __AtomCI__ 因你而变。
 
 ---
+## AtomCI 用户交流群
+可添加 微信![Wechat](https://img.shields.io/badge/-colynnliu-%2307C160?style=flat&logo=Wechat&logoColor=white) 邀请入群
 
+# 附录
 
-### AtomCI 用户交流群
-
-
-## 附录
-
-### 配置说明
+## 配置说明
 
 | 配置项  | 默认值  | 说明  |
 |---|---|---|
