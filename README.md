@@ -51,13 +51,16 @@ AtomCI 一款云原生CICD平台，致力于让中小企业快速落地Kubernete
 
 ## 在线体验
 
-[在线体验](http://atomci.wolfclan.top)
+[在线体验](http://atomci.wolfclan.top)， 非常感谢[@liuzilong](https://github.com/liuzilong66666)提供的kubernetes环境（：
   
 | 账号 | 密码 |
 | --- | --- |
 | atomci | 123456 |
 
-_注_: 体验帐户为授权用户，不显示“系统管理”的配置页面, 可本地安装完整体验。
+_注_: 
+* 体验帐户为授权用户，不显示“系统管理”的配置页面, 可本地安装完整体验。
+* 因k8s资源有限，部署的服务会定时清理，避免资源过分占用
+
 
 ## 视频演示
 1. 概述及如何安装部署 [视频链接](https://www.bilibili.com/video/BV1qq4y1N7mZ/)
