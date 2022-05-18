@@ -5,7 +5,7 @@
 <a href="https://goreportcard.com/report/github.com/go-atomci/atomci"><img src="https://goreportcard.com/badge/github.com/go-atomci/atomci" alt="A+"></a>
 [![Release](https://img.shields.io/github/release/go-atomci/atomci.svg)](https://github.com/go-atomci/atomci/releases/)
 [![codecov](https://codecov.io/gh/go-atomci/atomci/branch/master/graph/badge.svg?token=VPJGT3405P)](https://codecov.io/gh/go-atomci/atomci)
-![docker_pulls]( https://img.shields.io/docker/pulls/colynn/atomci)
+[![docker_pulls](https://img.shields.io/docker/pulls/colynn/atomci.svg)](https://hub.docker.com/r/colynn/atomci/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/go-atomci/atomci/blob/master/LICENSE)
 
 [文档](https://go-atomci.github.io/atomci-press) | [在线体验](http://atomci.wolfclan.top/) | [Releases](https://github.com/go-atomci/atomci/releases/)
