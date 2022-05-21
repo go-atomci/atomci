@@ -673,7 +673,7 @@ func (pm *PipelineManager) GetAppCodeCommitByBranch(appID int64, branchName stri
 		return branchName + "-" + got[0].Sha[0:7], nil
 	} else {
 		logs.Warn("branch: %v did not include any commit", branchName)
-		return "", fmt.Errorf("应用：%v 分支: %v 未包含任何提交, 请通过“我的应用”-“应用详情”-“同步远程分支”后重新选择", scmApp.Name, branchName)
+		return "", fmt.Errorf("应用:%v 分支:%v 未包含任何提交, 请通过“我的应用”-“应用详情”-“同步远程分支”后重新选择", scmApp.Name, branchName)
 	}
 }
 
