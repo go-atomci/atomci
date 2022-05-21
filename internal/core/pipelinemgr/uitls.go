@@ -579,49 +579,20 @@ func (pm *PipelineManager) renderTemplateStr(apps []*RunDeployAppReq, publishID,
 			log.Log.Error("get app id: %v  env id: %v real arrange, occur error: %s", item.ProjectAppID, envID, err.Error())
 			continue
 		}
-		// TODO: write continue
-		imageMappings, err := pm.modelAppArrange.GetAppImageMappingByArrangeID(arrange.ID)
-		if err != nil {
-			log.Log.Error("get imagemapping error: %s", err.Error())
-			continue
-		}
+
 		// replace template str
 		arrangeConfig := arrange.Config
-		var newImageAddr string
-		for _, image := range imageMappings {
-			switch image.ImageTagType {
-			// TODO: multiple imageTagType, code combine
-			case models.SystemDefaultTag:
-				publishApp, err := pm.modelPublish.GetPublishAppByPublishIDAndAppID(publishID, item.ProjectAppID)
-				if err != nil {
-					logs.Warn("when get publish app by publishid/appid occur error:%s, did not update app arrange image info", err.Error())
-					continue
-				}
-				imageTag, err := pm.getAppCodeCommitByBranch(item.ProjectAppID, publishApp.BranchName)
-				if err != nil {
-					logs.Warn("when get app code commit by branch error: %s, did not update app arrange image info", err.Error())
-					continue
-				}
-
-				originImageSplit := strings.Split(image.Image, ":")
-				imageStr := image.Image
-				if len(originImageSplit) == 2 {
-					imageStr = originImageSplit[0]
-				}
-				newImageAddr = fmt.Sprintf("%s:%s", imageStr, imageTag)
-				arrangeConfig = strings.Replace(arrangeConfig, image.Image, newImageAddr, -1)
-			case models.LatestTag:
-				originImageSplit := strings.Split(image.Image, ":")
-				imageStr := image.Image
-				if len(originImageSplit) == 2 {
-					imageStr = originImageSplit[0]
-				}
-				newImageAddr = fmt.Sprintf("%s:%s", imageStr, "latest")
-				arrangeConfig = strings.Replace(arrangeConfig, image.Image, newImageAddr, -1)
-			case models.OriginTag:
-				log.Log.Debug("image tag use from yaml, no need replace")
-			}
+		publishApp, err := pm.modelPublish.GetPublishAppByPublishIDAndAppID(publishID, item.ProjectAppID)
+		if err != nil {
+			logs.Warn("when get publish app by publishid/appid occur error:%s, did not update app arrange image info", err.Error())
+			continue
 		}
+
+		newImageAddr, originImage, err := pm.generateImageAddr(arrange.ID, item.ProjectAppID, publishApp.BranchName)
+		if err != nil {
+			continue
+		}
+		arrangeConfig = strings.Replace(arrangeConfig, originImage, newImageAddr, -1)
 		if templateStr == "" {
 			templateStr = arrangeConfig
 		} else {
@@ -631,7 +602,42 @@ func (pm *PipelineManager) renderTemplateStr(apps []*RunDeployAppReq, publishID,
 	return templateStr, nil
 }
 
-func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName string) (string, error) {
+func (pm *PipelineManager) generateImageAddr(arrangeID, projectAppID int64, branch string) (string, string, error) {
+	imageMapping, err := pm.modelAppArrange.GetAppImageMappingByArrangeIDAndProjectAppID(arrangeID, projectAppID)
+	if err != nil {
+		log.Log.Error("get imagemapping error: %s", err.Error())
+		return "", "", err
+	}
+	newImageAddr := imageMapping.Image
+	switch imageMapping.ImageTagType {
+	case models.SystemDefaultTag:
+		// branch get from RunBuildAppReq.Branch
+		imageTag, err := pm.GetAppCodeCommitByBranch(projectAppID, branch)
+		if err != nil {
+			logs.Error("when get app code commit by branch error: %s, did not update app arrange image info", err.Error())
+			return "", "", err
+		}
+
+		originImageSplit := strings.Split(imageMapping.Image, ":")
+		imageStr := imageMapping.Image
+		if len(originImageSplit) == 2 {
+			imageStr = originImageSplit[0]
+		}
+		newImageAddr = fmt.Sprintf("%s:%s", imageStr, imageTag)
+	case models.LatestTag:
+		originImageSplit := strings.Split(imageMapping.Image, ":")
+		imageStr := imageMapping.Image
+		if len(originImageSplit) == 2 {
+			imageStr = originImageSplit[0]
+		}
+		newImageAddr = fmt.Sprintf("%s:%s", imageStr, "latest")
+	case models.OriginTag:
+		log.Log.Debug("image tag use from yaml, no need replace")
+	}
+	return newImageAddr, imageMapping.Image, nil
+}
+
+func (pm *PipelineManager) GetAppCodeCommitByBranch(appID int64, branchName string) (string, error) {
 	projectApp, err := pm.modelProject.GetProjectApp(appID)
 	if err != nil {
 		log.Log.Error("when get app code commit, get project ap by id: %v error:%s", appID, err.Error())
@@ -666,8 +672,8 @@ func (pm *PipelineManager) getAppCodeCommitByBranch(appID int64, branchName stri
 	if len(got) > 0 {
 		return branchName + "-" + got[0].Sha[0:7], nil
 	} else {
-		logs.Warn("branch: %v did not include any commit, use latest tag", branchName)
-		return branchName + "-latest", nil
+		logs.Warn("branch: %v did not include any commit", branchName)
+		return "", fmt.Errorf("应用：%v 分支: %v 未包含任何提交, 请通过“我的应用”-“应用详情”-“同步远程分支”后重新选择", scmApp.Name, branchName)
 	}
 }
 
@@ -943,43 +949,16 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 			continue
 		}
 
-		imageMapping, err := pm.modelAppArrange.GetAppImageMappingByArrangeIDAndProjectAppID(arrange.ID, app.ProjectAppID)
+		publishApp, err := pm.modelPublish.GetPublishAppByPublishIDAndAppID(publishID, app.ProjectAppID)
 		if err != nil {
-			log.Log.Error("get imagemapping error: %s", err.Error())
+			logs.Warn("when get publish app by publishid/appid occur error:%s, did not update app arrange image info", err.Error())
 			continue
 		}
 
-		newImageAddr := imageMapping.Image
-		switch imageMapping.ImageTagType {
-		case models.SystemDefaultTag:
-			publishApp, err := pm.modelPublish.GetPublishAppByPublishIDAndAppID(publishID, app.ProjectAppID)
-			if err != nil {
-				logs.Warn("when get publish app by publishid/appid occur error:%s, did not update app arrange image info", err.Error())
-				continue
-			}
-			imageTag, err := pm.getAppCodeCommitByBranch(app.ProjectAppID, publishApp.BranchName)
-			if err != nil {
-				logs.Warn("when get app code commit by branch error: %s, did not update app arrange image info", err.Error())
-				continue
-			}
-
-			originImageSplit := strings.Split(imageMapping.Image, ":")
-			imageStr := imageMapping.Image
-			if len(originImageSplit) == 2 {
-				imageStr = originImageSplit[0]
-			}
-			newImageAddr = fmt.Sprintf("%s:%s", imageStr, imageTag)
-		case models.LatestTag:
-			originImageSplit := strings.Split(imageMapping.Image, ":")
-			imageStr := imageMapping.Image
-			if len(originImageSplit) == 2 {
-				imageStr = originImageSplit[0]
-			}
-			newImageAddr = fmt.Sprintf("%s:%s", imageStr, "latest")
-		case models.OriginTag:
-			log.Log.Debug("image tag use from yaml, no need replace")
+		newImageAddr, _, err := pm.generateImageAddr(arrange.ID, app.ProjectAppID, publishApp.BranchName)
+		if err != nil {
+			continue
 		}
-
 		log.Log.Debug("imageAddr: %s", newImageAddr)
 		allParm := &RunDeployAllParms{
 			ProjectID:       projectApp.ProjectID,
@@ -988,7 +967,6 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 			ImageAddr:       newImageAddr,
 		}
 		allParms = append(allParms, allParm)
-
 	}
 	return allParms, nil
 }
@@ -1101,44 +1079,10 @@ func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, sta
 			continue
 		}
 
-		imageMapping, err := pm.modelAppArrange.GetAppImageMappingByArrangeIDAndProjectAppID(arrange.ID, app.ProjectAppID)
+		imageURL, _, err := pm.generateImageAddr(arrange.ID, app.ProjectAppID, app.Branch)
 		if err != nil {
-			log.Log.Error("get imagemapping error: %s", err.Error())
 			continue
 		}
-
-		newImageAddr := imageMapping.Image
-		switch imageMapping.ImageTagType {
-		case models.SystemDefaultTag:
-			publishApp, err := pm.modelPublish.GetPublishAppByPublishIDAndAppID(publishID, app.ProjectAppID)
-			if err != nil {
-				logs.Warn("when get publish app by publishid/appid occur error:%s, did not update app arrange image info", err.Error())
-				continue
-			}
-			imageTag, err := pm.getAppCodeCommitByBranch(app.ProjectAppID, publishApp.BranchName)
-			if err != nil {
-				logs.Warn("when get app code commit by branch error: %s, did not update app arrange image info", err.Error())
-				continue
-			}
-
-			originImageSplit := strings.Split(imageMapping.Image, ":")
-			imageStr := imageMapping.Image
-			if len(originImageSplit) == 2 {
-				imageStr = originImageSplit[0]
-			}
-			newImageAddr = fmt.Sprintf("%s:%s", imageStr, imageTag)
-		case models.LatestTag:
-			originImageSplit := strings.Split(imageMapping.Image, ":")
-			imageStr := imageMapping.Image
-			if len(originImageSplit) == 2 {
-				imageStr = originImageSplit[0]
-			}
-			newImageAddr = fmt.Sprintf("%s:%s", imageStr, "latest")
-		case models.OriginTag:
-			log.Log.Debug("image tag use from yaml, no need replace")
-		}
-
-		imageURL := newImageAddr
 		dockerfile := app.Dockerfile
 		if dockerfile == "" {
 			dockerfile = "Dockerfile"

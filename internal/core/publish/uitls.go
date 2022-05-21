@@ -18,6 +18,7 @@ package publish
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/go-atomci/atomci/internal/core/pipelinemgr"
 	"github.com/go-atomci/atomci/internal/middleware/log"
@@ -314,15 +315,28 @@ func (pm *PublishManager) createPublishOperationLogItem(co *CreateOperationLogRe
 func (pm *PublishManager) publishCreateParamVerify(req *PublishReq) error {
 	// name
 	if len(req.Name) > 64 {
-		return fmt.Errorf("版本名称过长，不允许超过64个字符")
+		return fmt.Errorf("流水线描述过长，不允许超过64个字符")
 	}
 	// VersionNo
 	if len(req.VersionNo) > 64 {
-		return fmt.Errorf("版本号不允许超过16个字符")
+		return fmt.Errorf("流水线名称不允许超过64个字符")
 	}
 	// App
 	if len(req.Apps) == 0 {
 		return fmt.Errorf("请至少勾选一个代码库后，重试")
+	}
+	errs := []string{}
+	for _, app := range req.Apps {
+		if app.BranchName == "" {
+			errs = []string{"请确认分支选择"}
+		}
+		_, err := pm.pipelineHandler.GetAppCodeCommitByBranch(app.AppID, app.BranchName)
+		if err != nil {
+			errs = append(errs, err.Error())
+		}
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf("%v", strings.Join(errs, ","))
 	}
 	return nil
 }

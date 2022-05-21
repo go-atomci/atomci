@@ -287,7 +287,6 @@
     },
     methods: {
       tabClick(val) {
-        console.info(val.name);
         this.activeName = val.name;
         this.getList();
       },

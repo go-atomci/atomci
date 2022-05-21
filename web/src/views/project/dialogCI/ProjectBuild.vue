@@ -36,7 +36,7 @@
   }
 </style>
 <template>
-  <el-dialog top='15vh' v-if="dialogFormVisible" :close-on-click-modal="false" :show-close="false" width='70%' :title="username"
+  <el-dialog top='15vh' z-index="1100" v-if="dialogFormVisible" :close-on-click-modal="false" :show-close="false" width='70%' :title="username"
     :visible.sync="dialogFormVisible" class="commonDialog projectPubModuleList">
     <div>
       <i id="color" class="el-icon-close" @click="handleClose" style="cursor:pointer;position:absolute;right:15px;top:15px;"></i>
@@ -67,7 +67,7 @@
       <el-table-column prop="build_path" label="构建目录" sortable min-width="10%" :show-overflow-tooltip="true" />
       <el-table-column :label="$t('bm.deployCenter.releaseBran')" min-width="15%">
         <template slot-scope="scope">
-          <el-select v-model.trim="scope.row.branch_name" filterable :placeholder="$t('bm.add.selectSubmitBra')">
+          <el-select v-model.trim="scope.row.branch_name" filterable :placeholder="$t('bm.add.selectSubmitBra')" disabled>
             <el-option v-for="(item, index) in scope.row.branch_history_list" :key="index" :label="item" :value="item">
             </el-option>
           </el-select>
@@ -99,8 +99,6 @@
     props: ['listData', 'pubType', 'cpData'],
     data() {
       return {
-        // 是否启用切换分支
-        enable_switch_branch: true,
         username: '',
         envStageID: '',
         publishid: '',
@@ -203,7 +201,6 @@
       },
       doShows(publishid, envStageID, step) {
         this.selectList = [];
-        this.enable_switch_branch = true;
         this.tableList = [];
         this.cpList = [];
         this.username = step;

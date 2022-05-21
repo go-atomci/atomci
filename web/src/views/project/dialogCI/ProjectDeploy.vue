@@ -1,6 +1,6 @@
 
 <template>
-  <el-dialog top='15vh' v-if="dialogFormVisible" :close-on-click-modal="false" width='65%' :title="title"
+  <el-dialog z-index="1100" top='15vh' v-if="dialogFormVisible" :close-on-click-modal="false" width='65%' :title="title"
     :visible.sync="dialogFormVisible" class="createDialog">
     <el-table border :data="dataList" @select-all="handleSelectAll" @select='handleSelect' ref="appDeploy">
       <el-table-column type="selection" width="50" disabled='true' :show-overflow-tooltip=true />

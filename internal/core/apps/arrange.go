@@ -99,8 +99,8 @@ func (manager *AppManager) SetArrange(
 				return err
 			}
 			log.Log.Debug("update app arrnage item id: %v", id)
-			//
 			validItemIDs := []int64{}
+			// TODO: add verify, one arrange only support add one image mapping item.
 			for _, imageMappingitem := range request.ImageMapings {
 				if imageMappingitem.ProjectAppID == 0 {
 					log.Log.Debug("item: %v did not join with project app: 0, skip", imageMappingitem.Name)

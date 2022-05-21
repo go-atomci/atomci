@@ -28,6 +28,7 @@
       :visible.sync="dialogFormVisible"
       class="arrangement"
       size="40%"
+      z-index="1100"
       :before-close="handleClose"
     >
       <div class="arrange-body">
