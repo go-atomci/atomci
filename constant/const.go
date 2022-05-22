@@ -69,3 +69,8 @@ const (
 
 var Integratetypes = []string{IntegrateKubernetes, IntegrateJenkins, IntegrateRegistry}
 var ScmIntegratetypes = []string{SCMGitlab, SCMGithub, SCMGitea, SCMGitee, SCMGogs}
+
+const (
+	DefaultContainerName    = "jnlp"
+	BuildImageContainerName = "kaniko"
+)

@@ -104,6 +104,8 @@ export default {
         };
         if (this.form.name == 'jnlp' || this.form.name == 'kaniko') {
           this.systemReserved = true
+        } else {
+          this.systemReserved = false
         }
         this.rowId = item.id;
       } else {
