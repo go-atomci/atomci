@@ -129,6 +129,10 @@ func (pm *PipelineManager) generateCompileEnvParams(apps []*RunBuildAppReq) []co
 		if err != nil {
 			logs.Warn("get compile env by id:%v error: %s", scmApp.CompileEnvID, err.Error())
 		}
+		if compileItem.Name == constant.DefaultContainerName {
+			log.Log.Warn("app: %v setup complie env to %v, skip this compileItem generate", constant.DefaultContainerName, scmApp.Name)
+			continue
+		}
 		compileEnvItem := compileEnv{
 			Image:      compileItem.Image,
 			Args:       compileItem.Args,
@@ -264,12 +268,12 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 	}
 	jobName := fmt.Sprintf("atomci_%v_%v_%v", projectID, publishID, envStageJSON.StageID)
 
-	jenkinsJNLPTemplate, err := pm.getSysDefaultCompileEnv("jnlp")
+	jenkinsJNLPTemplate, err := pm.getSysDefaultCompileEnv(constant.DefaultContainerName)
 	if err != nil {
-		log.Log.Error("when create build job, get sys default jnlp compile env error: %s", err.Error())
+		log.Log.Error("when create build job, get sys default %v compile env error: %s", constant.DefaultContainerName, err.Error())
 		return 0, "", err
 	}
-	jenkinsKanikoTemplate, err := pm.getSysDefaultCompileEnv("kaniko")
+	jenkinsKanikoTemplate, err := pm.getSysDefaultCompileEnv(constant.BuildImageContainerName)
 	if err != nil {
 		log.Log.Error("when create build job, get sys default kaniko compile env  error: %s", err.Error())
 		return 0, "", err
@@ -531,9 +535,9 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 		{Key: "USER_TOKEN", Value: userToken},
 	}
 
-	jenkinsJNLPTemplate, err := pm.getSysDefaultCompileEnv("jnlp")
+	jenkinsJNLPTemplate, err := pm.getSysDefaultCompileEnv(constant.DefaultContainerName)
 	if err != nil {
-		log.Log.Error("when create deploy job, get sys default jnlp compile env error: %s", err.Error())
+		log.Log.Error("when create deploy job, get sys default %v compile env error: %s", constant.DefaultContainerName, err.Error())
 		return 0, "", err
 	}
 
@@ -1035,17 +1039,17 @@ func (pm *PipelineManager) renderAppBuildItemsForBuild(projectID, stageID, publi
 	for _, app := range allParms {
 		item := &jenkins.StepItem{}
 		item.Name = app.Name
-		// Default containername is jnlp
-		item.ContainerName = strings.ToLower(app.Name)
+		// Default containername is constant.DefaultContainerName(jnlp)
+		item.ContainerName = constant.DefaultContainerName
 		command := fmt.Sprintf("sh 'echo app:%v language:%v, did not defined compile command, skip compile'", app.Name, app.Language)
 		customCompileCommand := app.RunBuildAppReq.CompileCommand
 
 		appPath := pm.generateAppPth(stageID, projectID, ciConfig[3], app)
 		appRootPath := appPath
 		if app.CompileEnvID == 0 {
-			item.ContainerName = "jnlp"
 			command = fmt.Sprintf("sh 'echo app:%v language:%v, did not setup compile env,skip compile...'", app.Name, app.Language)
 		} else if len(customCompileCommand) > 0 {
+			item.ContainerName = strings.ToLower(app.Name)
 			command = fmt.Sprintf("sh 'cd %v; %v'", appRootPath, customCompileCommand)
 		}
 		item.Command = command
