@@ -17,7 +17,7 @@
   }
 </style>
 <template>
-  <el-dialog top='15vh' v-if="dialogFormVisible" :close-on-click-modal="false" width='65%' :title="setname" :visible.sync="dialogFormVisible" class="createDialog">
+  <el-dialog z-index="1020" top='15vh' v-if="dialogFormVisible" :close-on-click-modal="false" width='65%' :title="setname" :visible.sync="dialogFormVisible" class="createDialog">
     <el-form ref="ruleForm" :model="form" :rules="rules" label-width="52px">
       <div>
         <el-row>

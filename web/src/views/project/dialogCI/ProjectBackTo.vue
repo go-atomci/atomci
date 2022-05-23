@@ -1,5 +1,5 @@
 <template>
-  <el-dialog top='25vh' :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog"  :before-close="doCancelCreate">
+  <el-dialog top='25vh' z-index="1100" :close-on-click-modal="false" :visible.sync="dialogFormVisible" class="createDialog"  :before-close="doCancelCreate">
     <el-form ref="ruleForm" :model="form" :rules="rules">
       <el-form-item :label="$t('bm.add.backStage')" prop="stage">
         <el-select v-model="form.stage" :placeholder="$t('bm.add.select')" filterable>

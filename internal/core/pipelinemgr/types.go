@@ -71,43 +71,6 @@ type DeployStepReq struct {
 	Apps       []*RunDeployAppReq `json:"apps"`
 }
 
-//PublishApplyStepReq publish apply request
-type PublishApplyStepReq struct {
-	Approver string `json:"approver"`
-	Message  string `json:"message"`
-}
-
-// PublishStepReq  pipeline run publish
-type PublishStepReq struct {
-	ActionName         string              `json:"action_name"`
-	Apps               []*RunPublishAppReq `json:"apps"`
-	EnableSwitchBranch bool                `json:"enable_switch_branch"`
-}
-
-// BaseStepReq  [Verify Step]..
-type BaseStepReq struct {
-	Status string `json:"status"`
-}
-
-// PublishAuditStepReq ..
-type PublishAuditStepReq struct {
-	BaseStepReq
-	Message string `json:"message"`
-}
-
-// RunPublishAppReq .
-type RunPublishAppReq struct {
-	AutoMerge    bool   `json:"auto_merge"`
-	Branch       string `json:"branch_name"`
-	Gray         bool   `json:"gray"`
-	ImageVersion string `json:"image_version"`
-	Jacoco       bool   `json:"jacoco"`
-	ProjectAppID int64  `json:"project_app_id"`
-	StaticCheck  bool   `json:"static_check"`
-	TargetBranch string `json:"target_branch"`
-	UnitTest     bool   `json:"unit_test"`
-}
-
 // WeeklyDenyList ..
 type WeeklyDenyList []*struct {
 	StartTime string `json:"start_time"`
@@ -321,14 +284,6 @@ type AppParamsForHealthCheck struct {
 	Name     string `json:"name"`
 	Type     string `json:"type"`
 	FullName string `json:"full_name"`
-}
-
-// RunPublishAllParms there are all apps parms for jenkins pipeline job
-type RunPublishAllParms struct {
-	*models.ProjectApp
-	*RunPublishAppReq
-	Release     string `json:"release"`
-	MergeBranch bool   `json:"merge-branch"`
 }
 
 // PublishJobBuildResult ..
