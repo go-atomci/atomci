@@ -8,6 +8,18 @@ NAME = atomci
 export CGO_ENABLED := ${CGO_ENABLED}
 export PROJECT_ROOT := $(CURDIR)
 
+
+VERSION := v1.5.1
+BuildTS = $(shell date -u '+%Y-%m-%d %I:%M:%S')
+COMMIT_ID=$(shell git rev-parse --short HEAD)
+BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD)
+
+project=$(shell go list -m)
+LDFLAGS += -X "$(project)/version.BuildTS=$(BuildTS)"
+LDFLAGS += -X "$(project)/version.GitHash=$(COMMIT_ID)"
+LDFLAGS += -X "$(project)/version.Version=$(VERSION)"
+LDFLAGS += -X "$(project)/version.GitBranch=$(BRANCH_NAME)"
+
 ## linux-amd64: Compile linux-amd64 package
 linux-amd64:
 	@env GOOS=linux GOARCH=amd64 go build -o deploy/binary/$(NAME)-linux-amd64 cmd/atomci/main.go
@@ -19,7 +31,7 @@ linux-arm64:
 .PHONY: build
 ## build: Compile the packages.
 build:
-	@go build -o $(NAME) cmd/atomci/main.go
+	@go build -ldflags '$(LDFLAGS)' -o $(NAME) cmd/atomci/main.go
 
 .PHONY: run
 ## run: Build and Run in local mode.

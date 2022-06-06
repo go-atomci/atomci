@@ -1,11 +1,11 @@
 ## build
-FROM golang:1.15-alpine AS build-env
+FROM colynn/golang:1.15-alpine AS build-env
 
 ADD . /go/src/atomci
 
 WORKDIR /go/src/atomci
 
-RUN go build ./cmd/atomci
+RUN make build
 
 ## run
 FROM alpine:3.9
