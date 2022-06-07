@@ -1,5 +1,5 @@
 ## build
-FROM colynn/golang:1.15-alpine AS build-env
+FROM golang:1.15-buster AS build-env
 
 ADD . /go/src/atomci
 
