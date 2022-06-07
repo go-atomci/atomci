@@ -25,6 +25,7 @@ import (
 	"github.com/go-atomci/atomci/internal/initialize"
 	"github.com/go-atomci/atomci/internal/migrations"
 	"github.com/go-atomci/atomci/internal/models"
+	"github.com/go-atomci/atomci/version"
 
 	"github.com/go-atomci/atomci/internal/cronjob"
 	"github.com/go-atomci/atomci/internal/routers"
@@ -37,9 +38,10 @@ func main() {
 	initialize.Init()
 
 	cronjob.RunPublishJobServer()
-	beego.Info("Beego version:", beego.VERSION)
 
 	routers.RegisterRoutes()
+	beego.Info("Beego version:", beego.VERSION)
 	beego.Info("Golang version:", runtime.Version())
+	version.PrintFullVersionInfo()
 	beego.Run()
 }

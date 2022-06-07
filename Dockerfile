@@ -1,11 +1,11 @@
 ## build
-FROM golang:1.15-alpine AS build-env
+FROM golang:1.15-buster AS build-env
 
 ADD . /go/src/atomci
 
 WORKDIR /go/src/atomci
 
-RUN go build ./cmd/atomci
+RUN make build
 
 ## run
 FROM alpine:3.9
