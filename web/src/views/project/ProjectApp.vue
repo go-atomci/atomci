@@ -73,10 +73,10 @@
               </el-button>
               <el-button type="text" size="small" @click="$refs.appRegister.doCreate(false, scope.row)">
                 {{$t('bm.deployCenter.edit')}}
-              </el-button> 
+              </el-button>
               <el-button type="text" size="small" @click="$refs.commonDelete.doDelete('delProjectApp',$route.params.projectID, scope.row.id)">
                 {{$t('bm.deployCenter.delete')}}
-              </el-button>           
+              </el-button>
               <el-button type="text" size="small" @click="appDetail(scope.row.scm_id)">
                 {{$t('bm.deployCenter.details')}}
               </el-button>
@@ -194,6 +194,7 @@ export default {
       }
       backend.getApp(this.projectID, params, (data) => {
         this.$refs.pages.total = data.total;
+        this.projectAppList = data.item;
         this.listCol = data.item
       });
     },
@@ -219,7 +220,7 @@ export default {
           },
         });
       }).catch(() => { });
-      
+
     },
     changeFilterTxt(val, type) {
       this.searchVal = val;
