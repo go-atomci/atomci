@@ -37,7 +37,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/drone/go-scm v1.20.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-atomci/workflow v0.0.0-20211126090842-208f180b47ab
+	github.com/go-atomci/workflow v0.0.0-20220608023934-99048cac8a37
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang/protobuf v1.4.3 // indirect
