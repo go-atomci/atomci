@@ -78,54 +78,64 @@ func resetEnv(env *string) {
 	*env = ""
 }
 
+func compileEnvNameUnique(pm *SettingManager, name string, stepId int64) error {
+	if len(name) == 0 {
+		return errors.New("param `Name` is not allowed empty")
+	}
+
+	exists, _ := pm.model.GetCompileEnvByName(name)
+
+	if exists != nil && (stepId == 0 || exists.ID != stepId) {
+		return errors.New("环境名称 `" + name + "` 已经存在")
+	}
+
+	return nil
+}
+
 // UpdateCompileEnv ..
 func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64) error {
-	compileEnv, err := pm.model.GetCompileEnvByID(stepID)
-	if err != nil {
+	if compileEnv, err := pm.model.GetCompileEnvByID(stepID); err != nil {
 		return err
-	}
-	if request.Name != "" {
-		compileEnv.Name = request.Name
-	}
-
-	if request.Args != "" {
-		compileEnv.Args = request.Args
 	} else {
-		resetEnv(&compileEnv.Args)
-	}
 
-	if request.Command != "" {
-		compileEnv.Command = request.Command
-	} else {
-		resetEnv(&compileEnv.Command)
-	}
+		if err := compileEnvNameUnique(pm, request.Name, stepID); err != nil {
+			return err
+		}
+		if request.Name != "" {
+			compileEnv.Name = request.Name
+		}
 
-	if request.Description != "" {
-		compileEnv.Description = request.Description
-	} else {
-		resetEnv(&compileEnv.Description)
-	}
+		if request.Args != "" {
+			compileEnv.Args = request.Args
+		} else {
+			resetEnv(&compileEnv.Args)
+		}
 
-	if request.Image != "" {
-		compileEnv.Image = request.Image
-	}
+		if request.Command != "" {
+			compileEnv.Command = request.Command
+		} else {
+			resetEnv(&compileEnv.Command)
+		}
 
-	return pm.model.UpdateCompileEnv(compileEnv)
+		if request.Description != "" {
+			compileEnv.Description = request.Description
+		} else {
+			resetEnv(&compileEnv.Description)
+		}
+
+		if request.Image != "" {
+			compileEnv.Image = request.Image
+		}
+
+		return pm.model.UpdateCompileEnv(compileEnv)
+	}
 }
 
 // CreateCompileEnv ..
 func (pm *SettingManager) CreateCompileEnv(request *CompileEnvReq, creator string) error {
 
-	if len(request.Name) == 0 {
-		return errors.New("param `Name` is not allowed empty")
-	}
-
-	if exists, err := pm.model.GetCompileEnvByName(request.Name); err != nil {
+	if err := compileEnvNameUnique(pm, request.Name, 0); err != nil {
 		return err
-	} else {
-		if exists != nil {
-			return errors.New("环境名称 `" + request.Name + "` 已经存在")
-		}
 	}
 
 	// TODO: verify req struct is valid
