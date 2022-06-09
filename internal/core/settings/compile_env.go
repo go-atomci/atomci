@@ -17,6 +17,7 @@ limitations under the License.
 package settings
 
 import (
+	"errors"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
@@ -114,6 +115,19 @@ func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64)
 
 // CreateCompileEnv ..
 func (pm *SettingManager) CreateCompileEnv(request *CompileEnvReq, creator string) error {
+
+	if len(request.Name) == 0 {
+		return errors.New("param `Name` is not allowed empty")
+	}
+
+	if exists, err := pm.model.GetCompileEnvByName(request.Name); err != nil {
+		return err
+	} else {
+		if exists != nil {
+			return errors.New("环境名称 `" + request.Name + "` 已经存在")
+		}
+	}
+
 	// TODO: verify req struct is valid
 	newCompileEnv := &models.CompileEnv{
 		Name:        request.Name,
