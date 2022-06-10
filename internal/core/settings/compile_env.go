@@ -18,6 +18,7 @@ package settings
 
 import (
 	"errors"
+
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
@@ -94,41 +95,42 @@ func compileEnvNameUnique(pm *SettingManager, name string, stepId int64) error {
 
 // UpdateCompileEnv ..
 func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64) error {
-	if compileEnv, err := pm.model.GetCompileEnvByID(stepID); err != nil {
+	compileEnv, err := pm.model.GetCompileEnvByID(stepID)
+	if err != nil {
 		return err
-	} else {
-
-		if err := compileEnvNameUnique(pm, request.Name, stepID); err != nil {
-			return err
-		}
-		if request.Name != "" {
-			compileEnv.Name = request.Name
-		}
-
-		if request.Args != "" {
-			compileEnv.Args = request.Args
-		} else {
-			resetEnv(&compileEnv.Args)
-		}
-
-		if request.Command != "" {
-			compileEnv.Command = request.Command
-		} else {
-			resetEnv(&compileEnv.Command)
-		}
-
-		if request.Description != "" {
-			compileEnv.Description = request.Description
-		} else {
-			resetEnv(&compileEnv.Description)
-		}
-
-		if request.Image != "" {
-			compileEnv.Image = request.Image
-		}
-
-		return pm.model.UpdateCompileEnv(compileEnv)
 	}
+
+	if err := compileEnvNameUnique(pm, request.Name, stepID); err != nil {
+		return err
+	}
+
+	if request.Name != "" {
+		compileEnv.Name = request.Name
+	}
+
+	if request.Args != "" {
+		compileEnv.Args = request.Args
+	} else {
+		resetEnv(&compileEnv.Args)
+	}
+
+	if request.Command != "" {
+		compileEnv.Command = request.Command
+	} else {
+		resetEnv(&compileEnv.Command)
+	}
+
+	if request.Description != "" {
+		compileEnv.Description = request.Description
+	} else {
+		resetEnv(&compileEnv.Description)
+	}
+
+	if request.Image != "" {
+		compileEnv.Image = request.Image
+	}
+
+	return pm.model.UpdateCompileEnv(compileEnv)
 }
 
 // CreateCompileEnv ..
