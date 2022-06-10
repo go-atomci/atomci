@@ -17,6 +17,8 @@ limitations under the License.
 package settings
 
 import (
+	"errors"
+
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils/query"
@@ -77,12 +79,31 @@ func resetEnv(env *string) {
 	*env = ""
 }
 
+func compileEnvNameUnique(pm *SettingManager, name string, stepId int64) error {
+	if len(name) == 0 {
+		return errors.New("param `Name` is not allowed empty")
+	}
+
+	exists, _ := pm.model.GetCompileEnvByName(name)
+
+	if exists != nil && (stepId == 0 || exists.ID != stepId) {
+		return errors.New("环境名称 `" + name + "` 已经存在")
+	}
+
+	return nil
+}
+
 // UpdateCompileEnv ..
 func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64) error {
 	compileEnv, err := pm.model.GetCompileEnvByID(stepID)
 	if err != nil {
 		return err
 	}
+
+	if err := compileEnvNameUnique(pm, request.Name, stepID); err != nil {
+		return err
+	}
+
 	if request.Name != "" {
 		compileEnv.Name = request.Name
 	}
@@ -114,6 +135,11 @@ func (pm *SettingManager) UpdateCompileEnv(request *CompileEnvReq, stepID int64)
 
 // CreateCompileEnv ..
 func (pm *SettingManager) CreateCompileEnv(request *CompileEnvReq, creator string) error {
+
+	if err := compileEnvNameUnique(pm, request.Name, 0); err != nil {
+		return err
+	}
+
 	// TODO: verify req struct is valid
 	newCompileEnv := &models.CompileEnv{
 		Name:        request.Name,
