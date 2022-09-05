@@ -1,4 +1,4 @@
-FROM node:12.2.0-alpine as node_cache
+FROM node:14.20.0-alpine as node_cache
 WORKDIR /root/app
 COPY package.json .
 
