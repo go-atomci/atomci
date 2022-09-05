@@ -152,6 +152,7 @@ export default {
     return {
       dialogFormVisible: false,
       integrateRepos: [],
+      loading: false,
       compileEnvs: [],
       scmProjects: [],
       languageList: [
