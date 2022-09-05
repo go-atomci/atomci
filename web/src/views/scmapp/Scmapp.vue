@@ -58,7 +58,6 @@
 </template>
 <style lang="scss"  scoped>
   .content-container {
-    position: absolute;
     left: 0; 
     top: 30px;
     width: 100%;
