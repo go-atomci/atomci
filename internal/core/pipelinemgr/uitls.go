@@ -622,23 +622,41 @@ func (pm *PipelineManager) generateImageAddr(arrangeID, projectAppID int64, bran
 			return "", "", err
 		}
 
-		originImageSplit := strings.Split(imageMapping.Image, ":")
-		imageStr := imageMapping.Image
-		if len(originImageSplit) == 2 {
-			imageStr = originImageSplit[0]
-		}
+		imageStr, _ := removeImageUrlTag(imageMapping.Image)
 		newImageAddr = fmt.Sprintf("%s:%s", imageStr, imageTag)
 	case models.LatestTag:
-		originImageSplit := strings.Split(imageMapping.Image, ":")
-		imageStr := imageMapping.Image
-		if len(originImageSplit) == 2 {
-			imageStr = originImageSplit[0]
-		}
+		imageStr, _ := removeImageUrlTag(imageMapping.Image)
 		newImageAddr = fmt.Sprintf("%s:%s", imageStr, "latest")
 	case models.OriginTag:
 		log.Log.Debug("image tag use from yaml, no need replace")
 	}
 	return newImageAddr, imageMapping.Image, nil
+}
+
+func removeImageUrlTag(imageUrl string) (string, error) {
+	// 10.10.0.8/abc
+	// 10.10.0.8/abc:tag
+	// 10.10.0.8/abc:tag:deg 错误
+
+	// 10.10.0.8:9980/abc
+	// 10.10.0.8:9980/abc:tag
+	// 10.10.0.8:9980/abc:tag:def 错误
+
+	if !strings.Contains(imageUrl, ":") {
+		return imageUrl, nil
+	}
+	originImageSplit := strings.Split(imageUrl, ":")
+	if len(originImageSplit) > 2 {
+		real := imageUrl[0:strings.LastIndex(imageUrl, ":")]
+		return real, nil
+	}
+	if strings.Contains(originImageSplit[1], "/") {
+		return imageUrl, nil
+	}
+	real := imageUrl[0:strings.LastIndex(imageUrl, ":")]
+	return real, nil
+
+	return "", nil
 }
 
 func (pm *PipelineManager) GetAppCodeCommitByBranch(appID int64, branchName string) (string, error) {
