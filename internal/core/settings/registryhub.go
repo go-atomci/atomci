@@ -27,23 +27,29 @@ func TryLoginRegistry(basicUrl, username, password string, insecure bool) error 
 	if resp.StatusCode != 401 {
 		return errors.New(fmt.Sprintf("%s不支持V2版本访问", url))
 	}
-	//get Auth Info
-	auth := resp.Header.Get("Www-Authenticate")
-	if !strings.HasPrefix(auth, "Bearer") {
-		return errors.New("basicUrl is incorrect")
-	}
-	//Bearer realm="https://dockerauth.cn-hangzhou.aliyuncs.com/auth",service="registry.aliyuncs.com:cn-hangzhou:26842"
-	kvArr := strings.Split(strings.TrimPrefix(auth, "Bearer "), ",")
 
 	var authBaseUrl, authFullUrl string
 	var queryParams []string
-	for _, i2 := range kvArr {
-		temp := strings.Split(i2, "=")
-		if strings.HasPrefix(i2, "realm") {
-			authBaseUrl = strings.Trim(temp[1], "\"")
-		} else {
-			queryParams = append(queryParams, temp[0]+"="+strings.Trim(temp[1], "\""))
+
+	//get Auth Info
+	auth := resp.Header.Get("Www-Authenticate")
+	if strings.HasPrefix(auth, "Basic") {
+		authBaseUrl = url
+		queryParams = nil
+	} else if strings.HasPrefix(auth, "Bearer") {
+		//Bearer realm="https://dockerauth.cn-hangzhou.aliyuncs.com/auth",service="registry.aliyuncs.com:cn-hangzhou:26842"
+		kvArr := strings.Split(strings.TrimPrefix(auth, "Bearer "), ",")
+
+		for _, i2 := range kvArr {
+			temp := strings.Split(i2, "=")
+			if strings.HasPrefix(i2, "realm") {
+				authBaseUrl = strings.Trim(temp[1], "\"")
+			} else {
+				queryParams = append(queryParams, temp[0]+"="+strings.Trim(temp[1], "\""))
+			}
 		}
+	} else {
+		return errors.New("basicUrl is incorrect")
 	}
 	if len(queryParams) > 0 {
 		authFullUrl = authBaseUrl + "?" + strings.Join(queryParams, "&")
