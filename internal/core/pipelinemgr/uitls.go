@@ -498,7 +498,7 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 	for _, param := range appsAllParams {
 		item := &AppParamsForHealthCheck{
 			Name:     param.Name,
-			ID:       param.ProjectAppId,
+			ID:       param.ProjectAppID,
 			FullName: param.FullName,
 			Type:     "app",
 		}
@@ -986,7 +986,6 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 			ScmApp:          scmApp,
 			RunDeployAppReq: app,
 			ImageAddr:       newImageAddr,
-			ProjectAppId:    projectApp.ID,
 		}
 		allParms = append(allParms, allParm)
 	}
