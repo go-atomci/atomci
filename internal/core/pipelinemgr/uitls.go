@@ -498,7 +498,7 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 	for _, param := range appsAllParams {
 		item := &AppParamsForHealthCheck{
 			Name:     param.Name,
-			ID:       param.ID,
+			ID:       param.ProjectAppId,
 			FullName: param.FullName,
 			Type:     "app",
 		}
@@ -964,7 +964,6 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 		if err != nil {
 			log.Log.Error("get scmapp error: %s", err.Error())
 		}
-
 		arrange, err := pm.appHandler.GetRealArrange(app.ProjectAppID, stageID)
 		if err != nil {
 			log.Log.Error("get app id: %v  env id: %v real arrange, occur error: %s", app.ProjectAppID, stageID, err.Error())
@@ -987,6 +986,7 @@ func (pm *PipelineManager) aggregateAppsParamsForDeploy(publishID, stageID int64
 			ScmApp:          scmApp,
 			RunDeployAppReq: app,
 			ImageAddr:       newImageAddr,
+			ProjectAppId:    projectApp.ID,
 		}
 		allParms = append(allParms, allParm)
 	}

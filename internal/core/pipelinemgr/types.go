@@ -264,8 +264,9 @@ type RunBuildAllParms struct {
 type RunDeployAllParms struct {
 	*models.ScmApp
 	*RunDeployAppReq
-	ImageAddr string `json:"image_addr"`
-	ProjectID int64
+	ImageAddr    string `json:"image_addr"`
+	ProjectID    int64
+	ProjectAppId int64
 }
 
 // AppParamsForCreatePublishJob ..
