@@ -100,7 +100,7 @@ func (a *AuthController) Authenticate() {
 		log.Log.Debug("externalAccountInfo user: %s", externalAccountInfo.User)
 	} else {
 		log.Log.Error("login authenticate error: %v", authErr.Error())
-		http.Error(a.Ctx.ResponseWriter, authErr.Error(), http.StatusInternalServerError)
+		http.Error(a.Ctx.ResponseWriter, "用户不存在或密码错误", http.StatusInternalServerError)
 		return
 	}
 

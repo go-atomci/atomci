@@ -19,7 +19,6 @@ package local
 import (
 	"fmt"
 
-	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/pkg/auth"
 
 	"golang.org/x/crypto/bcrypt"
@@ -47,8 +46,7 @@ func NewProvider(opts ...Option) auth.Provider {
 func (p *Provider) Authenticate(loginUser, password string) (*auth.ExternalAccount, error) {
 	_, err := CompareHashAndPassword(p.password, password)
 	if err != nil {
-		log.Log.Error("comparehas password, error: %v", err.Error())
-		return nil, fmt.Errorf("用户不存在或密码错误")
+		return nil, fmt.Errorf("comparehas password, error: %v", err.Error())
 	}
 	return &auth.ExternalAccount{
 		Name:  p.name,
