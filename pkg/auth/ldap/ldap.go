@@ -19,7 +19,6 @@ package ldap
 import (
 	"fmt"
 
-	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/pkg/auth"
 
 	"github.com/astaxie/beego"
@@ -66,10 +65,7 @@ func (p *Provider) Authenticate(user, password string) (*auth.ExternalAccount, e
 
 	authVerify, resp, err := client.Authenticate(user, password)
 	if !authVerify {
-		if err != nil {
-			log.Log.Error("authVerify error: %s", err.Error())
-		}
-		return nil, fmt.Errorf("域帐号或密码错误，或请联系管理员")
+		return nil, fmt.Errorf("authVerify error: %v", err)
 	}
 
 	// TODO: resp add verification
