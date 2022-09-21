@@ -19,39 +19,41 @@ package local
 import (
 	"fmt"
 
-	"github.com/go-atomci/atomci/internal/core/auth"
-	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
+	"github.com/go-atomci/atomci/pkg/auth"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 // Provider a local authentication provider.
 // TODO: support configuration later
-type Provider struct{}
+type Provider struct {
+	name     string
+	email    string
+	user     string
+	password string
+}
 
 // NewProvider creates a new local authentication provider.
-func NewProvider() auth.Provider {
-	return &Provider{}
+func NewProvider(opts ...Option) auth.Provider {
+	provider := &Provider{}
+	for _, opt := range opts {
+		opt(provider)
+	}
+	return provider
 }
 
 // Authenticate ..
 func (p *Provider) Authenticate(loginUser, password string) (*auth.ExternalAccount, error) {
-	userModel, err := dao.GetUser(loginUser)
-	if err != nil {
-		log.Log.Error("get user error: %v", err.Error())
-		return nil, fmt.Errorf("用户不存在或密码错误")
-	}
-
-	_, err = CompareHashAndPassword(userModel.Password, password)
+	_, err := CompareHashAndPassword(p.password, password)
 	if err != nil {
 		log.Log.Error("comparehas password, error: %v", err.Error())
 		return nil, fmt.Errorf("用户不存在或密码错误")
 	}
 	return &auth.ExternalAccount{
-		Name:  userModel.Name,
-		Email: userModel.Email,
-		User:  userModel.User,
+		Name:  p.name,
+		Email: p.email,
+		User:  p.user,
 	}, nil
 
 }
