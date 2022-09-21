@@ -32,9 +32,9 @@ import (
 	mycasbin "github.com/go-atomci/atomci/internal/middleware/casbin"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 
-	"github.com/go-atomci/atomci/internal/core/auth"
-	"github.com/go-atomci/atomci/internal/core/auth/ldap"
-	"github.com/go-atomci/atomci/internal/core/auth/local"
+	"github.com/go-atomci/atomci/pkg/auth"
+	"github.com/go-atomci/atomci/pkg/auth/ldap"
+	"github.com/go-atomci/atomci/pkg/auth/local"
 )
 
 // AuthController .operations about login/logout
@@ -68,9 +68,27 @@ func (a *AuthController) Authenticate() {
 	var loginProvider auth.Provider
 	switch req.LoginType {
 	case models.LocalAuth:
-		loginProvider = local.NewProvider()
+		userModel, err := dao.GetUser(req.Username)
+		if err != nil {
+			log.Log.Error("get user error: " + err.Error())
+			a.CustomAbort(http.StatusBadRequest, "用户不存在或密码错误")
+		}
+		loginProvider = local.NewProvider(
+			local.Name(userModel.Name),
+			local.Email(userModel.Email),
+			local.User(userModel.User),
+			local.Password(userModel.Password),
+		)
 	case models.LDAPAuth:
-		loginProvider = ldap.NewProvider()
+		port, _ := beego.AppConfig.Int("ldap::port")
+		loginProvider = ldap.NewProvider(
+			ldap.BaseDN(beego.AppConfig.String("ldap::baseDN")),
+			ldap.Host(beego.AppConfig.String("ldap::host")),
+			ldap.Port(port),
+			ldap.BindDN(beego.AppConfig.String("ldap::bindDN")),
+			ldap.BindPassword(beego.AppConfig.String("ldap::bindPassword")),
+			ldap.UserFilter(beego.AppConfig.String("ldap::userFilter")),
+		)
 	default:
 		log.Log.Error("login_type is %v, not support", req.LoginType)
 		http.Error(a.Ctx.ResponseWriter, "不支持此类型的登录，请联系管理员", http.StatusInternalServerError)
