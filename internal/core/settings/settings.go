@@ -142,7 +142,8 @@ func (config *Config) Struct(sc string, settingType string) (interface{}, error)
 		err := json.Unmarshal([]byte(sc), scmConf)
 		return scmConf, err
 	case "gitea", "gitee", "github":
-		scmConf := &ScmBaseConfig{}
+		scmConf := &ScmAuthConf{}
+		scmConf.User = "oauth2"
 		err := json.Unmarshal([]byte(sc), scmConf)
 		return scmConf, err
 	default:
@@ -197,20 +198,13 @@ func (pm *SettingManager) GetSCMIntegrateSettinByID(id int64) (*ScmIntegrateSett
 func getScmConf(scmType string, config interface{}) ScmAuthConf {
 	scmCONF := ScmAuthConf{}
 	switch strings.ToLower(scmType) {
-	case constant.SCMGitlab:
+	case constant.SCMGitlab, constant.SCMGitea, constant.SCMGitee, constant.SCMGithub:
 		if conf, ok := config.(*ScmAuthConf); ok {
 			scmCONF.URL = conf.URL
 			scmCONF.User = conf.User
 			scmCONF.Token = conf.Token
 		} else {
 			log.Log.Error("parse type: %s conf error", constant.SCMGitlab)
-		}
-	case constant.SCMGitea, constant.SCMGitee, constant.SCMGithub:
-		if conf, ok := config.(*ScmBaseConfig); ok {
-			scmCONF.URL = conf.URL
-			scmCONF.Token = conf.Token
-		} else {
-			log.Log.Error("parse type: %s conf error", "scmbase conf")
 		}
 	}
 	return scmCONF
