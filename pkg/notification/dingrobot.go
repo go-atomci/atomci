@@ -7,20 +7,23 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/astaxie/beego"
-	messages "github.com/go-atomci/atomci/internal/core/notification/types"
+	messages "github.com/go-atomci/atomci/pkg/notification/types"
 )
 
-type DingRobot struct{}
+type DingRobot struct {
+	DingUrl string
+}
 
-func DingRobotHandler() INotify {
-	notifyHandler := &DingRobot{}
+func DingRobotHandler(dingUrl string) INotify {
+	notifyHandler := &DingRobot{
+		DingUrl: dingUrl,
+	}
 	return notifyHandler
 }
 
-func dingEventMessage(template INotifyTemplate, result messages.StepCallbackResult) messages.EventMessage {
+func (dingtalk *DingRobot) dingEventMessage(template INotifyTemplate, result PushNotification) messages.EventMessage {
 
-	robotHost := beego.AppConfig.String("notification::ding")
+	robotHost := dingtalk.DingUrl
 
 	var buf bytes.Buffer
 	template.GenSubject(&buf, result)
@@ -51,11 +54,11 @@ func dingEventMessage(template INotifyTemplate, result messages.StepCallbackResu
 	return msg
 }
 
-func (dingtalk *DingRobot) Send(result messages.StepCallbackResult) error {
+func (dingtalk *DingRobot) Send(result PushNotification) error {
 
 	template := &DingRobotMarkdownTemplate{}
 
-	message := dingEventMessage(template, result)
+	message := dingtalk.dingEventMessage(template, result)
 
 	body, err := json.Marshal(message.Ding.EventMessage)
 	if err != nil {

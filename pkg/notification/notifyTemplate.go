@@ -3,18 +3,18 @@ package notification
 import (
 	"bytes"
 
-	messages "github.com/go-atomci/atomci/internal/core/notification/types"
+	messages "github.com/go-atomci/atomci/pkg/notification/types"
 )
 
 type INotifyTemplate interface {
-	GenSubject(buf *bytes.Buffer, m messages.StepCallbackResult) string
-	GenContent(buf *bytes.Buffer, m messages.StepCallbackResult) string
-	GenFooter(buf *bytes.Buffer, m messages.StepCallbackResult) string
+	GenSubject(buf *bytes.Buffer, m PushNotification) string
+	GenContent(buf *bytes.Buffer, m PushNotification) string
+	GenFooter(buf *bytes.Buffer, m PushNotification) string
 }
 
 type DingRobotMarkdownTemplate struct{}
 
-func (temp *DingRobotMarkdownTemplate) GenSubject(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *DingRobotMarkdownTemplate) GenSubject(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString("## ")
 	buf.WriteString(messages.StatusCodeToChinese(m.Status))
@@ -22,7 +22,7 @@ func (temp *DingRobotMarkdownTemplate) GenSubject(buf *bytes.Buffer, m messages.
 	return buf.String()
 }
 
-func (temp *DingRobotMarkdownTemplate) GenContent(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *DingRobotMarkdownTemplate) GenContent(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString(m.PublishName)
 	buf.WriteString("\r\n\r\n")
@@ -33,7 +33,7 @@ func (temp *DingRobotMarkdownTemplate) GenContent(buf *bytes.Buffer, m messages.
 	return buf.String()
 }
 
-func (temp *DingRobotMarkdownTemplate) GenFooter(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *DingRobotMarkdownTemplate) GenFooter(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString("\r\n\r\n> by AtomCI")
 
@@ -42,7 +42,7 @@ func (temp *DingRobotMarkdownTemplate) GenFooter(buf *bytes.Buffer, m messages.S
 
 type EmailTemplate struct{}
 
-func (temp *EmailTemplate) GenSubject(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *EmailTemplate) GenSubject(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString("流水线")
 	buf.WriteString(m.PublishName)
@@ -52,7 +52,7 @@ func (temp *EmailTemplate) GenSubject(buf *bytes.Buffer, m messages.StepCallback
 	return buf.String()
 }
 
-func (temp *EmailTemplate) GenContent(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *EmailTemplate) GenContent(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString("<p><h2><span>流水线: </span><b>")
 	buf.WriteString(m.PublishName)
@@ -67,7 +67,7 @@ func (temp *EmailTemplate) GenContent(buf *bytes.Buffer, m messages.StepCallback
 	return buf.String()
 }
 
-func (temp *EmailTemplate) GenFooter(buf *bytes.Buffer, m messages.StepCallbackResult) string {
+func (temp *EmailTemplate) GenFooter(buf *bytes.Buffer, m PushNotification) string {
 
 	buf.WriteString("<p>by AtomCI</p>")
 

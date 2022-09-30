@@ -2,28 +2,30 @@ package notification
 
 import (
 	"bytes"
-	"github.com/astaxie/beego/logs"
 	"strings"
 
-	"github.com/astaxie/beego"
-	messages "github.com/go-atomci/atomci/internal/core/notification/types"
+	messages "github.com/go-atomci/atomci/pkg/notification/types"
 	"github.com/go-gomail/gomail"
 )
 
-type Email struct{}
+type Email struct {
+	smtpHost     string
+	stmpAccount  string
+	smtpPassword string
+	smtpPort     int
+}
 
-func EmailHandler() INotify {
-	notifyHandler := &Email{}
+func EmailHandler(host, user, password string, port int) INotify {
+	notifyHandler := &Email{
+		smtpHost:     host,
+		stmpAccount:  user,
+		smtpPassword: password,
+		smtpPort:     port,
+	}
 	return notifyHandler
 }
 
-func emailEventMessage(template INotifyTemplate, result messages.StepCallbackResult) messages.EventMessage {
-
-	smtpHost := beego.AppConfig.String("notification::smtpHost")
-	smtpAccount := beego.AppConfig.String("notification::smtpAccount")
-	smtpPassword := beego.AppConfig.String("notification::smtpPassword")
-	smtpPort, _ := beego.AppConfig.Int("notification::smtpPort")
-
+func emailEventMessage(template INotifyTemplate, result PushNotification) messages.EventMessage {
 	var buf bytes.Buffer
 	subject := template.GenSubject(&buf, result)
 	buf.Reset()
@@ -31,10 +33,10 @@ func emailEventMessage(template INotifyTemplate, result messages.StepCallbackRes
 	template.GenFooter(&buf, result)
 
 	mailMessage := &messages.MailMessage{
-		SmtpPort:     smtpPort,
-		SmtpHost:     smtpHost,
-		SmtpAccount:  smtpAccount,
-		SmtpPassword: smtpPassword,
+		SmtpPort:     result.EmailPort,
+		SmtpHost:     result.EmailHost,
+		SmtpAccount:  result.EmailUser,
+		SmtpPassword: result.EmailPassword,
 		Body:         buf.String(),
 		Subject:      subject,
 	}
@@ -45,7 +47,7 @@ func emailEventMessage(template INotifyTemplate, result messages.StepCallbackRes
 	return msg
 }
 
-func (email *Email) Send(result messages.StepCallbackResult) error {
+func (email *Email) Send(result PushNotification) error {
 
 	template := &EmailTemplate{}
 
@@ -64,15 +66,5 @@ func (email *Email) Send(result messages.StepCallbackResult) error {
 
 	d := gomail.NewDialer(message.Mail.SmtpHost, message.Mail.SmtpPort, message.Mail.SmtpAccount, message.Mail.SmtpPassword)
 
-	defer func() {
-		if r := recover(); r != nil {
-			logs.Error("%v", r)
-		}
-	}()
-
-	if err := d.DialAndSend(m); err != nil {
-		panic(err)
-	}
-
-	return nil
+	return d.DialAndSend(m)
 }

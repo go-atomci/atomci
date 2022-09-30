@@ -17,10 +17,11 @@ limitations under the License.
 package api
 
 import (
-	"github.com/go-atomci/atomci/internal/core/notification/impl"
+	"github.com/astaxie/beego"
 	"github.com/go-atomci/atomci/internal/core/pipelinemgr"
 	"github.com/go-atomci/atomci/internal/core/publish"
 	"github.com/go-atomci/atomci/internal/middleware/log"
+	"github.com/go-atomci/atomci/pkg/notification"
 )
 
 // PipelineController ...
@@ -119,8 +120,35 @@ func (p *PipelineController) RunStepCallback() {
 		log.Log.Error("RunStep callback, update publish Order occur error: %s", err.Error())
 		return
 	}
+	publishInfo, _ := publishmgr.GetPublishInfo(publishID)
 
-	go notification.Send(publishID, publishStatus)
+	dingEnable := beego.AppConfig.DefaultBool("notification::dingEnable", false)
+	mailEnable := beego.AppConfig.DefaultBool("notification::mailEnable", false)
+	dingURL := beego.AppConfig.String("notification::ding")
+
+	smtpHost := beego.AppConfig.String("notification::smtpHost")
+	smtpAccount := beego.AppConfig.String("notification::smtpAccount")
+	smtpPassword := beego.AppConfig.String("notification::smtpPassword")
+	smtpPort, _ := beego.AppConfig.Int("notification::smtpPort")
+
+	pushOptions := notification.PushNotification{
+		// message
+		Status:      publishStatus,
+		PublishName: publishInfo.Name,
+		StageName:   publishInfo.StageName,
+		StepName:    publishInfo.Step,
+		// dingding
+		DingURL:    dingURL,
+		DingEnable: dingEnable,
+		// email
+		EmailEnable:   mailEnable,
+		EmailHost:     smtpHost,
+		EmailPort:     smtpPort,
+		EmailUser:     smtpAccount,
+		EmailPassword: smtpPassword,
+	}
+	// publishID
+	go notification.Send(pushOptions)
 
 	p.Data["json"] = NewResult(true, nil, "")
 	p.ServeJSON()
