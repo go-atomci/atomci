@@ -47,10 +47,14 @@ url = http://localhost:8080
 # 通知配置
 [notification]
 # 钉钉通知
-dingEnable = 1
+#  dingEnable=true 开启dinding通知
+#  dingEnable=false 关闭dingding通知
+dingEnable = true
 ding = "https://oapi.dingtalk.com/robot/send?access_token=faketoken"
-# 邮件通知
-mailEnable = 1
+# 邮件通知 
+# mailEnable = true 开启email通知
+# mailEnable = false 关闭email通知
+mailEnable = true
 smtpHost = "smtp.host"
 smtpPort = 465
 smtpAccount = "fake@mail.com"

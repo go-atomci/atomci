@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/go-atomci/atomci/internal/models"
 )
 
@@ -58,13 +59,6 @@ type DingMessage struct {
 type EventMessage struct {
 	Mail *MailMessage
 	Ding *DingMessage
-}
-
-type StepCallbackResult struct {
-	StageName   string
-	PublishName string
-	StepName    string
-	Status      int64
 }
 
 func StatusCodeToChinese(status int64) string {
