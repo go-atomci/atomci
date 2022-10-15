@@ -67,6 +67,7 @@ require (
 	github.com/googleapis/gnostic v0.0.0-20170729233727-0c5108395e2d // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/isbrick/http-client v0.0.0-20210321135403-0a5df00fdb84 // indirect
+	github.com/jarcoal/httpmock v1.2.0 // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
