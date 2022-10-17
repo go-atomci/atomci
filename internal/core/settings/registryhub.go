@@ -33,19 +33,23 @@ func TryLoginRegistry(basicUrl, username, password string, insecure bool) error 
 
 	//get Auth Info
 	auth := resp.Header.Get("Www-Authenticate")
-	if strings.HasPrefix(auth, "Basic") {
+
+	if strings.EqualFold("Basic", auth[:5]) {
 		authBaseUrl = url
 		queryParams = nil
-	} else if strings.HasPrefix(auth, "Bearer") {
+	} else if strings.EqualFold("Bearer", auth[:6]) {
 		//Bearer realm="https://dockerauth.cn-hangzhou.aliyuncs.com/auth",service="registry.aliyuncs.com:cn-hangzhou:26842"
-		kvArr := strings.Split(strings.TrimPrefix(auth, "Bearer "), ",")
+		//Bearer realm="https://auth.pkg.coding.net/artifacts-auth/docker/jwt?host=leafly-docker.pkg.coding.net",service="docker"
+		kvArr := strings.Split(auth[7:], ",")
 
 		for _, i2 := range kvArr {
-			temp := strings.Split(i2, "=")
-			if strings.HasPrefix(i2, "realm") {
-				authBaseUrl = strings.Trim(temp[1], "\"")
+			index := strings.Index(i2, "=")
+			if index == -1 {
+				continue
+			} else if strings.EqualFold(strings.Trim(i2[:index], " "), "realm") {
+				authBaseUrl = strings.Trim(i2[index+1:], "\"")
 			} else {
-				queryParams = append(queryParams, temp[0]+"="+strings.Trim(temp[1], "\""))
+				queryParams = append(queryParams, i2[:index]+"="+strings.Trim(i2[index+1:], "\""))
 			}
 		}
 	} else {
