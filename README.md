@@ -8,7 +8,7 @@
 [![docker_pulls](https://img.shields.io/docker/pulls/colynn/atomci.svg)](https://hub.docker.com/r/colynn/atomci/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/go-atomci/atomci/blob/master/LICENSE)
 
-[文档](https://go-atomci.github.io/atomci-press) | [在线体验](http:/101.43.110.73:8090/) | [Releases](https://github.com/go-atomci/atomci/releases/)
+[文档](https://go-atomci.github.io/atomci-press) | [在线体验](http://atomci.wolfclan.top) | [Releases](https://github.com/go-atomci/atomci/releases/)
 </div>
 
 # 介绍
@@ -51,7 +51,7 @@ AtomCI 一款云原生CICD平台，致力于让中小企业快速落地Kubernete
 
 ## 在线体验
 
-[在线体验](http://101.43.110.73:8090/)， 非常感谢[@liuzilong](https://github.com/liuzilong66666)提供的kubernetes环境（：
+[在线体验](http://atomci.wolfclan.top/)， 非常感谢[@liuzilong](https://github.com/liuzilong66666)提供的kubernetes环境（：
   
 | 账号 | 密码 |
 | --- | --- |
