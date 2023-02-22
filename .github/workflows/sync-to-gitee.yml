@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - v1.5.0-feat-app-refactor
+      - v2.0-alpha
 jobs:
   sync:
     runs-on: ubuntu-latest
