@@ -1,7 +1,9 @@
 ## build
 FROM golang:1.18-buster AS build-env
 
-ADD . /go/src/atomci
+COPY . /go/src/atomci
+
+COPY .git  /go/src/atomci/.git
 
 WORKDIR /go/src/atomci
 
