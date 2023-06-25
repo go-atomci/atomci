@@ -37,11 +37,12 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/drone/go-scm v1.20.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-atomci/workflow v0.0.0-20220613022903-d67d3a46ad6a
+	github.com/go-atomci/workflow v1.0.2
 	github.com/go-gomail/gomail v0.0.0-20160411212932-81ebce5c23df
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/isbrick/tools v0.0.0-20211027093338-a3a0ded37175
+	github.com/jarcoal/httpmock v1.2.0
 	github.com/pborman/uuid v1.2.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
@@ -67,7 +68,6 @@ require (
 	github.com/googleapis/gnostic v0.0.0-20170729233727-0c5108395e2d // indirect
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/isbrick/http-client v0.0.0-20210321135403-0a5df00fdb84 // indirect
-	github.com/jarcoal/httpmock v1.2.0 // indirect
 	github.com/json-iterator/go v1.1.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
