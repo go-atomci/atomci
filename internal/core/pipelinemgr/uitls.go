@@ -411,6 +411,7 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		Stages:             pipelineStagesStr,
 		CommonContext: jenkins.CommonContext{
 			Namespace: CIInfo[4],
+			PodName:   strings.ReplaceAll(jobName, "_", "-"),
 		},
 		CallBack: jenkins.CallbackRequest{
 			Token: adminToken,
@@ -557,6 +558,7 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 		},
 		CommonContext: jenkins.CommonContext{
 			Namespace: CIInfo[4],
+			PodName:   strings.ReplaceAll(jobName, "_", "-"),
 		},
 	}
 

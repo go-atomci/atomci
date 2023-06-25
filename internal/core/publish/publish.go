@@ -57,7 +57,8 @@ func NewPublishManager() *PublishManager {
 // CreatePublish ...
 func (pm *PublishManager) CreatePublish(user string, projectID int64, p *PublishReq) error {
 	if err := pm.publishCreateParamVerify(p); err != nil {
-		return err
+		log.Log.Error("args verify failed: %v", err.Error())
+		return fmt.Errorf("app args verify failed, please check app url/branch info, err: %v", err.Error())
 	}
 	firstStageID, firstStageName, step, stepType, err := pm.projectHandler.GetStageStepInfo(p.BindPipelineID)
 	if err != nil {
@@ -96,6 +97,7 @@ func (pm *PublishManager) CreatePublish(user string, projectID int64, p *Publish
 	if pipelineInstanceID, err := pm.createPipelineInstance(p.BindPipelineID, publishID, user); err == nil {
 		publishModel, err := pm.model.GetPublishByID(publishID)
 		if err != nil {
+			log.Log.Error("get publishby id error: %s", err.Error())
 			return err
 		}
 		publishModel.LastPipelineInstanceID = pipelineInstanceID
