@@ -63,7 +63,7 @@ func (pm *PublishManager) getPublishItemCanEnableOperations(item *models.Publish
 		operations.BackTo = false
 	case models.Running, models.Pending:
 		operations = getOperationCanEnableByStepStatus(item.StepType, item.Status, operations)
-	case models.Failed:
+	case models.Failed, models.UnKnown:
 		operations = getOperationCanEnableByStepStatus(item.StepType, item.Status, operations)
 	case models.Success:
 		nextStep, err := pm.pipelineHandler.GetNextStepTypeByStageID(item.LastPipelineInstanceID, item.StageID, item.StepIndex)

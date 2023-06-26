@@ -18,6 +18,7 @@ package cronjob
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-atomci/atomci/internal/core/pipelinemgr"
@@ -25,6 +26,7 @@ import (
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
 	"github.com/go-atomci/atomci/utils"
+	"github.com/go-atomci/workflow"
 
 	"github.com/go-atomci/workflow/jenkins"
 )
@@ -61,7 +63,7 @@ func syncAllPublishJobStatus() {
 }
 
 func getRunningPublishJob(newPublishJob *dao.PublishJobModel) []*models.PublishJob {
-	publishJobs, err := newPublishJob.GetPublishJobsByFilter([]string{models.StatusRunning, models.StatusUnknown, models.StatusInit}, []string{models.JobTypeBuild, models.JobTypeDeploy})
+	publishJobs, err := newPublishJob.GetPublishJobsByFilter([]string{models.StatusRunning, models.StatusInit}, []string{models.JobTypeBuild, models.JobTypeDeploy})
 	if err != nil {
 		log.Log.Error("when sync publish job, get publish jobs occur error: %s", err.Error())
 		return nil
@@ -128,7 +130,16 @@ func getPipelineJobStatus(jobName string, job *models.PublishJob, pipeline *pipe
 
 	jobDetail, err := workFlowProvider.GetJobInfo(job.RunID)
 	if err != nil {
-		return nil, 0, err
+		if strings.Contains(err.Error(), "404 not found") {
+			// when job 404/ set jobDetail default value.
+			jobDetail = &workflow.JobInfo{
+				Result:         models.StatusUnknown,
+				DurationMillis: 0,
+				Stages:         []workflow.Stage{},
+			}
+		} else {
+			return nil, 0, err
+		}
 	}
 
 	// get job result and execute time
@@ -171,7 +182,7 @@ func getPipelineJobStatus(jobName string, job *models.PublishJob, pipeline *pipe
 	case "IN_PROGRESS":
 		jobStatus = models.StatusRunning
 	default:
-		log.Log.Error("job's status is undesired value: %v, reset job status to: 'UNKNOWN'", status)
+		log.Log.Warn("job's status is undesired value: %v, reset job status to: 'UNKNOWN'", status)
 		jobStatus = models.StatusUnknown
 		publishStatus = models.UnKnown
 	}
