@@ -273,6 +273,12 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		log.Log.Error("when create build job, get sys default %v compile env error: %s", constant.DefaultContainerName, err.Error())
 		return 0, "", err
 	}
+
+	jenkinsCheckoutTemplate, err := pm.getSysDefaultCompileEnv(constant.CheckoutContainerName)
+	if err != nil {
+		log.Log.Error("when create build job, get sys default checkout compile env  error: %s", err.Error())
+		return 0, "", err
+	}
 	jenkinsKanikoTemplate, err := pm.getSysDefaultCompileEnv(constant.BuildImageContainerName)
 	if err != nil {
 		log.Log.Error("when create build job, get sys default kaniko compile env  error: %s", err.Error())
@@ -282,6 +288,7 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 	// default container template
 	containerTemplates := []jenkins.ContainerEnv{
 		jenkinsJNLPTemplate,
+		jenkinsCheckoutTemplate,
 		jenkinsKanikoTemplate,
 	}
 	// TaskTmplItem.SubTask
@@ -410,8 +417,9 @@ func (pm *PipelineManager) CreateBuildJob(creator string, projectID, publishID i
 		ContainerTemplates: containerTemplates,
 		Stages:             pipelineStagesStr,
 		CommonContext: jenkins.CommonContext{
-			Namespace: CIInfo[4],
-			PodName:   strings.ReplaceAll(jobName, "_", "-"),
+			Namespace:        CIInfo[4],
+			PodName:          strings.ReplaceAll(jobName, "_", "-"),
+			DefaultContainer: constant.DefaultContainerName,
 		},
 		CallBack: jenkins.CallbackRequest{
 			Token: adminToken,
@@ -542,9 +550,16 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 		return 0, "", err
 	}
 
+	jenkinsCheckoutTemplate, err := pm.getSysDefaultCompileEnv(constant.CheckoutContainerName)
+	if err != nil {
+		log.Log.Error("when create deploy job, get sys default checkout compile env  error: %s", err.Error())
+		return 0, "", err
+	}
+
 	// default container template
 	containerTemplates := []jenkins.ContainerEnv{
 		jenkinsJNLPTemplate,
+		jenkinsCheckoutTemplate,
 	}
 
 	flowProcessor := &jenkins.DeployContext{
@@ -557,8 +572,9 @@ func (pm *PipelineManager) CreateDeployJob(creator string, projectID, publishID 
 			Body:  callBackRequestBody,
 		},
 		CommonContext: jenkins.CommonContext{
-			Namespace: CIInfo[4],
-			PodName:   strings.ReplaceAll(jobName, "_", "-"),
+			Namespace:        CIInfo[4],
+			PodName:          strings.ReplaceAll(jobName, "_", "-"),
+			DefaultContainer: constant.DefaultContainerName,
 		},
 	}
 
@@ -1020,10 +1036,9 @@ func (pm *PipelineManager) generateAutoDeployStep(publishID int64) (*DeployStepR
 
 /*  auto Trigger part end */
 
-func (pm *PipelineManager) generateBaseInfo(projectID, stageID, publishJobID int64) (string, string) {
-	scriptsDir := "/home/admin/scripts_dev"
+func (pm *PipelineManager) generateBaseInfo(projectID, stageID, publishJobID int64) string {
 	scriptBaseInfo := fmt.Sprintf(" --project-id %d --stage-id %d --publish-job-id %d ", projectID, stageID, publishJobID)
-	return scriptsDir, scriptBaseInfo
+	return scriptBaseInfo
 }
 func (pm *PipelineManager) generateAppPth(stageID, projectID int64, workSpace string, appArgs *RunBuildAllParms) string {
 	appPath := strings.Join([]string{workSpace, strconv.Itoa(int(projectID)), strconv.Itoa(int(stageID)), appArgs.Name, appArgs.Branch, appArgs.BuildPath}, "/")
@@ -1034,7 +1049,7 @@ func (pm *PipelineManager) generateAppPth(stageID, projectID int64, workSpace st
 func (pm *PipelineManager) renderAppCheckoutItemsForBuild(projectID, stageID, publishJobID int64, allParms []*RunBuildAllParms) ([]jenkins.StepItem, error) {
 	appCheckoutItems := []jenkins.StepItem{}
 
-	scriptsDir, buildBaseInfo := pm.generateBaseInfo(projectID, stageID, publishJobID)
+	buildBaseInfo := pm.generateBaseInfo(projectID, stageID, publishJobID)
 	for _, app := range allParms {
 		// TODO: if GitAPP type is not app, how to deal with this, skip ??
 		item := jenkins.StepItem{}
@@ -1043,8 +1058,9 @@ func (pm *PipelineManager) renderAppCheckoutItemsForBuild(projectID, stageID, pu
 		// TODO: app build vcsType use git
 		appInfoStr := fmt.Sprintf(" --scm-app-id %d --app-name %s --app-language %s --branch-url %s --vcs-type %s --build-path %s ", app.ProjectAppID, app.Name, app.Language, app.Path, "git", app.BuildPath)
 		appParms := fmt.Sprintf(" --branch-name %s ", app.Branch)
-		Command := fmt.Sprintf("sh 'python3 %s/app_checkout.py %s %s %s'", scriptsDir, buildBaseInfo, appInfoStr, appParms)
+		Command := fmt.Sprintf("sh 'checkout.py %s %s %s'", buildBaseInfo, appInfoStr, appParms)
 		item.Command = Command
+		item.ContainerName = constant.CheckoutContainerName
 		appCheckoutItems = append(appCheckoutItems, item)
 	}
 
@@ -1116,6 +1132,7 @@ func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, sta
 		}
 		Command := fmt.Sprintf("sh \"cd %v; export DOCKER_CONFIG=$DOCKER_CONFIG; /kaniko/executor -f %v -c ./  -d %v %s \"", appPath, dockerfile, imageURL, insecure)
 		item.Command = Command
+		item.ContainerName = constant.BuildImageContainerName
 		appImageItems = append(appImageItems, item)
 	}
 
@@ -1125,7 +1142,7 @@ func (pm *PipelineManager) renderAppImageitemsForBuild(projectID, publishID, sta
 // Rendering parameters for healthcheck command
 func (pm *PipelineManager) renderHealthCheckCommand(projectID, stageID, publishJobID int64, allParms []*AppParamsForHealthCheck, stageJSON *PipelineStageStruct) ([]*jenkins.StepItem, error) {
 	healthCheckItems := []*jenkins.StepItem{}
-	scriptsDir, buildBaseInfo := pm.generateBaseInfo(projectID, stageID, publishJobID)
+	buildBaseInfo := pm.generateBaseInfo(projectID, stageID, publishJobID)
 
 	envStage, err := pm.modelProject.GetProjectEnvByID(stageJSON.StageID)
 	if err != nil {
@@ -1140,6 +1157,8 @@ func (pm *PipelineManager) renderHealthCheckCommand(projectID, stageID, publishJ
 		}
 		item := &jenkins.StepItem{}
 		item.Name = app.Name
+		// TODO: wip split healthcheck, use checkout container name tmp.
+		item.ContainerName = constant.CheckoutContainerName
 
 		appArrange, err := pm.appHandler.GetRealArrange(app.ID, stageID)
 		if err != nil {
@@ -1165,7 +1184,7 @@ func (pm *PipelineManager) renderHealthCheckCommand(projectID, stageID, publishJ
 		for _, appRes := range appResItems {
 			svcName := appRes.Name
 			svcInfo := fmt.Sprintf(" --cluster %s --namespace %s --app-name %s --service-name %s", settingKubernetesItem.Name, envStage.Namespace, app.Name, svcName)
-			item.Command = fmt.Sprintf("sh 'python3 %s/healthcheck.py %s %s'", scriptsDir, buildBaseInfo, svcInfo)
+			item.Command = fmt.Sprintf("sh 'healthcheck.py %s %s'", buildBaseInfo, svcInfo)
 			healthCheckItems = append(healthCheckItems, item)
 		}
 	}
