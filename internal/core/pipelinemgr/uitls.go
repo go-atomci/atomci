@@ -1157,7 +1157,7 @@ func (pm *PipelineManager) renderHealthCheckCommand(projectID, stageID, publishJ
 		}
 		item := &jenkins.StepItem{}
 		item.Name = app.Name
-		// TODO: wip split healthcheck, use checkout container name tmp.
+		// TODO: refactor(WIP) healthcheck stage, use checkout container name tmp.
 		item.ContainerName = constant.CheckoutContainerName
 
 		appArrange, err := pm.appHandler.GetRealArrange(app.ID, stageID)

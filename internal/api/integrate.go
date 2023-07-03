@@ -203,7 +203,7 @@ func (p *IntegrateController) DeleteIntegrateSetting() {
 // GetCompileEnvs ..
 func (p *IntegrateController) GetCompileEnvs() {
 	pm := settings.NewSettingManager()
-	rsp, err := pm.GetCompileEnvs("")
+	rsp, err := pm.GetCompileEnvs()
 	if err != nil {
 		p.HandleInternalServerError(err.Error())
 		log.Log.Error("Get compile envs occur error: %s", err.Error())

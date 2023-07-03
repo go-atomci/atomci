@@ -146,12 +146,10 @@ func (model *SysSettingModel) GetCompileEnvByName(compileEnvItem string) (*model
 }
 
 // GetCompileEnvs ...
-func (model *SysSettingModel) GetCompileEnvs(integrateType string) ([]*models.CompileEnv, error) {
+func (model *SysSettingModel) GetCompileEnvs() ([]*models.CompileEnv, error) {
 	integrateSettings := []*models.CompileEnv{}
 	qs := model.ormer.QueryTable(model.CompileEnvTableName).Filter("deleted", false)
-	if integrateType != "" {
-		qs = qs.Filter("type", integrateType)
-	}
+
 	_, err := qs.All(&integrateSettings)
 	if err != nil {
 		return nil, err
