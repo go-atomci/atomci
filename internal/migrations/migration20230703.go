@@ -48,7 +48,7 @@ func (m Migration20230703) Upgrade(ormer orm.Ormer) error {
 }
 
 func updateCompileEnvs(ormer orm.Ormer) error {
-	_, err := ormer.Raw("UPDATE `sys_compile_env` SET `image`='jenkins/inbound-agent:latest' WHERE `name`='jnlp';").Exec()
+	_, err := ormer.Raw("UPDATE `sys_compile_env` SET `image`='jenkins/inbound-agent:latest',`description`='默认jenkins jnlp agent' WHERE `name`='jnlp';").Exec()
 	if err != nil {
 		return err
 	}
