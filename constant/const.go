@@ -72,5 +72,6 @@ var ScmIntegratetypes = []string{SCMGitlab, SCMGithub, SCMGitea, SCMGitee, SCMGo
 
 const (
 	DefaultContainerName    = "jnlp"
+	CheckoutContainerName   = "checkout"
 	BuildImageContainerName = "kaniko"
 )

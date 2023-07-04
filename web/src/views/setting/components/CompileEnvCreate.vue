@@ -102,7 +102,7 @@ export default {
           args: item.args || '',
           description: item.description || '',
         };
-        if (this.form.name == 'jnlp' || this.form.name == 'kaniko') {
+        if (this.form.name == 'jnlp' || this.form.name == 'checkout' || this.form.name == 'kaniko') {
           this.systemReserved = true
         } else {
           this.systemReserved = false
@@ -110,6 +110,7 @@ export default {
         this.rowId = item.id;
       } else {
         this.title = '新增';
+        this.systemReserved = false;
         this.form = {
           name: '',
           image: '',

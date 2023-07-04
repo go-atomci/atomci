@@ -189,6 +189,14 @@ github.com/go-asn1-ber/asn1-ber v1.5.0 h1:/S4hO/AO6tLMlPX0oftGSOcdGJJN/MuYzfgWRM
 github.com/go-asn1-ber/asn1-ber v1.5.0/go.mod h1:hEBeB/ic+5LoWskz+yKT7vGhhPYkProFKoKdwZRWMe0=
 github.com/go-atomci/workflow v1.0.2 h1:IGcSE5F36hWDP8Xx1zEKcwMGu7fKwWKy9wJBCIfQ4y8=
 github.com/go-atomci/workflow v1.0.2/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
+github.com/go-atomci/workflow v1.0.3-0.20230630031545-beb50c2eaffa h1:jjzwKJwAfuHDgy0komZs8kYaJ5KLS0tzVw6mxu9XVuY=
+github.com/go-atomci/workflow v1.0.3-0.20230630031545-beb50c2eaffa/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
+github.com/go-atomci/workflow v1.0.3-0.20230630033439-2e6002705112 h1:aC6igjAo5yAoMXS4aNi2zRAX2BMf37njPd+8RQN7et8=
+github.com/go-atomci/workflow v1.0.3-0.20230630033439-2e6002705112/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
+github.com/go-atomci/workflow v1.0.3-0.20230630072558-4261cca14b22 h1:SQwN89DSZT9u/t2nkA9LAAWbZwd2ULSMnApm4rj9poQ=
+github.com/go-atomci/workflow v1.0.3-0.20230630072558-4261cca14b22/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
+github.com/go-atomci/workflow v1.0.3-0.20230630103220-4f8f444edbaa h1:k0aY1K1c62QtHB+AKnHc9WvPJBBJRHWxQFQ8wvtLNiE=
+github.com/go-atomci/workflow v1.0.3-0.20230630103220-4f8f444edbaa/go.mod h1:U396Nlydy0L3cVrlkdqp2DLn8e4DtwN+wJ+nmWIaS0s=
 github.com/go-bindata/go-bindata v3.1.1+incompatible/go.mod h1:xK8Dsgwmeed+BBsSy2XTopBn/8uK2HWuGSnA11C3Joo=
 github.com/go-critic/go-critic v0.3.5-0.20190526074819-1df300866540/go.mod h1:+sE8vrLDS2M0pZkBk0wy6+nLdKexVDrl/jBqQOTDThA=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=

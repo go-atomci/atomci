@@ -34,8 +34,8 @@ type CompileEnvReq struct {
 }
 
 // GetCompileEnvs ..
-func (pm *SettingManager) GetCompileEnvs(integrateType string) ([]*models.CompileEnv, error) {
-	items, err := pm.model.GetCompileEnvs(integrateType)
+func (pm *SettingManager) GetCompileEnvs() ([]*models.CompileEnv, error) {
+	items, err := pm.model.GetCompileEnvs()
 	if err != nil {
 		log.Log.Error("get interate settings error: %s", err.Error())
 		return nil, err
