@@ -7,6 +7,7 @@ on:
       - v2.0-alpha
 jobs:
   sync:
+    if: github.repository == 'go-atomci/atomci'
     runs-on: ubuntu-latest
 
     steps:

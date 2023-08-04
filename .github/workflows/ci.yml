@@ -6,7 +6,7 @@ on:
       - master
   push:
     branches:
-      - master
+      - '*'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,6 +25,10 @@ jobs:
           yarn install
           yarn run build
       
+  image:
+    if: github.repository == 'go-atomci/atomci' && github.com.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
