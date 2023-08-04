@@ -1,4 +1,4 @@
-name: Compile&Publish
+name: Build
 
 on:
   pull_request:
@@ -29,6 +29,8 @@ jobs:
     if: github.repository == 'go-atomci/atomci' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Repo
+        uses: actions/checkout@master
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
