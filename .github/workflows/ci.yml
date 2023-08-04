@@ -26,7 +26,7 @@ jobs:
           yarn run build
       
   image:
-    if: github.repository == 'go-atomci/atomci' && github.com.ref == 'refs/heads/master'
+    if: github.repository == 'go-atomci/atomci' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       -
