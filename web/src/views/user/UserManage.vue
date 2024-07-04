@@ -64,7 +64,7 @@
                 </el-button>
                 <el-button @click="$refs.commonDelete.doDelete('delUser',scope.row.user)"
                           type="text"
-                          size="small">{{$t('bm.other.delete')}}
+                          size="small" v-if="scope.row.user != 'admin'">{{$t('bm.other.delete')}}
                 </el-button>
               </template>
             </el-table-column>
