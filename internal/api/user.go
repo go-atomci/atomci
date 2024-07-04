@@ -19,6 +19,7 @@ package api
 import (
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/go-atomci/atomci/constant"
 	"github.com/go-atomci/atomci/internal/dao"
 	"github.com/go-atomci/atomci/internal/middleware/log"
 	"github.com/go-atomci/atomci/internal/models"
@@ -149,17 +150,18 @@ func (u *UserController) UpdateUser() {
 func (u *UserController) DeleteUser() {
 	userName := u.GetStringFromPath(":user")
 
-	user, err := dao.GetUser(userName)
-	if err != nil {
-		u.HandleInternalServerError(err.Error())
-		log.Log.Error("Delete user error: %s", err.Error())
-		return
-	}
-
-	if err := dao.DeleteUser(user); err != nil {
-		u.HandleInternalServerError(err.Error())
-		log.Log.Error("Delete user error: %s", err.Error())
-		return
+	if userName != constant.SystemAdminUser {
+		user, err := dao.GetUser(userName)
+		if err != nil {
+			u.HandleInternalServerError(err.Error())
+			log.Log.Error("Delete user error: %s", err.Error())
+			return
+		}
+		if err := dao.DeleteUser(user); err != nil {
+			u.HandleInternalServerError(err.Error())
+			log.Log.Error("Delete user error: %s", err.Error())
+			return
+		}
 	}
 	u.Data["json"] = NewResult(true, nil, "")
 	u.ServeJSON()
