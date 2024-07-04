@@ -200,6 +200,10 @@ __AtomCI__ 因你而变。
 
 可添加 微信![Wechat](https://img.shields.io/badge/-colynnliu-%2307C160?style=flat&logo=Wechat&logoColor=white) 邀请入群
 
+## 给我鼓励
+
+![Image](./wechat-pay.jpg)
+
 # 附录
 
 ## 配置说明
