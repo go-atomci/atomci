@@ -3,7 +3,7 @@ WORKDIR /root/app
 COPY package.json .
 
 ENV NPM_CONFIG_LOGLEVEL warn
-ENV NPM_CONFIG_REGISTRY https://registry.npm.taobao.org
+#ENV NPM_CONFIG_REGISTRY https://registry.npm.taobao.org
 
 RUN yarn install --loglevel notice
 
