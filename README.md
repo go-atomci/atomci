@@ -167,7 +167,7 @@ $ docker build .
 贡献代码
 ===============
 
-可查阅`AtomCI`的[项目计划](https://github.com/go-atomci/atomci/projects/1)，在对应issues中回复认领，或者直接提交PR，感谢你对AtomCI的贡献  
+可查阅`AtomCI`的[项目计划](https://github.com/go-atomci/atomci/issues)，在对应issues中回复认领，或者直接提交PR，感谢你对AtomCI的贡献  
 贡献包括但不限于以下方式：
 * [帮助文档](https://github.com/go-atomci/atomci-press)
 * Bug修复
