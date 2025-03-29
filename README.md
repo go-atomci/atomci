@@ -55,17 +55,6 @@ AtomCI 一款云原生CICD平台，致力于让中小企业快速落地Kubernete
 
 > 体验环境已下线，如有需要请参照文档自行部署，也可参看[视频链接](https://www.bilibili.com/video/BV18F411a7Rk/)
 
-[在线体验](http://106.15.124.155/)：
-  
-| 账号 | 密码 |  备注|
-| --- | --- | --- |
-| atomci | atomci123456 | 角色为developer, 已移除admin的体验权限 |
-
-_注_:
-
-* 体验帐户为授权用户，不显示“系统管理”的配置页面（且当前环境未配置k8s资源及jenkins资源）,
-* 想体验管理员角色可 __本地docker安装__ 完整体验,也可参看[视频链接](https://www.bilibili.com/video/BV18F411a7Rk/)
-
 ## 视频演示
 
 1. 概述及如何安装部署 [视频链接](https://www.bilibili.com/video/BV1qq4y1N7mZ/)
@@ -197,14 +186,6 @@ $ docker build .
 __AtomCI__ 因你而变。
 
 ---
-
-## AtomCI 用户交流群
-
-可添加 微信![Wechat](https://img.shields.io/badge/-colynnliu-%2307C160?style=flat&logo=Wechat&logoColor=white) 邀请入群
-
-## 给我鼓励
-
-![Image](./wechat-pay.jpg)
 
 # 附录
 
